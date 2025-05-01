@@ -21,7 +21,9 @@ All your conversation history and API keys are safely stored on your device.
   Claude 3.7 Sonnet
 - 💬 Multi-threaded conversation management (coming soon)
 - 🌙 Simple and clean user interface
-
+- 🗑️Deleting messages in a thread
+- 📝Edit message content
+- 
 ---
 
 ## Screenshots
