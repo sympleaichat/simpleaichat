@@ -41,7 +41,7 @@ All your conversation history and API keys are safely stored on your device.
 
 ## Usage
 
-1. Enter your API key for OpenAI or Gemini in the settings.
+1. Enter your API key in the settings.
 2. Start chatting!
 3. All conversations are stored securely on your device.
 
