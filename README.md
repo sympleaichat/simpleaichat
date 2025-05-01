@@ -29,7 +29,7 @@ Designed for Claude, ChatGPT, Gemini — with full message editing and local his
 
 1. Download the latest `.exe` from the [Releases](https://github.com/your-username/SimpleAIChat/releases) page.
 2. Run `SimpleAIChat.exe`.
-3. Set your API key in the settings (`config.ini` or in-app).
+3. Set your API key in the settings (`chatconf.ini` or in-app).
 
 ---
 
