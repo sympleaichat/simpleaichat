@@ -2,7 +2,7 @@
 
 SimpleAIChat is a lightweight, secure, and fully local AI chat client built with Flutter.
 
-It connects to OpenAI and Gemini APIs, allowing you to have flexible and private conversations without relying on external servers.  
+It connects to OpenAI and Gemini and Claude APIs, allowing you to have flexible and private conversations without relying on external servers.  
 All your conversation history and API keys are safely stored on your device.
 
 ---
@@ -64,5 +64,6 @@ This project is licensed under the [MIT License](LICENSE).
 
 SimpleAIChat is an independent, unofficial client.  
 It is not affiliated with or endorsed by OpenAI or Google.
-
 All API keys are used locally and are never transmitted to any third-party servers.
+The app provides an interface to third-party AI services (OpenAI, Gemini, etc.). Use is subject to the terms and conditions of each respective provider.
+The developer is not responsible for any charges, API fees, or data loss that may result from the use of the app.
