@@ -12,7 +12,13 @@ All your conversation history and API keys are safely stored on your device.
 - 📦 Lightweight and fast startup
 - 🔒 Fully local storage (no server-side data saving)
 - 🛡️ API keys managed and saved locally
-- 🧠 Supports both OpenAI and Gemini APIs
+- 🧠 Supports the following models
+  ChatGPT o4-mini
+  ChatGPT o4
+  ChatGPT 3.5-turbo
+  Gemini 1.5 Pro
+  Claude 3.5 Haiku
+  Claude 3.7 Sonnet
 - 💬 Multi-threaded conversation management (coming soon)
 - 🌙 Simple and clean user interface
 
