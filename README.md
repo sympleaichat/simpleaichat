@@ -25,9 +25,8 @@ All your conversation history and API keys are safely stored on your device.
 ---
 
 ## Screenshots
-
-*(Coming soon)*
-
+![image](screenshot/1.jpg)
+![image](screenshot/2.jpg)
 ---
 
 ## Installation
