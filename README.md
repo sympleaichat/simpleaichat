@@ -47,10 +47,11 @@ All your conversation history and API keys are safely stored on your device.
 
 ---
 
-## Supported APIs
+## Notice
 
-- OpenAI Chat Models (e.g., gpt-3.5-turbo)
-- Gemini Models (e.g., gemini-1.5-pro)
+This application allows local editing of conversation content. Please be aware that any modified messages sent to API services (such as OpenAI or Anthropic) are your sole responsibility.
+Abuse or violation of the API provider’s terms may result in service suspension or account ban.
+Use responsibly.
 
 ---
 
