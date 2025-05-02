@@ -18,8 +18,7 @@ Designed for Claude, ChatGPT, Gemini — with full message editing and local his
 
 ---
 
-## 📸 Screenshots
-
+### 🎯 Multi-LLM Support with Syntax Highlighting
 ![screenshot1](screenshot/1.jpg)  
 ![screenshot2](screenshot/2.jpg)
 
