@@ -20,7 +20,15 @@ Designed for Claude, ChatGPT, Gemini — with full message editing and local his
 
 ### 🎯 Multi-LLM Support with Syntax Highlighting
 ![screenshot1](screenshot/1.jpg)  
-![screenshot2](screenshot/2.jpg)
+
+### ✏️ Rename Threads with Ease
+![screenshot2](screenshot/2.jpg) 
+
+### 💡 You can delete or edit messages individually.
+![screenshot2](screenshot/3.jpg) 
+
+### 💡 Claude 3.7 Sonnet — RPG World Design Example
+![screenshot2](screenshot/4.jpg) 
 
 ---
 
