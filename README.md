@@ -7,14 +7,16 @@ Designed for Claude, ChatGPT, Gemini — with full message editing and local his
 
 ## ✨ Features
 
-- 🧠 **Claude-ready**: Works with Claude 3.5 Haiku / 3.7 Sonnet, ChatGPT, Gemini
-- 📝 **Edit and delete messages** freely in any conversation
-- 💾 **Everything is saved locally** — no data sent to third-party servers
-- 🔐 **API keys are never uploaded** (saved on your device only)
-- 🖥️ **Windows-native .exe app** — no Electron, no browser dependency
-- 🧵 **Multi-threaded chat interface** (thread switcher & history)
-- 🌙 Clean, minimal UI with dark mode
-- 📦 Lightweight build — launches instantly
+🧠 Claude-ready: Works with Claude 3.5 Haiku / 3.7 Sonnet, ChatGPT, Gemini  
+📝 Edit and delete messages freely in any conversation  
+💾 Everything is saved locally — no data sent to third-party servers  
+🔐 API keys are never uploaded (saved on your device only)  
+🖥️ Windows-native .exe app — no Electron, no browser dependency  
+🧵 Multi-threaded chat interface (thread switcher & history)  
+🌙 Clean, minimal UI with dark mode  
+📦 Lightweight build — launches instantly  
+🧠 Custom system prompt support via external file  
+🔁 Full chat history is sent with each request for better context understanding  
 
 ---
 
