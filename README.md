@@ -20,13 +20,18 @@ Designed for Claude, ChatGPT, Gemini — with full message editing and local his
 
 ---
 
+### 💡 There are many helpful features for chatting with LLMs
+Configuration information such as API keys, message history, and system prompts can be stored locally and edited.  
+Messages can be sent in either thread mode or single message mode.  
+Messages can be deleted or edited individually.  
+The character count of messages at the time of sending can be checked.  
+![screenshot2](screenshot/3.jpg) 
+
 ### 🎯 Multi-LLM Support with Syntax Highlighting
 ![screenshot1](screenshot/1.jpg)  
 
-### 💡 You can delete or edit messages individually.
-![screenshot2](screenshot/3.jpg) 
-
-
+### 🎯 Supports Claude, ChatGPT, and Gemini.
+![screenshot1](screenshot/2.jpg)  
 ---
 
 ## 🛠️ Installation
