@@ -224,7 +224,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 style: TextStyle(fontWeight: FontWeight.bold)),
           ),
           Container(
-            height: 300,
+            height: 400,
             child: Scrollbar(
               controller: _scrollController,
               thumbVisibility: true,
@@ -246,19 +246,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ],
                 ),
               ),
-            ),
-          ),
-          const SizedBox(height: 60),
-          Text(
-            appVersion,
-            style: TextStyle(
-              fontSize: 12,
-            ),
-          ),
-          Text(
-            copyrightNotice,
-            style: TextStyle(
-              fontSize: 12,
             ),
           ),
         ],

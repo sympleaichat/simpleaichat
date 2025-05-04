@@ -11,6 +11,7 @@ import '../models/thread.dart';
 import '../screens/settings_screen.dart';
 import '../utils/dart_highlight_code.dart';
 import 'dart:math';
+import '../utils/constants.dart';
 
 class ChatScreen extends StatefulWidget {
   final String? threadId;
@@ -657,13 +658,20 @@ class _ChatScreenState extends State<ChatScreen> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
+                      Opacity(
+                        opacity: 0.70,
+                        child: Text(appVersion,
+                            style: TextStyle(
+                              fontSize: 11,
+                            )),
+                      ),
                       Expanded(
                         child: Container(),
                       ),
                       Opacity(
-                        opacity: 0.75,
+                        opacity: 0.70,
                         child: Text(
-                            'Sent: ${ApiService.msgSendLength} characters | Received: ${ApiService.msgSendLength} characters',
+                            'Sent: ${ApiService.msgSendLength} characters | Received: ${ApiService.msgReceivedLength} characters',
                             style: TextStyle(
                               fontSize: 11,
                             )),
