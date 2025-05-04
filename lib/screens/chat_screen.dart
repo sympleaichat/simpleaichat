@@ -34,6 +34,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _editController = TextEditingController();
   bool _isLoading = false;
   bool _sendModeThread = true;
+  bool _isSidebarVisible = true;
   @override
   void initState() {
     super.initState();
@@ -253,8 +254,18 @@ class _ChatScreenState extends State<ChatScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(
+              _isSidebarVisible ? Icons.chevron_left : Icons.chevron_right),
+          tooltip: _isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar',
+          onPressed: () {
+            setState(() {
+              _isSidebarVisible = !_isSidebarVisible;
+            });
+          },
+        ),
         title: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
               'Thread: ${_getThreadTitle()}',
@@ -306,142 +317,146 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
       body: Row(
         children: [
-          Container(
-            width: 220,
-            color: Theme.of(context).brightness == Brightness.dark
-                ? Color(0xFF2a2d32)
-                : Colors.grey[200],
-            child: Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: _threads.length,
-                    itemBuilder: (context, index) {
-                      final thread = _threads[index];
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                        child: ListTile(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8)),
-                            contentPadding: EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 6),
-                            tileColor: thread.threadId == _activeThreadId
-                                ? Theme.of(context)
-                                    .primaryColor
-                                    .withOpacity(0.2)
-                                : thread.isUnread
-                                    ? Theme.of(context)
-                                        .primaryColor
-                                        .withOpacity(0.1)
-                                    : Colors.transparent,
-                            hoverColor:
-                                Theme.of(context).primaryColor.withOpacity(0.2),
-                            title: Text(
-                              thread.title,
-                              style: TextStyle(
-                                fontWeight: thread.threadId == _activeThreadId
-                                    ? FontWeight.bold
-                                    : FontWeight.w500,
-                                fontSize: 14,
-                                color: thread.threadId == _activeThreadId
-                                    ? Theme.of(context).primaryColor
-                                    : null,
+          if (_isSidebarVisible)
+            Container(
+              width: 220,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Color(0xFF2a2d32)
+                  : Colors.grey[200],
+              child: Column(
+                children: [
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: _threads.length,
+                      itemBuilder: (context, index) {
+                        final thread = _threads[index];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
+                          child: ListTile(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8)),
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 6),
+                              tileColor: thread.threadId == _activeThreadId
+                                  ? Theme.of(context)
+                                      .primaryColor
+                                      .withOpacity(0.2)
+                                  : thread.isUnread
+                                      ? Theme.of(context)
+                                          .primaryColor
+                                          .withOpacity(0.1)
+                                      : Colors.transparent,
+                              hoverColor: Theme.of(context)
+                                  .primaryColor
+                                  .withOpacity(0.2),
+                              title: Text(
+                                thread.title,
+                                style: TextStyle(
+                                  fontWeight: thread.threadId == _activeThreadId
+                                      ? FontWeight.bold
+                                      : FontWeight.w500,
+                                  fontSize: 14,
+                                  color: thread.threadId == _activeThreadId
+                                      ? Theme.of(context).primaryColor
+                                      : null,
+                                ),
                               ),
-                            ),
-                            trailing: PopupMenuButton<String>(
-                              onSelected: (value) async {
-                                if (value == 'rename') {
-                                  final newTitle =
-                                      await _showRenameDialog(thread.title);
-                                  if (newTitle != null &&
-                                      newTitle.trim().isNotEmpty) {
-                                    setState(() {
-                                      _threads[index] = Thread(
-                                        threadId: thread.threadId,
-                                        title: newTitle.trim(),
-                                        messages: thread.messages,
+                              trailing: PopupMenuButton<String>(
+                                onSelected: (value) async {
+                                  if (value == 'rename') {
+                                    final newTitle =
+                                        await _showRenameDialog(thread.title);
+                                    if (newTitle != null &&
+                                        newTitle.trim().isNotEmpty) {
+                                      setState(() {
+                                        _threads[index] = Thread(
+                                          threadId: thread.threadId,
+                                          title: newTitle.trim(),
+                                          messages: thread.messages,
+                                        );
+                                      });
+                                      await StorageService.saveAllThreads(
+                                          _threads);
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                            content: Text('Thread renamed')),
                                       );
-                                    });
-                                    await StorageService.saveAllThreads(
-                                        _threads);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('Thread renamed')),
-                                    );
+                                    }
+                                  } else if (value == 'delete') {
+                                    final confirm =
+                                        await _showConfirmDeleteDialog();
+                                    if (confirm == true) {
+                                      setState(() {
+                                        _threads.removeAt(index);
+                                      });
+                                      await StorageService.saveAllThreads(
+                                          _threads);
+                                      //   ScaffoldMessenger.of(context).showSnackBar(
+                                      //    SnackBar(content: Text('Thread deleted')),
+                                      //  );
+                                    }
                                   }
-                                } else if (value == 'delete') {
-                                  final confirm =
-                                      await _showConfirmDeleteDialog();
-                                  if (confirm == true) {
-                                    setState(() {
-                                      _threads.removeAt(index);
-                                    });
-                                    await StorageService.saveAllThreads(
-                                        _threads);
-                                    //   ScaffoldMessenger.of(context).showSnackBar(
-                                    //    SnackBar(content: Text('Thread deleted')),
-                                    //  );
-                                  }
-                                }
-                              },
-                              itemBuilder: (context) => [
-                                PopupMenuItem(
-                                    value: 'rename', child: Text('Rename')),
-                                PopupMenuItem(
-                                    value: 'delete', child: Text('Delete')),
-                              ],
-                            ),
-                            onTap: () {
-                              setState(() {
-                                _activeThreadId = thread.threadId;
-                              });
-                              _loadMessages();
-                            }),
-                      );
-                    },
-                  ),
-                ),
-                Divider(height: 1),
-                SwitchListTile(
-                  title: (!_sendModeThread)
-                      ? Text('Send Mode \nSingle',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13,
-                          ))
-                      : Text('Send Mode \nThread',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13,
-                          )),
-                  value: _sendModeThread,
-                  onChanged: _chngSendMode,
-                ),
-                Divider(height: 1),
-                Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: ElevatedButton.icon(
-                    onPressed: () async {
-                      await _createNewThread();
-                    },
-                    icon: Icon(
-                      Icons.add,
-                      color: const Color.fromARGB(183, 255, 255, 255),
+                                },
+                                itemBuilder: (context) => [
+                                  PopupMenuItem(
+                                      value: 'rename', child: Text('Rename')),
+                                  PopupMenuItem(
+                                      value: 'delete', child: Text('Delete')),
+                                ],
+                              ),
+                              onTap: () {
+                                setState(() {
+                                  _activeThreadId = thread.threadId;
+                                });
+                                _loadMessages();
+                              }),
+                        );
+                      },
                     ),
-                    label: Text('New Chat'),
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: Size(double.infinity, 40),
-                      backgroundColor: Theme.of(context).primaryColor,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                  ),
+                  Divider(height: 1),
+                  SwitchListTile(
+                    title: (!_sendModeThread)
+                        ? Text('Send Mode \nSingle',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                            ))
+                        : Text('Send Mode \nThread',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                            )),
+                    value: _sendModeThread,
+                    onChanged: _chngSendMode,
+                  ),
+                  Divider(height: 1),
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: ElevatedButton.icon(
+                      onPressed: () async {
+                        await _createNewThread();
+                      },
+                      icon: Icon(
+                        Icons.add,
+                        color: const Color.fromARGB(183, 255, 255, 255),
+                      ),
+                      label: Text('New Chat'),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: Size(double.infinity, 40),
+                        backgroundColor: Theme.of(context).primaryColor,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
           VerticalDivider(width: 1),
           Expanded(
             child: Column(
