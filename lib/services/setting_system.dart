@@ -32,6 +32,7 @@ class SystemService {
     }
     String content = await file.readAsString();
 
-    return _getCurrenttime() + content;
+    return content;
+    //       return _getCurrenttime() + content;
   }
 }
