@@ -1,4 +1,5 @@
 # SimpleAIChat
+[Repositories](https://github.com/sympleaichat/simpleaichat)
 
 A fast, ad-free, fully local AI chat client for Windows.  
 Designed for Claude, ChatGPT, Gemini — with full message editing and local history.
