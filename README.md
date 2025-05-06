@@ -35,6 +35,36 @@ The character count of messages at the time of sending can be checked.
 ![screenshot1](screenshot/2.jpg)  
 ---
 
+## Why SimpleAIChat?
+
+Most LLMs today — whether OpenAI's GPT, Anthropic's Claude, or Google's Gemini — are accessed through hosted web interfaces that abstract away the details of message formatting, memory control, and backend behavior.
+
+That’s convenient — but not always ideal.
+
+**SimpleAIChat** is a lightweight, local-first chat client for people who want more control, transparency, or minimalism in how they interact with large language models. It supports multiple backends and aims to provide a clean, editable space to experiment, prototype, or just talk to your favorite models on your own terms.
+
+## Design Philosophy
+
+- Treat LLMs as stateless engines by default — leave memory and personalization to external tools.
+- Minimize UI friction: no login, no telemetry, no branding — just your models and your prompts.
+- Make it easy to extend, customize, and connect to other tools.
+- Support OpenAI, Claude, and Gemini backends with a unified, consistent interface.
+
+## Roadmap / Ideas
+
+- External memory (e.g. user profiles, emotional context, long-term preferences)
+- Prompt scaffolding and message structuring tools
+- Message history visualization and editing
+
+## Contributing / Feedback
+
+This project started as a personal tool to get closer to how LLMs really behave — without the UI layers getting in the way.
+
+If you’ve ever wished for a simpler, more direct way to interact with your preferred models, give it a try.  
+Pull requests and ideas are welcome!
+
+
+
 ## 🛠️ Installation
 
 1. Download the latest `.exe` from the [Releases](https://github.com/your-username/SimpleAIChat/releases) page.
