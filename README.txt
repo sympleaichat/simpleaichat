@@ -1,9 +1,9 @@
 ==============================
-SympleAIChat - Thank you for installing!
+SimpleAIChat - Thank you for installing!
 ==============================
 
 ■ Overview
-SympleAIChat is a lightweight and secure AI chat client built with Flutter.
+SimpleAIChat is a lightweight and secure AI chat client built with Flutter.
 It allows for flexible and private conversations by connecting directly to OpenAI and Gemini APIs,
 without relying on external servers. All conversation history and API keys are securely stored on your device.
 
@@ -81,7 +81,7 @@ Claude 3.7 Sonnet
 ■ Support & Contact
 For questions, suggestions, or bug reports, contact us at:
 - Email: sympleaichat125@gmail.com
-- GitHub: https://github.com/sympleaichat
+- GitHub: https://github.com/sympleaichat/simpleaichat
 
 ■ License
 This software is licensed under the MIT License.
