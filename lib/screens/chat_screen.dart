@@ -89,15 +89,15 @@ class _ChatScreenState extends State<ChatScreen> {
     await _loadMessages();
   }
 
-  Future<void> _sendMessage(String content) async {
+  Future<void> _sendMessage(String content, bool web) async {
     if (_sendModeThread) {
-      await _sendThreadMessage(content);
+      await _sendThreadMessage(content, web);
     } else {
-      await _sendSingleMessage(content);
+      await _sendSingleMessage(content, web);
     }
   }
 
-  Future<void> _sendSingleMessage(String content) async {
+  Future<void> _sendSingleMessage(String content, bool web) async {
     if (content.trim().isEmpty) return;
 
     final userMessage = Message(
@@ -113,8 +113,12 @@ class _ChatScreenState extends State<ChatScreen> {
 
     await StorageService.saveMessage(_activeThreadId, userMessage);
     _controller.clear();
-
-    final assistantReply = await ApiService.sendMessage(content);
+    String assistantReply = '';
+    if (web) {
+      assistantReply = await ApiService.sendMessageWeb(content);
+    } else {
+      assistantReply = await ApiService.sendMessage(content);
+    }
 
     final assistantMessage = Message(
       messageId: _generateRandomId(),
@@ -134,7 +138,7 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
-  Future<void> _sendThreadMessage(String content) async {
+  Future<void> _sendThreadMessage(String content, bool web) async {
     if (content.trim().isEmpty) return;
 
     final userMessage = Message(
@@ -151,9 +155,12 @@ class _ChatScreenState extends State<ChatScreen> {
     _controller.clear();
 
     final allMessages = [..._messages];
-
-    final assistantReply = await ApiService.sendMessageWithHistory(allMessages);
-
+    String assistantReply = '';
+    if (web) {
+      assistantReply = await ApiService.sendMessageWithHistoryWeb(allMessages);
+    } else {
+      assistantReply = await ApiService.sendMessageWithHistory(allMessages);
+    }
     final isError = assistantReply.startsWith("Sorry") ||
         assistantReply.contains("Error") ||
         assistantReply.contains("communication") ||
@@ -625,6 +632,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   padding: const EdgeInsets.only(
                       top: 12, right: 12, bottom: 4, left: 12),
                   child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
                         child: TextField(
@@ -645,10 +653,21 @@ class _ChatScreenState extends State<ChatScreen> {
                       const SizedBox(width: 8),
                       IconButton(
                         icon: Icon(Icons.send),
-                        onPressed: () => _sendMessage(_controller.text),
+                        onPressed: () => _sendMessage(_controller.text, false),
                         tooltip: 'Send',
                         color: Theme.of(context).primaryColor,
                       ),
+                      if (ApiService.currentEngine == AIEngine.claude35 ||
+                          ApiService.currentEngine == AIEngine.claude37)
+                        const SizedBox(width: 8),
+                      if (ApiService.currentEngine == AIEngine.claude35 ||
+                          ApiService.currentEngine == AIEngine.claude37)
+                        IconButton(
+                          icon: Icon(Icons.language),
+                          onPressed: () => _sendMessage(_controller.text, true),
+                          tooltip: 'Web',
+                          color: Theme.of(context).primaryColor,
+                        ),
                     ],
                   ),
                 ),

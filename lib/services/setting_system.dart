@@ -12,7 +12,7 @@ class SystemService {
     String customFormattedDate =
         DateFormat('MMM dd, yyyy').format(DateTime.now());
 
-    return 'It is now ${customFormattedDate}. ';
+    return 'I would like to present the current date in the format \'${customFormattedDate}\' within the system prompt. This is intended solely to indicate the current time, and I would like the recognition of dates from the training data to remain unchanged.';
   }
 
   static Future<File> _getIniFile() async {

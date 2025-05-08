@@ -16,6 +16,7 @@ class DartHighlightedCode extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: SelectableText.rich(
+        maxLines: null,
         TextSpan(children: spans),
         style: const TextStyle(
           fontFamily: 'monospace',

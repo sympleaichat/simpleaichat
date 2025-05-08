@@ -82,9 +82,9 @@ class ApiService {
     } else if (currentEngine == AIEngine.gemini) {
       return _sendToGemini(userInput);
     } else if (currentEngine == AIEngine.claude35) {
-      return _sendToClaude35(userInput);
+      return _sendToClaude('claude-3-5-haiku-20241022', userInput);
     } else if (currentEngine == AIEngine.claude37) {
-      return _sendToClaude37(userInput);
+      return _sendToClaude('claude-3-7-sonnet-20250219', userInput);
     } else {
       return 'This model does not support history yet.';
     }
@@ -103,6 +103,28 @@ class ApiService {
       return _sendToClaudeWithHistory('claude-3-5-haiku-20241022', messages);
     } else if (currentEngine == AIEngine.claude37) {
       return _sendToClaudeWithHistory('claude-3-7-sonnet-20250219', messages);
+    } else {
+      return 'This model does not support history yet.';
+    }
+  }
+
+  static Future<String> sendMessageWeb(String userInput) async {
+    if (currentEngine == AIEngine.claude35) {
+      return _sendToClaudeWeb('claude-3-5-haiku-20241022', userInput);
+    } else if (currentEngine == AIEngine.claude37) {
+      return _sendToClaudeWeb('claude-3-7-sonnet-20250219', userInput);
+    } else {
+      return 'This model does not support history yet.';
+    }
+  }
+
+  static Future<String> sendMessageWithHistoryWeb(
+      List<Message> messages) async {
+    if (currentEngine == AIEngine.claude35) {
+      return _sendToClaudeWithHistoryWeb('claude-3-5-haiku-20241022', messages);
+    } else if (currentEngine == AIEngine.claude37) {
+      return _sendToClaudeWithHistoryWeb(
+          'claude-3-7-sonnet-20250219', messages);
     } else {
       return 'This model does not support history yet.';
     }
@@ -204,7 +226,7 @@ class ApiService {
       final systemPrompt = await SystemService.loadSystem();
 
       final chatMessages = [
-        {"role": "user", "content": systemPrompt},
+        {'role': 'user', 'content': systemPrompt},
         ...messages.map((m) => {"role": m.role, "content": m.content}).toList(),
       ];
 
@@ -234,6 +256,100 @@ class ApiService {
           return content.first['text'] ?? '(no response)';
         }
         return '(empty response)';
+      } else {
+        print('Claude API error: ${response.body}');
+        return '[Error ${response.statusCode}]: ${response.body}';
+      }
+    } catch (e) {
+      print('Claude API error: $e');
+      return 'Claude Error occurred.';
+    }
+  }
+
+  static Future<String> _sendToClaudeWithHistoryWeb(
+      String model, List<Message> messages) async {
+    msgSendLength = 0;
+    msgReceivedLength = 0;
+    try {
+      final apiKey = await SettingService.loadApiKey(currentEngine);
+      final systemPrompt = await SystemService.loadSystem();
+
+      final chatMessages = [
+        {'role': 'user', 'content': systemPrompt},
+        ...messages.map((m) => {"role": m.role, "content": m.content}).toList(),
+      ];
+
+      final sendJson = jsonEncode({
+        'model': model,
+        'messages': chatMessages,
+        'max_tokens': 1000,
+        'temperature': 0.7,
+        "tools": [
+          {
+            "type": "web_search_20250305",
+            "name": "web_search",
+            "max_uses": 5,
+          }
+        ]
+      });
+      msgSendLength = sendJson.length;
+
+      final response = await http.post(
+        Uri.parse('$claudeUrl?key=$apiKey'),
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+        },
+        body: sendJson,
+      );
+
+      if (response.statusCode == 200) {
+        final json = jsonDecode(utf8.decode(response.bodyBytes));
+        msgReceivedLength = response.bodyBytes.length;
+
+        // Handle the new response structurenew response structure
+        if (json.containsKey('content') && json['content'] is List) {
+          final contentList = json['content'] as List;
+          final StringBuilder responseText = StringBuilder();
+
+          for (var item in contentList) {
+            if (item['type'] == 'text') {
+              responseText.write(item['text']);
+
+              // Handle citations if presentif present
+              if (item.containsKey('citations') && item['citations'] is List) {
+                // Optional: Format citations as you prefer
+                // This example appends footnote-style references
+                final citations = item['citations'] as List;
+                if (citations.isNotEmpty) {
+                  responseText.write(' [');
+                  for (int i = 0; i < citations.length; i++) {
+                    if (i > 0) responseText.write(', ');
+                    final citation = citations[i];
+                    if (citation.containsKey('url') &&
+                        citation.containsKey('title')) {
+                      responseText.write('${citation['title']}');
+                    }
+                  }
+                  responseText.write(']');
+                }
+              }
+              responseText.write('\n');
+            } else if (item['type'] == 'web_search_tool_result') {
+              // Optionally include information about the search
+              responseText.write('\n[Web search performed]\n');
+            } else if (item['type'] == 'server_tool_use' &&
+                item['name'] == 'web_search') {
+              // Optionally include the search query
+              responseText
+                  .write('\n[Searching for: ${item['input']['query']}]\n');
+            }
+          }
+
+          return responseText.toString().trim();
+        }
+        return '(empty or invalid response structure)';
       } else {
         print('Claude API error: ${response.body}');
         return '[Error ${response.statusCode}]: ${response.body}';
@@ -408,12 +524,11 @@ class ApiService {
     }
   }
 
-  static Future<String> _sendToClaude35(String userInput) async {
+  static Future<String> _sendToClaude(String model, String userInput) async {
     msgSendLength = 0;
     msgReceivedLength = 0;
     try {
       String systemPrompt = await SystemService.loadSystem();
-      const model = 'claude-3-5-haiku-20241022';
       final apiKey = await SettingService.loadApiKey(AIEngine.claude35);
 
       final sendJson = jsonEncode({
@@ -453,12 +568,11 @@ class ApiService {
     }
   }
 
-  static Future<String> _sendToClaude37(String userInput) async {
+  static Future<String> _sendToClaudeWeb(String model, String userInput) async {
     msgSendLength = 0;
     msgReceivedLength = 0;
     try {
       String systemPrompt = await SystemService.loadSystem();
-      const model = 'claude-3-7-sonnet-20250219';
       final apiKey = await SettingService.loadApiKey(AIEngine.claude35);
 
       final sendJson = jsonEncode({
@@ -469,6 +583,13 @@ class ApiService {
         ],
         'max_tokens': 1000,
         'temperature': 0.7,
+        "tools": [
+          {
+            "type": "web_search_20250305",
+            "name": "web_search",
+            "max_uses": 5,
+          }
+        ],
       });
       msgSendLength = sendJson.length;
       final response = await http.post(
@@ -484,12 +605,51 @@ class ApiService {
       if (response.statusCode == 200) {
         final json = jsonDecode(utf8.decode(response.bodyBytes));
         msgReceivedLength = response.bodyBytes.length;
-        final content = json['content'];
-        if (content is List && content.isNotEmpty) {
-          return content.first['text'] ?? '(no response)';
+
+        // Handle the new response structurenew response structure
+        if (json.containsKey('content') && json['content'] is List) {
+          final contentList = json['content'] as List;
+          final StringBuilder responseText = StringBuilder();
+
+          for (var item in contentList) {
+            if (item['type'] == 'text') {
+              responseText.write(item['text']);
+
+              // Handle citations if presentif present
+              if (item.containsKey('citations') && item['citations'] is List) {
+                // Optional: Format citations as you prefer
+                // This example appends footnote-style references
+                final citations = item['citations'] as List;
+                if (citations.isNotEmpty) {
+                  responseText.write(' [');
+                  for (int i = 0; i < citations.length; i++) {
+                    if (i > 0) responseText.write(', ');
+                    final citation = citations[i];
+                    if (citation.containsKey('url') &&
+                        citation.containsKey('title')) {
+                      responseText.write('${citation['title']}');
+                    }
+                  }
+                  responseText.write(']');
+                }
+              }
+              responseText.write('\n');
+            } else if (item['type'] == 'web_search_tool_result') {
+              // Optionally include information about the search
+              responseText.write('\n[Web search performed]\n');
+            } else if (item['type'] == 'server_tool_use' &&
+                item['name'] == 'web_search') {
+              // Optionally include the search query
+              responseText
+                  .write('\n[Searching for: ${item['input']['query']}]\n');
+            }
+          }
+
+          return responseText.toString().trim();
         }
-        return '(empty response)';
+        return '(empty or invalid response structure)';
       } else {
+        print('Claude API error: ${response.body}');
         return '[Error ${response.statusCode}]: ${response.body}';
       }
     } catch (e) {
@@ -534,5 +694,30 @@ class ApiService {
       print('Claude API error: $e');
       return 'Claude Error occurred.';
     }
+  }
+}
+
+class StringBuilder {
+  final StringBuffer _buffer = StringBuffer();
+
+  void write(String? text) {
+    if (text != null) {
+      _buffer.write(text);
+    }
+  }
+
+  void writeln(String? text) {
+    if (text != null) {
+      _buffer.writeln(text);
+    }
+  }
+
+  @override
+  String toString() {
+    return _buffer.toString();
+  }
+
+  void clear() {
+    _buffer.clear();
   }
 }
