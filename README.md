@@ -17,7 +17,7 @@ That’s convenient — but not always ideal.
 
 ## Design Philosophy
 
-- Treat LLMs as stateless engines by default — leave memory and personalization to external tools.
+- LLM is treated as a stateless engine by default, with all memory and personalization stored and editable on the PC.
 - Minimize UI friction: no login, no telemetry, no branding — just your models and your prompts.
 - Make it easy to extend, customize, and connect to other tools.
 - Support OpenAI, Claude, and Gemini backends with a unified, consistent interface.
