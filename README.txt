@@ -4,7 +4,7 @@ SimpleAIChat - Thank you for installing!
 
 ■ Overview
 SimpleAIChat is a lightweight and secure AI chat client built with Flutter.
-It allows for flexible and private conversations by connecting directly to OpenAI and Gemini APIs,
+It allows for flexible and private conversations by connecting directly to AI APIs,
 without relying on external servers. All conversation history and API keys are securely stored on your device.
 
 ■ How to Use
@@ -40,12 +40,15 @@ dark_mode = false
 | Key                 | Description                                   | Example                        |
 |---------------------|-----------------------------------------------|--------------------------------|
 | engine              | AI engine to use (chatgpt or gemini)          | engine = chatgpt               |
+| api_key_chatgpt41   | API key for ChatGPT-4.1                       | api_key_chatgpt41  = sk-xxxxxx |
 | api_key_chatgpt4om  | API key for ChatGPT-4 Omni                    | api_key_chatgpt4om = sk-xxxxxx |
 | api_key_chatgpt4o   | API key for ChatGPT-4 O                       | api_key_chatgpt4o = sk-xxxxxx  |
 | api_key_chatgpt35t  | API key for ChatGPT-3.5turbo                  | api_key_chatgpt35t = sk-xxxxxx |
 | api_key_gemini      | API key for Gemini                            | api_key_gemini = gemini-xxxxxx |
 | api_key_claude35    | API key for Claude 3.5 Haiku                  | api_key_claude35 = sk-xxxxxx   |
 | api_key_claude37    | API key for Claude 3.7 Sonnet                 | api_key_claude37 = sk-xxxxxx   |
+| api_key_grok3       | API key for Grok 3                            | api_key_grok3 = xai-xxxx       |
+| api_key_grok3mini   | API key for Grok 3 Mini Sonnet                | api_key_grok3mini = xai-xxxxx  |
 | dark_mode           | UI theme: true for dark mode, false for light | dark_mode = true               |
 
 ⚠ Important Notes
@@ -67,12 +70,15 @@ dark_mode = false
 - Restart the app after editing `chatconf.ini` to apply changes.
 
 ■ Compatible models
+ChatGPT-4.1
 ChatGPT o4-mini
 ChatGPT o4
 ChatGPT 3.5-turbo
 Gemini 1.5 Pro
 Claude 3.5 Haiku
 Claude 3.7 Sonnet
+Grok 3
+Grok 3 Mini
 
 ■ Requirements
 - Internet connection is required for AI interaction.
