@@ -103,6 +103,16 @@ It is **not affiliated with OpenAI, Google, or Anthropic**.
 All API keys are stored locally and never shared.  
 Use is subject to each provider’s terms of service.
 
+## ✨ Link
+anthropic https://www.anthropic.com/api
+
+OpenAI https://openai.com/api/
+
+gemini https://ai.google.dev/gemini-api/docs
+
+Grok https://x.ai/api
+
+
 ---
 
 SimpleAIChat is built for those who want full control over their AI chat experience —  
