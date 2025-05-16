@@ -10,7 +10,7 @@ import '../models/message.dart';
 import '../models/thread.dart';
 import '../screens/settings_screen.dart';
 import '../utils/dart_highlight_code.dart';
-import 'dart:math';
+
 import '../utils/constants.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -39,7 +39,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    _activeThreadId = widget.threadId ?? _generateRandomId();
+    _activeThreadId = widget.threadId ?? StorageService.generateRandomId();
     _loadThreads();
     _loadMessages();
 
@@ -70,16 +70,23 @@ class _ChatScreenState extends State<ChatScreen> {
 
   // Create a new thread and navigate to the chat screen
   Future<void> _createNewThread() async {
-    final newThreadId = _generateRandomId();
+    final newThreadId = StorageService.generateRandomId();
 
-    await StorageService.saveMessage(
-      newThreadId,
-      Message(
-        messageId: _generateRandomId(),
-        role: 'user',
-        content: 'New conversation started.',
-      ),
-    );
+    await StorageService.createNewThread(newThreadId);
+
+    await _loadThreads();
+
+    setState(() {
+      _activeThreadId = newThreadId;
+    });
+    await _loadMessages();
+  }
+
+  // Create a new thread and navigate to the chat screen
+  Future<void> _copyThread(String threadId) async {
+    final newThreadId = StorageService.generateRandomId();
+
+    await StorageService.copyThread(threadId, newThreadId);
 
     await _loadThreads();
 
@@ -101,7 +108,7 @@ class _ChatScreenState extends State<ChatScreen> {
     if (content.trim().isEmpty) return;
 
     final userMessage = Message(
-      messageId: _generateRandomId(),
+      messageId: StorageService.generateRandomId(),
       role: 'user',
       content: content.trim(),
     );
@@ -121,7 +128,7 @@ class _ChatScreenState extends State<ChatScreen> {
     }
 
     final assistantMessage = Message(
-      messageId: _generateRandomId(),
+      messageId: StorageService.generateRandomId(),
       role: 'assistant',
       content: assistantReply,
     );
@@ -142,7 +149,7 @@ class _ChatScreenState extends State<ChatScreen> {
     if (content.trim().isEmpty) return;
 
     final userMessage = Message(
-      messageId: _generateRandomId(),
+      messageId: StorageService.generateRandomId(),
       role: 'user',
       content: content.trim(),
     );
@@ -180,7 +187,7 @@ class _ChatScreenState extends State<ChatScreen> {
     }
 
     final assistantMessage = Message(
-      messageId: _generateRandomId(),
+      messageId: StorageService.generateRandomId(),
       role: 'assistant',
       content: assistantReply,
     );
@@ -200,13 +207,6 @@ class _ChatScreenState extends State<ChatScreen> {
     setState(() {
       _sendModeThread = value;
     });
-  }
-
-  String _generateRandomId() {
-    final random = Random();
-    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-    return List.generate(8, (index) => chars[random.nextInt(chars.length)])
-        .join();
   }
 
   void _backupData() {
@@ -386,11 +386,11 @@ class _ChatScreenState extends State<ChatScreen> {
                                       });
                                       await StorageService.saveAllThreads(
                                           _threads);
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                            content: Text('Thread renamed')),
-                                      );
+                                      //  ScaffoldMessenger.of(context)
+                                      //      .showSnackBar(
+                                      //  SnackBar(
+                                      //       content: Text('Thread renamed')),
+                                      // );
                                     }
                                   } else if (value == 'delete') {
                                     final confirm =
@@ -405,6 +405,9 @@ class _ChatScreenState extends State<ChatScreen> {
                                       //    SnackBar(content: Text('Thread deleted')),
                                       //  );
                                     }
+                                  } else if (value == 'copy') {
+                                    await _copyThread(thread.threadId);
+                                    setState(() {});
                                   }
                                 },
                                 itemBuilder: (context) => [
@@ -412,6 +415,8 @@ class _ChatScreenState extends State<ChatScreen> {
                                       value: 'rename', child: Text('Rename')),
                                   PopupMenuItem(
                                       value: 'delete', child: Text('Delete')),
+                                  PopupMenuItem(
+                                      value: 'copy', child: Text('copy')),
                                 ],
                               ),
                               onTap: () {
@@ -657,10 +662,12 @@ class _ChatScreenState extends State<ChatScreen> {
                         tooltip: 'Send',
                         color: Theme.of(context).primaryColor,
                       ),
-                      if (ApiService.currentEngine == AIEngine.claude35 ||
+                      if (ApiService.currentEngine == AIEngine.chatgpt_4o ||
+                          ApiService.currentEngine == AIEngine.claude35 ||
                           ApiService.currentEngine == AIEngine.claude37)
                         const SizedBox(width: 8),
-                      if (ApiService.currentEngine == AIEngine.claude35 ||
+                      if (ApiService.currentEngine == AIEngine.chatgpt_4o ||
+                          ApiService.currentEngine == AIEngine.claude35 ||
                           ApiService.currentEngine == AIEngine.claude37)
                         IconButton(
                           icon: Icon(Icons.language),
@@ -690,7 +697,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       Opacity(
                         opacity: 0.70,
                         child: Text(
-                            'Sent: ${ApiService.msgSendLength} characters | Received: ${ApiService.msgReceivedLength} characters',
+                            'Sent: ${ApiService.msgSendLength} characters | Received: ${ApiService.msgReceivedLength} characters | model: ${ApiService.msgModel}',
                             style: TextStyle(
                               fontSize: 11,
                             )),

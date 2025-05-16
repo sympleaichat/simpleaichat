@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'setting_service.dart';
 import '../services/setting_system.dart';
 import '../models/message.dart';
+import '../utils/logger.dart';
 
 enum AIEngine {
   chatgpt_4omini,
@@ -38,6 +39,7 @@ class ApiService {
   static const String STR_claude37 = 'claude37';
   static int msgSendLength = 0;
   static int msgReceivedLength = 0;
+  static String msgModel = '';
   static String getModelName(AIEngine engine) {
     switch (engine) {
       case AIEngine.chatgpt_4omini:
@@ -74,11 +76,11 @@ class ApiService {
 
   static Future<String> sendMessage(String userInput) async {
     if (currentEngine == AIEngine.chatgpt_4omini) {
-      return _sendToChatGPT_4omini(userInput);
+      return _sendToChatGPT("gpt-4o", userInput);
     } else if (currentEngine == AIEngine.chatgpt_4o) {
-      return _sendToChatGPT_4o(userInput);
+      return _sendToChatGPT("gpt-4o-mini", userInput);
     } else if (currentEngine == AIEngine.chatgpt_35turbo) {
-      return _sendToChatGPT_35turbo(userInput);
+      return _sendToChatGPT("gpt-3.5-turbo", userInput);
     } else if (currentEngine == AIEngine.gemini) {
       return _sendToGemini(userInput);
     } else if (currentEngine == AIEngine.claude35) {
@@ -120,7 +122,13 @@ class ApiService {
 
   static Future<String> sendMessageWithHistoryWeb(
       List<Message> messages) async {
-    if (currentEngine == AIEngine.claude35) {
+    if (currentEngine == AIEngine.chatgpt_4omini) {
+      return _sendToChatGPTWithHistoryWeb("gpt-4o-mini", messages);
+    } else if (currentEngine == AIEngine.chatgpt_4o) {
+      return _sendToChatGPTWithHistoryWeb("gpt-4o", messages);
+    } else if (currentEngine == AIEngine.chatgpt_35turbo) {
+      return _sendToChatGPTWithHistoryWeb("gpt-3.5-turbo", messages);
+    } else if (currentEngine == AIEngine.claude35) {
       return _sendToClaudeWithHistoryWeb('claude-3-5-haiku-20241022', messages);
     } else if (currentEngine == AIEngine.claude37) {
       return _sendToClaudeWithHistoryWeb(
@@ -134,6 +142,7 @@ class ApiService {
       String model, List<Message> messages) async {
     msgSendLength = 0;
     msgReceivedLength = 0;
+    msgModel = '';
     try {
       String systemPrompt = await SystemService.loadSystem();
       final apiKey = await SettingService.loadApiKey(currentEngine);
@@ -147,8 +156,9 @@ class ApiService {
         "messages": chatMessages,
         "temperature": 0.7,
       });
+      msgModel = model;
       msgSendLength = sendJson.length;
-
+      Logger.log(sendJson);
       final response = await http.post(
         Uri.parse(openAIUrl),
         headers: {
@@ -173,9 +183,131 @@ class ApiService {
     }
   }
 
+  static Future<String> _sendToChatGPTWithHistoryWeb(
+      String model, List<Message> messages) async {
+    msgSendLength = 0;
+    msgReceivedLength = 0;
+    msgModel = '';
+    try {
+      String systemPrompt = await SystemService.loadSystem();
+      final apiKey = await SettingService.loadApiKey(currentEngine);
+
+      final chatMessages = [
+        {'role': 'system', 'content': systemPrompt},
+        ...messages.map((m) => {'role': m.role, 'content': m.content}).toList(),
+      ];
+      final sendJson = jsonEncode({
+        "model": model,
+/*
+        "tools": [
+          {"type": "web_search_preview"}
+        ],
+        */
+        "tools": [
+          {
+            "type": "function",
+            "function": {
+              "name": "web_search_preview",
+              "description": "Provides a preview of web search results",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "query": {"type": "string"}
+                },
+                "required": ["query"]
+              }
+            }
+          }
+        ],
+        "messages": chatMessages,
+        "temperature": 0.7,
+      });
+      msgModel = model;
+      msgSendLength = sendJson.length;
+
+      final response = await http.post(
+        Uri.parse(openAIUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $apiKey',
+        },
+        body: sendJson,
+      );
+
+      if (response.statusCode == 200) {
+        Logger.log(response.body);
+        final data = jsonDecode(utf8.decode(response.bodyBytes));
+        msgReceivedLength = response.bodyBytes.length;
+        final dynamic decodedJson = jsonDecode(utf8.decode(response.bodyBytes));
+        // final reply = data['choices'][0]['message']['content'];
+        // return reply.trim();
+
+        if (json is List) {
+          final StringBuffer responseText = StringBuffer();
+
+          for (var item in decodedJson) {
+            if (item['type'] == 'message' && item['status'] == 'completed') {
+              final contentList = item['content'] as List;
+
+              for (var contentItem in contentList) {
+                if (contentItem['type'] == 'output_text') {
+                  responseText.write(contentItem['text']);
+
+                  if (contentItem.containsKey('annotations') &&
+                      contentItem['annotations'] is List) {
+                    final annotations = contentItem['annotations'] as List;
+                    if (annotations.isNotEmpty) {
+                      responseText.write(' [');
+                      for (int i = 0; i < annotations.length; i++) {
+                        if (i > 0) responseText.write(', ');
+                        final annotation = annotations[i];
+                        if (annotation['type'] == 'url_citation' &&
+                            annotation.containsKey('url') &&
+                            annotation.containsKey('title')) {
+                          responseText.write('${annotation['title']}');
+                        }
+                      }
+                      responseText.write(']');
+                    }
+                  }
+                  responseText.write('\n');
+                }
+              }
+            } else if (item['type'] == 'web_search_call' &&
+                item['status'] == 'completed') {
+              responseText.write('\n[Web search completed]\n');
+            }
+          }
+
+          return responseText.toString().trim();
+        }
+
+        return '(empty or invalid response structure)';
+      } else {
+        print('ChatGPT API error: ${response.body}');
+        return 'Sorry, ChatGPT did not respond.';
+      }
+    } catch (e) {
+      print('ChatGPT API error: $e');
+      return 'ChatGPT Error occurred.';
+    }
+  }
+
+  String processSearchResults(dynamic results) {
+    // ここで結果を整形し、ユーザーに表示するための文字列を作成
+    final StringBuffer responseText = StringBuffer();
+    for (var item in results['items']) {
+      responseText.writeln(item['title']);
+      responseText.writeln(item['link']);
+      responseText.writeln();
+    }
+    return responseText.toString().trim();
+  }
+
   static Future<String> _sendToGeminiWithHistory(List<Message> messages) async {
     msgSendLength = 0;
     msgReceivedLength = 0;
+    msgModel = '';
     try {
       final apiKey = await SettingService.loadApiKey(AIEngine.gemini);
       final systemPrompt = await SystemService.loadSystem();
@@ -192,7 +324,10 @@ class ApiService {
           }
         ]
       });
+
+      Logger.log(sendJson);
       msgSendLength = sendJson.length;
+      msgModel = 'Gemini';
       final response = await http.post(
         Uri.parse('$geminiUrl?key=$apiKey'),
         headers: {
@@ -220,6 +355,7 @@ class ApiService {
       String model, List<Message> messages) async {
     msgSendLength = 0;
     msgReceivedLength = 0;
+    msgModel = '';
     try {
       final apiKey =
           await SettingService.loadApiKey(AIEngine.claude35); // or claude37
@@ -236,8 +372,9 @@ class ApiService {
         'max_tokens': 1000,
         'temperature': 0.7,
       });
+      Logger.log(sendJson);
       msgSendLength = sendJson.length;
-
+      msgModel = model;
       final response = await http.post(
         Uri.parse('$claudeUrl?key=$apiKey'),
         headers: {
@@ -250,6 +387,7 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final json = jsonDecode(utf8.decode(response.bodyBytes));
+        print('${response.body}');
         msgReceivedLength = response.bodyBytes.length;
         final content = json['content'];
         if (content is List && content.isNotEmpty) {
@@ -270,6 +408,7 @@ class ApiService {
       String model, List<Message> messages) async {
     msgSendLength = 0;
     msgReceivedLength = 0;
+    msgModel = '';
     try {
       final apiKey = await SettingService.loadApiKey(currentEngine);
       final systemPrompt = await SystemService.loadSystem();
@@ -292,8 +431,9 @@ class ApiService {
           }
         ]
       });
+      Logger.log(sendJson);
       msgSendLength = sendJson.length;
-
+      msgModel = model;
       final response = await http.post(
         Uri.parse('$claudeUrl?key=$apiKey'),
         headers: {
@@ -360,10 +500,11 @@ class ApiService {
     }
   }
 
-  static Future<String> _sendToChatGPT_4omini(String userInput) async {
+  static Future<String> _sendToChatGPT(String model, String userInput) async {
     msgSendLength = 0;
     msgReceivedLength = 0;
-    final model = "gpt-4o-mini";
+    msgModel = '';
+
     try {
       String systemPrompt = await SystemService.loadSystem();
       final apiKey = await SettingService.loadApiKey(AIEngine.chatgpt_4omini);
@@ -376,89 +517,9 @@ class ApiService {
         ],
         "temperature": 0.7,
       });
+      Logger.log(sendJson);
       msgSendLength = sendJson.length;
-      final response = await http.post(
-        Uri.parse(openAIUrl),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $apiKey',
-        },
-        body: sendJson,
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(utf8.decode(response.bodyBytes));
-        msgReceivedLength = response.bodyBytes.length;
-        final reply = data['choices'][0]['message']['content'];
-        return reply.trim();
-      } else {
-        print('ChatGPT API error: ${response.body}');
-        return 'Sorry, ChatGPT did not respond.';
-      }
-    } catch (e) {
-      print('ChatGPT API error: $e');
-      return 'ChatGPT Error occurred.';
-    }
-  }
-
-  static Future<String> _sendToChatGPT_4o(String userInput) async {
-    msgSendLength = 0;
-    msgReceivedLength = 0;
-    final model = "gpt-4o";
-    try {
-      String systemPrompt = await SystemService.loadSystem();
-      final apiKey = await SettingService.loadApiKey(AIEngine.chatgpt_4o);
-
-      final sendJson = jsonEncode({
-        "model": model,
-        "messages": [
-          {'role': 'system', 'content': systemPrompt},
-          {"role": "user", "content": userInput}
-        ],
-        "temperature": 0.7,
-      });
-      msgSendLength = sendJson.length;
-      final response = await http.post(
-        Uri.parse(openAIUrl),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $apiKey',
-        },
-        body: sendJson,
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(utf8.decode(response.bodyBytes));
-        msgReceivedLength = response.bodyBytes.length;
-        final reply = data['choices'][0]['message']['content'];
-        return reply.trim();
-      } else {
-        print('ChatGPT API error: ${response.body}');
-        return 'Sorry, ChatGPT did not respond.';
-      }
-    } catch (e) {
-      print('ChatGPT API error: $e');
-      return 'ChatGPT Error occurred.';
-    }
-  }
-
-  static Future<String> _sendToChatGPT_35turbo(String userInput) async {
-    msgSendLength = 0;
-    msgReceivedLength = 0;
-    final model = "gpt-3.5-turbo";
-    try {
-      String systemPrompt = await SystemService.loadSystem();
-      final apiKey = await SettingService.loadApiKey(AIEngine.chatgpt_35turbo);
-
-      final sendJson = jsonEncode({
-        "model": model,
-        "messages": [
-          {'role': 'system', 'content': systemPrompt},
-          {"role": "user", "content": userInput}
-        ],
-        "temperature": 0.7,
-      });
-      msgSendLength = sendJson.length;
+      msgModel = model;
       final response = await http.post(
         Uri.parse(openAIUrl),
         headers: {
@@ -486,6 +547,7 @@ class ApiService {
   static Future<String> _sendToGemini(String userInput) async {
     msgSendLength = 0;
     msgReceivedLength = 0;
+    msgModel = '';
     try {
       String systemPrompt = await SystemService.loadSystem();
       final apiKey = await SettingService.loadApiKey(AIEngine.gemini);
@@ -500,7 +562,9 @@ class ApiService {
           }
         ]
       });
+      Logger.log(sendJson);
       msgSendLength = sendJson.length;
+      msgModel = 'gemini';
       final response = await http.post(
         Uri.parse('$geminiUrl?key=$apiKey'),
         headers: {
@@ -527,6 +591,7 @@ class ApiService {
   static Future<String> _sendToClaude(String model, String userInput) async {
     msgSendLength = 0;
     msgReceivedLength = 0;
+    msgModel = '';
     try {
       String systemPrompt = await SystemService.loadSystem();
       final apiKey = await SettingService.loadApiKey(AIEngine.claude35);
@@ -540,7 +605,9 @@ class ApiService {
         'max_tokens': 1000,
         'temperature': 0.7,
       });
+      Logger.log(sendJson);
       msgSendLength = sendJson.length;
+      msgModel = model;
       final response = await http.post(
         Uri.parse('$claudeUrl?key=$apiKey'),
         headers: {
@@ -571,6 +638,7 @@ class ApiService {
   static Future<String> _sendToClaudeWeb(String model, String userInput) async {
     msgSendLength = 0;
     msgReceivedLength = 0;
+    msgModel = '';
     try {
       String systemPrompt = await SystemService.loadSystem();
       final apiKey = await SettingService.loadApiKey(AIEngine.claude35);
@@ -591,7 +659,9 @@ class ApiService {
           }
         ],
       });
+      Logger.log(sendJson);
       msgSendLength = sendJson.length;
+      msgModel = model;
       final response = await http.post(
         Uri.parse('$claudeUrl?key=$apiKey'),
         headers: {
@@ -662,7 +732,7 @@ class ApiService {
     try {
       const model = 'llama3.2-3b';
       final apiKey = 'xxxxx';
-
+      msgModel = '';
       final response = await http.post(
         Uri.parse(llamaUrl),
         headers: {
