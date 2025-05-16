@@ -61,7 +61,7 @@ The character count of messages at the time of sending can be checked.
 ### 🎯 Multi-LLM Support with Syntax Highlighting
 ![screenshot1](screenshot/1.jpg)  
 
-### 🎯 Supports Claude, ChatGPT, and Gemini.
+### 🎯 Supports Claude, ChatGPT, Gemini, Grok.
 ![screenshot1](screenshot/2.jpg)  
 ---
 
