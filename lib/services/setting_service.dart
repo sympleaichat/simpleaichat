@@ -26,11 +26,36 @@ class SettingService {
     return Config.fromString(content);
   }
 
+  static String getKeyStr(AIEngine engine) {
+    switch (engine) {
+      case AIEngine.chatgpt_41:
+        return 'api_key_chatgpt41';
+      case AIEngine.chatgpt_4omini:
+        return 'api_key_chatgpt4om';
+      case AIEngine.chatgpt_4o:
+        return 'api_key_chatgpt4o';
+      case AIEngine.chatgpt_35turbo:
+        return 'api_key_chatgpt35t';
+      case AIEngine.gemini:
+        return 'api_key_gemini';
+      case AIEngine.claude35:
+        return 'api_key_claude35';
+      case AIEngine.claude37:
+        return 'api_key_claude37';
+      case AIEngine.grok_3:
+        return 'api_key_grok3';
+      case AIEngine.grok_3mini:
+        return 'api_key_grok3mini';
+    }
+  }
+
   static Future<AIEngine> loadEngine() async {
     final config = await _loadConfig();
     final engine = config.get('settings', 'engine');
 
-    if (engine == ApiService.STR_chatgpt_4omini) {
+    if (engine == ApiService.STR_chatgpt_41) {
+      return AIEngine.chatgpt_41;
+    } else if (engine == ApiService.STR_chatgpt_4omini) {
       return AIEngine.chatgpt_4omini;
     } else if (engine == ApiService.STR_chatgpt_4o) {
       return AIEngine.chatgpt_4o;
@@ -42,6 +67,10 @@ class SettingService {
       return AIEngine.claude35;
     } else if (engine == ApiService.STR_claude37) {
       return AIEngine.claude37;
+    } else if (engine == ApiService.STR_grok3) {
+      return AIEngine.grok_3;
+    } else if (engine == ApiService.STR_grok3mini) {
+      return AIEngine.grok_3mini;
     } else {
       return AIEngine.chatgpt_4omini;
     }
@@ -57,22 +86,10 @@ class SettingService {
   static Future<String> loadApiKey(AIEngine engine) async {
     final config = await _loadConfig();
 
-    switch (engine) {
-      case AIEngine.chatgpt_4omini:
-        return config.get('settings', 'api_key_chatgpt4om')!;
-      case AIEngine.chatgpt_4o:
-        return config.get('settings', 'api_key_chatgpt4o')!;
-      case AIEngine.chatgpt_35turbo:
-        return config.get('settings', 'api_key_chatgpt35t')!;
-      case AIEngine.gemini:
-        return config.get('settings', 'api_key_gemini')!;
-      case AIEngine.claude35:
-        return config.get('settings', 'api_key_claude35')!;
-      case AIEngine.claude37:
-        return config.get('settings', 'api_key_claude37')!;
-      default:
-        return config.get('settings', 'api_key_chatgpt')!;
+    if (config.hasOption('settings', getKeyStr(engine))) {
+      return config.get('settings', getKeyStr(engine))!;
     }
+    return 'your_api_key';
   }
 
   static Future<bool> loadDarkMode() async {
@@ -92,21 +109,8 @@ class SettingService {
   static Future<void> saveApiKey(AIEngine engine, String apiKey) async {
     final file = await _getIniFile();
     final config = await _loadConfig();
-    if (engine == AIEngine.gemini) {
-      config.set('settings', 'api_key_gemini', apiKey);
-    } else if (engine == AIEngine.chatgpt_4omini) {
-      config.set('settings', 'api_key_chatgpt4om', apiKey);
-    } else if (engine == AIEngine.chatgpt_4o) {
-      config.set('settings', 'api_key_chatgpt4o', apiKey);
-    } else if (engine == AIEngine.chatgpt_35turbo) {
-      config.set('settings', 'api_key_chatgpt35t', apiKey);
-    } else if (engine == AIEngine.claude35) {
-      config.set('settings', 'api_key_claude35', apiKey);
-    } else if (engine == AIEngine.claude37) {
-      config.set('settings', 'api_key_claude37', apiKey);
-    } else {
-      config.set('settings', 'api_key_chatgpt4om', apiKey);
-    }
+    config.set('settings', getKeyStr(engine), apiKey);
+
     await file.writeAsString(config.toString());
   }
 }

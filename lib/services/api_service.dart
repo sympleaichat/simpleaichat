@@ -6,12 +6,15 @@ import '../models/message.dart';
 import '../utils/logger.dart';
 
 enum AIEngine {
+  chatgpt_41,
   chatgpt_4omini,
   chatgpt_4o,
   chatgpt_35turbo,
   gemini,
   claude35,
   claude37,
+  grok_3,
+  grok_3mini
 }
 
 class ApiService {
@@ -21,27 +24,37 @@ class ApiService {
   static const String geminiUrl =
       'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent';
   static const String claudeUrl = 'https://api.anthropic.com/v1/messages';
+  static const String grokUrl = 'https://api.x.ai/v1/messages';
   static const String llamaUrl =
       'https://api.llama.com/compat/v1/chat/completions';
 
+  static const String NAME_chatgpt_41 = 'ChatGPT 4.1';
   static const String NAME_chatgpt_4omini = 'ChatGPT o4-mini';
   static const String NAME_chatgpt_4o = 'ChatGPT o4';
   static const String NAME_chatgpt_35turbo = 'ChatGPT 3.5-turbo';
   static const String NAME_gemini = 'Gemini 1.5 Pro';
   static const String NAME_claude35 = 'Claude 3.5 Haiku';
   static const String NAME_claude37 = 'Claude 3.7 Sonnet';
+  static const String NAME_grok_3 = 'Grok 3';
+  static const String NAME_grok_3mini = 'Grok 3 Mini';
 
-  static const String STR_chatgpt_4omini = 'chatgpt_4omini ';
+  static const String STR_chatgpt_41 = 'chatgpt_41';
+  static const String STR_chatgpt_4omini = 'chatgpt_4omini';
   static const String STR_chatgpt_4o = 'chatgpt_4o';
   static const String STR_chatgpt_35turbo = 'chatgpt_35turbo';
   static const String STR_gemini = 'gemini';
   static const String STR_claude35 = 'claude35';
   static const String STR_claude37 = 'claude37';
+  static const String STR_grok3 = 'grok3';
+  static const String STR_grok3mini = 'grok3mini';
+
   static int msgSendLength = 0;
   static int msgReceivedLength = 0;
   static String msgModel = '';
   static String getModelName(AIEngine engine) {
     switch (engine) {
+      case AIEngine.chatgpt_41:
+        return NAME_chatgpt_41;
       case AIEngine.chatgpt_4omini:
         return NAME_chatgpt_4omini;
       case AIEngine.chatgpt_4o:
@@ -54,11 +67,17 @@ class ApiService {
         return NAME_claude35;
       case AIEngine.claude37:
         return NAME_claude37;
+      case AIEngine.grok_3:
+        return NAME_grok_3;
+      case AIEngine.grok_3mini:
+        return NAME_grok_3mini;
     }
   }
 
   static String getModelStr(AIEngine engine) {
     switch (engine) {
+      case AIEngine.chatgpt_41:
+        return STR_chatgpt_41;
       case AIEngine.chatgpt_4omini:
         return STR_chatgpt_4omini;
       case AIEngine.chatgpt_4o:
@@ -71,11 +90,17 @@ class ApiService {
         return STR_claude35;
       case AIEngine.claude37:
         return STR_claude37;
+      case AIEngine.grok_3:
+        return STR_grok3;
+      case AIEngine.grok_3mini:
+        return STR_grok3mini;
     }
   }
 
   static Future<String> sendMessage(String userInput) async {
-    if (currentEngine == AIEngine.chatgpt_4omini) {
+    if (currentEngine == AIEngine.chatgpt_41) {
+      return _sendToChatGPT("gpt-4.1", userInput);
+    } else if (currentEngine == AIEngine.chatgpt_4omini) {
       return _sendToChatGPT("gpt-4o", userInput);
     } else if (currentEngine == AIEngine.chatgpt_4o) {
       return _sendToChatGPT("gpt-4o-mini", userInput);
@@ -93,7 +118,9 @@ class ApiService {
   }
 
   static Future<String> sendMessageWithHistory(List<Message> messages) async {
-    if (currentEngine == AIEngine.chatgpt_4omini) {
+    if (currentEngine == AIEngine.chatgpt_41) {
+      return _sendToChatGPTWithHistory("gpt-4.1", messages);
+    } else if (currentEngine == AIEngine.chatgpt_4omini) {
       return _sendToChatGPTWithHistory("gpt-4o-mini", messages);
     } else if (currentEngine == AIEngine.chatgpt_4o) {
       return _sendToChatGPTWithHistory("gpt-4o", messages);
@@ -105,6 +132,10 @@ class ApiService {
       return _sendToClaudeWithHistory('claude-3-5-haiku-20241022', messages);
     } else if (currentEngine == AIEngine.claude37) {
       return _sendToClaudeWithHistory('claude-3-7-sonnet-20250219', messages);
+    } else if (currentEngine == AIEngine.grok_3) {
+      return _sendToGrokWithHistory("grok-3-beta", messages);
+    } else if (currentEngine == AIEngine.grok_3mini) {
+      return _sendToGrokWithHistory("grok-3-mini-beta", messages);
     } else {
       return 'This model does not support history yet.';
     }
@@ -122,13 +153,7 @@ class ApiService {
 
   static Future<String> sendMessageWithHistoryWeb(
       List<Message> messages) async {
-    if (currentEngine == AIEngine.chatgpt_4omini) {
-      return _sendToChatGPTWithHistoryWeb("gpt-4o-mini", messages);
-    } else if (currentEngine == AIEngine.chatgpt_4o) {
-      return _sendToChatGPTWithHistoryWeb("gpt-4o", messages);
-    } else if (currentEngine == AIEngine.chatgpt_35turbo) {
-      return _sendToChatGPTWithHistoryWeb("gpt-3.5-turbo", messages);
-    } else if (currentEngine == AIEngine.claude35) {
+    if (currentEngine == AIEngine.claude35) {
       return _sendToClaudeWithHistoryWeb('claude-3-5-haiku-20241022', messages);
     } else if (currentEngine == AIEngine.claude37) {
       return _sendToClaudeWithHistoryWeb(
@@ -181,127 +206,6 @@ class ApiService {
       print('ChatGPT API error: $e');
       return 'ChatGPT Error occurred.';
     }
-  }
-
-  static Future<String> _sendToChatGPTWithHistoryWeb(
-      String model, List<Message> messages) async {
-    msgSendLength = 0;
-    msgReceivedLength = 0;
-    msgModel = '';
-    try {
-      String systemPrompt = await SystemService.loadSystem();
-      final apiKey = await SettingService.loadApiKey(currentEngine);
-
-      final chatMessages = [
-        {'role': 'system', 'content': systemPrompt},
-        ...messages.map((m) => {'role': m.role, 'content': m.content}).toList(),
-      ];
-      final sendJson = jsonEncode({
-        "model": model,
-/*
-        "tools": [
-          {"type": "web_search_preview"}
-        ],
-        */
-        "tools": [
-          {
-            "type": "function",
-            "function": {
-              "name": "web_search_preview",
-              "description": "Provides a preview of web search results",
-              "parameters": {
-                "type": "object",
-                "properties": {
-                  "query": {"type": "string"}
-                },
-                "required": ["query"]
-              }
-            }
-          }
-        ],
-        "messages": chatMessages,
-        "temperature": 0.7,
-      });
-      msgModel = model;
-      msgSendLength = sendJson.length;
-
-      final response = await http.post(
-        Uri.parse(openAIUrl),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $apiKey',
-        },
-        body: sendJson,
-      );
-
-      if (response.statusCode == 200) {
-        Logger.log(response.body);
-        final data = jsonDecode(utf8.decode(response.bodyBytes));
-        msgReceivedLength = response.bodyBytes.length;
-        final dynamic decodedJson = jsonDecode(utf8.decode(response.bodyBytes));
-        // final reply = data['choices'][0]['message']['content'];
-        // return reply.trim();
-
-        if (json is List) {
-          final StringBuffer responseText = StringBuffer();
-
-          for (var item in decodedJson) {
-            if (item['type'] == 'message' && item['status'] == 'completed') {
-              final contentList = item['content'] as List;
-
-              for (var contentItem in contentList) {
-                if (contentItem['type'] == 'output_text') {
-                  responseText.write(contentItem['text']);
-
-                  if (contentItem.containsKey('annotations') &&
-                      contentItem['annotations'] is List) {
-                    final annotations = contentItem['annotations'] as List;
-                    if (annotations.isNotEmpty) {
-                      responseText.write(' [');
-                      for (int i = 0; i < annotations.length; i++) {
-                        if (i > 0) responseText.write(', ');
-                        final annotation = annotations[i];
-                        if (annotation['type'] == 'url_citation' &&
-                            annotation.containsKey('url') &&
-                            annotation.containsKey('title')) {
-                          responseText.write('${annotation['title']}');
-                        }
-                      }
-                      responseText.write(']');
-                    }
-                  }
-                  responseText.write('\n');
-                }
-              }
-            } else if (item['type'] == 'web_search_call' &&
-                item['status'] == 'completed') {
-              responseText.write('\n[Web search completed]\n');
-            }
-          }
-
-          return responseText.toString().trim();
-        }
-
-        return '(empty or invalid response structure)';
-      } else {
-        print('ChatGPT API error: ${response.body}');
-        return 'Sorry, ChatGPT did not respond.';
-      }
-    } catch (e) {
-      print('ChatGPT API error: $e');
-      return 'ChatGPT Error occurred.';
-    }
-  }
-
-  String processSearchResults(dynamic results) {
-    // ここで結果を整形し、ユーザーに表示するための文字列を作成
-    final StringBuffer responseText = StringBuffer();
-    for (var item in results['items']) {
-      responseText.writeln(item['title']);
-      responseText.writeln(item['link']);
-      responseText.writeln();
-    }
-    return responseText.toString().trim();
   }
 
   static Future<String> _sendToGeminiWithHistory(List<Message> messages) async {
@@ -497,6 +401,61 @@ class ApiService {
     } catch (e) {
       print('Claude API error: $e');
       return 'Claude Error occurred.';
+    }
+  }
+
+  static Future<String> _sendToGrokWithHistory(
+      String model, List<Message> messages) async {
+    msgSendLength = 0;
+    msgReceivedLength = 0;
+    msgModel = '';
+    try {
+      String systemPrompt = await SystemService.loadSystem();
+      final apiKey = await SettingService.loadApiKey(currentEngine);
+
+      final chatMessages = [
+        {'role': 'user', 'content': systemPrompt},
+        ...messages.map((m) => {'role': m.role, 'content': m.content}).toList(),
+      ];
+      final sendJson = jsonEncode({
+        "model": model,
+        "max_tokens": 2048,
+        "messages": chatMessages,
+        "temperature": 0.7,
+      });
+      msgModel = model;
+      msgSendLength = sendJson.length;
+      Logger.log(sendJson);
+      final response = await http.post(
+        Uri.parse(grokUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $apiKey',
+        },
+        body: sendJson,
+      );
+
+      if (response.statusCode == 200) {
+        print(response.body);
+        final data = jsonDecode(utf8.decode(response.bodyBytes));
+        msgReceivedLength = response.bodyBytes.length;
+        String retStr = '';
+        try {
+          final reply = data['content'][0]['thinking'];
+          retStr = reply.trim();
+        } catch (e) {
+          final reply = data['content'][0]['text'];
+          retStr = reply.trim();
+        }
+
+        return retStr;
+      } else {
+        print('grok API error: ${response.body}');
+        return 'Sorry, grok did not respond.';
+      }
+    } catch (e) {
+      print('grok API error: $e');
+      return 'grok Error occurred.';
     }
   }
 

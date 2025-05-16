@@ -11,11 +11,13 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  AIEngine _selectedEngine = AIEngine.chatgpt_4omini;
+  AIEngine _selectedEngine = AIEngine.chatgpt_41;
   bool _isDarkMode = false;
   bool _loading = true;
   bool _darkModeChanged = false;
 
+  final TextEditingController _chatgpt41ApiKeyController =
+      TextEditingController();
   final TextEditingController _chatgpt4omApiKeyController =
       TextEditingController();
   final TextEditingController _chatgpt4oApiKeyController =
@@ -26,6 +28,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final TextEditingController _claude35ApiKeyController =
       TextEditingController();
   final TextEditingController _claude37ApiKeyController =
+      TextEditingController();
+  final TextEditingController _grok3ApiKeyController = TextEditingController();
+  final TextEditingController _grok3miniApiKeyController =
       TextEditingController();
 
   String _historyFilePath = '';
@@ -53,6 +58,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _loadSettings() async {
     final engine = await SettingService.loadEngine();
     final darkMode = await SettingService.loadDarkMode();
+
+    final chatgpt41Key = await SettingService.loadApiKey(AIEngine.chatgpt_41);
     final chatgpt4omKey =
         await SettingService.loadApiKey(AIEngine.chatgpt_4omini);
     final chatgpt4oKey = await SettingService.loadApiKey(AIEngine.chatgpt_4o);
@@ -61,15 +68,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final geminiKey = await SettingService.loadApiKey(AIEngine.gemini);
     final claude35Key = await SettingService.loadApiKey(AIEngine.claude35);
     final claude37Key = await SettingService.loadApiKey(AIEngine.claude37);
+    final groq3Key = await SettingService.loadApiKey(AIEngine.grok_3);
+    final groq3miniKey = await SettingService.loadApiKey(AIEngine.grok_3mini);
     setState(() {
       _selectedEngine = engine;
       _isDarkMode = darkMode;
+
+      _chatgpt41ApiKeyController.text = chatgpt41Key;
       _chatgpt4omApiKeyController.text = chatgpt4omKey;
       _chatgpt4oApiKeyController.text = chatgpt4oKey;
       _chatgpt35ApiKeyController.text = chatgpt35tKey;
       _geminiApiKeyController.text = geminiKey;
       _claude35ApiKeyController.text = claude35Key;
       _claude37ApiKeyController.text = claude37Key;
+      _grok3ApiKeyController.text = groq3Key;
+      _grok3miniApiKeyController.text = groq3miniKey;
+
       _loading = false;
     });
   }
@@ -149,12 +163,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   void dispose() {
+    _chatgpt41ApiKeyController.dispose();
     _chatgpt4omApiKeyController.dispose();
     _chatgpt4oApiKeyController.dispose();
     _chatgpt35ApiKeyController.dispose();
     _geminiApiKeyController.dispose();
     _claude35ApiKeyController.dispose();
     _claude37ApiKeyController.dispose();
+    _grok3ApiKeyController.dispose();
+    _grok3miniApiKeyController.dispose();
+
     _scrollController.dispose();
     super.dispose();
   }
@@ -233,6 +251,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: Column(
                   children: [
                     _buildEngineCard(
+                        AIEngine.chatgpt_41, _chatgpt41ApiKeyController),
+                    _buildEngineCard(
                         AIEngine.chatgpt_4omini, _chatgpt4omApiKeyController),
                     _buildEngineCard(
                         AIEngine.chatgpt_4o, _chatgpt4oApiKeyController),
@@ -243,6 +263,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         AIEngine.claude35, _claude35ApiKeyController),
                     _buildEngineCard(
                         AIEngine.claude37, _claude37ApiKeyController),
+                    _buildEngineCard(AIEngine.grok_3, _grok3ApiKeyController),
+                    _buildEngineCard(
+                        AIEngine.grok_3mini, _grok3miniApiKeyController),
                   ],
                 ),
               ),
