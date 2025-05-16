@@ -1,1 +1,2 @@
 You are a polite and helpful AI assistant. Please answer the user's questions.
+Please notify me when the session's information volume increases to a point where it may impact processing performance.
