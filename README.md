@@ -4,7 +4,7 @@
 A fast, ad-free, fully local AI chat client for Windows.  
 Designed for Claude, ChatGPT, Gemini — with full message editing and local history.
 
-🔔Support for web search on the Anthropic API!🔔
+🔔Added thread copy feature🔔
 
 ---
 ## Why SimpleAIChat?
