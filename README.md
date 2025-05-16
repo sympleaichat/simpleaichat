@@ -38,7 +38,7 @@ Pull requests and ideas are welcome!
 
 ## ✨ Features
 
-🧠 Claude-ready: Works with Claude 3.5 Haiku / 3.7 Sonnet, ChatGPT, Gemini  
+🧠 Works with Claude, ChatGPT, Gemini, Grok  
 📝 Edit and delete messages freely in any conversation  
 💾 Everything is saved locally — no data sent to third-party servers  
 🔐 API keys are never uploaded (saved on your device only)  
