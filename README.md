@@ -13,7 +13,7 @@ Download for Desktop<br>
 ---
 ## Why SimpleAIChat?
 
-Most LLMs today — whether OpenAI's GPT, Anthropic's Claude, or Google's Gemini — are accessed through hosted web interfaces that abstract away the details of message formatting, memory control, and backend behavior.
+Most LLMs today — whether OpenAI's GPT, Anthropic's Claude, Grok, or Google's Gemini — are accessed through hosted web interfaces that abstract away the details of message formatting, memory control, and backend behavior.
 
 That’s convenient — but not always ideal.
 
