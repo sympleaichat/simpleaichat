@@ -30,6 +30,8 @@ engine = chatgpt
 api_key_chatgpt4om = your_chatgpt_api_key_here
 api_key_chatgpt4o = your_chatgpt_api_key_here
 api_key_chatgpt35t = your_chatgpt_api_key_here
+api_key_chatgpt4 = your_chatgpt_api_key_here
+api_key_chatgptdavinci002 = your_chatgpt_api_key_here
 api_key_gemini = your_gemini_api_key_here
 api_key_claude35 = your_claude_api_key_here
 api_key_claude37 = your_claude_api_key_here
@@ -44,6 +46,8 @@ dark_mode = false
 | api_key_chatgpt4om  | API key for ChatGPT-4 Omni                    | api_key_chatgpt4om = sk-xxxxxx |
 | api_key_chatgpt4o   | API key for ChatGPT-4 O                       | api_key_chatgpt4o = sk-xxxxxx  |
 | api_key_chatgpt35t  | API key for ChatGPT-3.5turbo                  | api_key_chatgpt35t = sk-xxxxxx |
+| api_key_chatgpt4    | API key for ChatGPT-4                         | api_key_chatgpt4   = sk-xxxxxx |
+| api_key_chatgptdavinci002  | API key for ChatGPT-davinci-002        | api_key_chatgptdavinci002 = sk-xxxxxx |
 | api_key_gemini      | API key for Gemini                            | api_key_gemini = gemini-xxxxxx |
 | api_key_claude35    | API key for Claude 3.5 Haiku                  | api_key_claude35 = sk-xxxxxx   |
 | api_key_claude37    | API key for Claude 3.7 Sonnet                 | api_key_claude37 = sk-xxxxxx   |
@@ -74,6 +78,8 @@ ChatGPT-4.1
 ChatGPT o4-mini
 ChatGPT o4
 ChatGPT 3.5-turbo
+ChatGPT 4
+ChatGPT davinci-002
 Gemini 1.5 Pro
 Claude 3.5 Haiku
 Claude 3.7 Sonnet
