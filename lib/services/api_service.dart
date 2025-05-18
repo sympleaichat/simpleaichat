@@ -10,17 +10,20 @@ enum AIEngine {
   chatgpt_4omini,
   chatgpt_4o,
   chatgpt_35turbo,
+  gpt4,
+  chatgpt_davinci002,
   gemini,
   claude35,
   claude37,
   grok_3,
-  grok_3mini
+  grok_3mini,
 }
 
 class ApiService {
   static AIEngine currentEngine = AIEngine.chatgpt_4omini;
 
   static const String openAIUrl = 'https://api.openai.com/v1/chat/completions';
+  static const String openAIUrlLegacy = 'https://api.openai.com/v1/completions';
   static const String geminiUrl =
       'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent';
   static const String claudeUrl = 'https://api.anthropic.com/v1/messages';
@@ -32,6 +35,8 @@ class ApiService {
   static const String NAME_chatgpt_4omini = 'ChatGPT o4-mini';
   static const String NAME_chatgpt_4o = 'ChatGPT o4';
   static const String NAME_chatgpt_35turbo = 'ChatGPT 3.5-turbo';
+  static const String NAME_chatgpt_4 = 'ChatGPT 4';
+  static const String NAME_chatgpt_davinci002 = 'ChatGPT davinci002';
   static const String NAME_gemini = 'Gemini 1.5 Pro';
   static const String NAME_claude35 = 'Claude 3.5 Haiku';
   static const String NAME_claude37 = 'Claude 3.7 Sonnet';
@@ -42,6 +47,8 @@ class ApiService {
   static const String STR_chatgpt_4omini = 'chatgpt_4omini';
   static const String STR_chatgpt_4o = 'chatgpt_4o';
   static const String STR_chatgpt_35turbo = 'chatgpt_35turbo';
+  static const String STR_chatgpt_4 = 'chatgpt_4';
+  static const String STR_chatgpt_davinci002 = 'chatgpt_davinci002';
   static const String STR_gemini = 'gemini';
   static const String STR_claude35 = 'claude35';
   static const String STR_claude37 = 'claude37';
@@ -61,6 +68,10 @@ class ApiService {
         return NAME_chatgpt_4o;
       case AIEngine.chatgpt_35turbo:
         return NAME_chatgpt_35turbo;
+      case AIEngine.gpt4:
+        return NAME_chatgpt_4;
+      case AIEngine.chatgpt_davinci002:
+        return NAME_chatgpt_davinci002;
       case AIEngine.gemini:
         return NAME_gemini;
       case AIEngine.claude35:
@@ -84,6 +95,10 @@ class ApiService {
         return STR_chatgpt_4o;
       case AIEngine.chatgpt_35turbo:
         return STR_chatgpt_35turbo;
+      case AIEngine.gpt4:
+        return STR_chatgpt_4;
+      case AIEngine.chatgpt_davinci002:
+        return STR_chatgpt_davinci002;
       case AIEngine.gemini:
         return STR_gemini;
       case AIEngine.claude35:
@@ -106,6 +121,10 @@ class ApiService {
       return _sendToChatGPT("gpt-4o-mini", userInput);
     } else if (currentEngine == AIEngine.chatgpt_35turbo) {
       return _sendToChatGPT("gpt-3.5-turbo", userInput);
+    } else if (currentEngine == AIEngine.gpt4) {
+      return _sendToChatGPT("gpt-4", userInput);
+    } else if (currentEngine == AIEngine.chatgpt_davinci002) {
+      return _sendToChatGPTLegacy("davinci-002", userInput);
     } else if (currentEngine == AIEngine.gemini) {
       return _sendToGemini(userInput);
     } else if (currentEngine == AIEngine.claude35) {
@@ -126,6 +145,11 @@ class ApiService {
       return _sendToChatGPTWithHistory("gpt-4o", messages);
     } else if (currentEngine == AIEngine.chatgpt_35turbo) {
       return _sendToChatGPTWithHistory("gpt-3.5-turbo", messages);
+    } else if (currentEngine == AIEngine.gpt4) {
+      return _sendToChatGPTWithHistory("gpt-4", messages);
+    } else if (currentEngine == AIEngine.chatgpt_davinci002) {
+      return 'This model does not support thread messages.';
+      //   return _sendToChatGPTWithHistoryLegacy("davinci-002", messages);
     } else if (currentEngine == AIEngine.gemini) {
       return _sendToGeminiWithHistory(messages);
     } else if (currentEngine == AIEngine.claude35) {
@@ -173,7 +197,8 @@ class ApiService {
       final apiKey = await SettingService.loadApiKey(currentEngine);
 
       final chatMessages = [
-        {'role': 'system', 'content': systemPrompt},
+        //      {'role': 'system', 'content': systemPrompt},
+        {'role': 'developer', 'content': systemPrompt},
         ...messages.map((m) => {'role': m.role, 'content': m.content}).toList(),
       ];
       final sendJson = jsonEncode({
@@ -197,6 +222,55 @@ class ApiService {
         final data = jsonDecode(utf8.decode(response.bodyBytes));
         msgReceivedLength = response.bodyBytes.length;
         final reply = data['choices'][0]['message']['content'];
+        return reply.trim();
+      } else {
+        print('ChatGPT API error: ${response.body}');
+        return 'Sorry, ChatGPT did not respond.';
+      }
+    } catch (e) {
+      print('ChatGPT API error: $e');
+      return 'ChatGPT Error occurred.';
+    }
+  }
+
+  static Future<String> _sendToChatGPTWithHistoryLegacy(
+      String model, List<Message> messages) async {
+    msgSendLength = 0;
+    msgReceivedLength = 0;
+    msgModel = '';
+    try {
+      String systemPrompt = await SystemService.loadSystem();
+      final apiKey = await SettingService.loadApiKey(currentEngine);
+
+      final chatMessages = [
+        //  {'role': 'system', 'content': systemPrompt},
+        //  {'role': 'developer', 'content': systemPrompt},
+        ...messages.map((m) => {'role': m.role, 'content': m.content}).toList(),
+      ];
+      final sendJson = jsonEncode({
+        "model": model,
+
+        "prompt": chatMessages.join('\n'), // ここを文字列にする
+        "temperature": 0.7,
+        "max_tokens": 1000,
+      });
+      msgModel = model;
+      msgSendLength = sendJson.length;
+      Logger.log(sendJson);
+      final response = await http.post(
+        Uri.parse(openAIUrlLegacy),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $apiKey',
+        },
+        body: sendJson,
+      );
+
+      if (response.statusCode == 200) {
+        print(response.body);
+        final data = jsonDecode(utf8.decode(response.bodyBytes));
+        msgReceivedLength = response.bodyBytes.length;
+        final reply = data['choices'][0]['text'];
         return reply.trim();
       } else {
         print('ChatGPT API error: ${response.body}');
@@ -459,6 +533,53 @@ class ApiService {
     }
   }
 
+  static Future<String> _sendToChatGPTLegacy(
+      String model, String userInput) async {
+    msgSendLength = 0;
+    msgReceivedLength = 0;
+    msgModel = '';
+
+    try {
+      String systemPrompt = await SystemService.loadSystem();
+      final apiKey = await SettingService.loadApiKey(AIEngine.chatgpt_4omini);
+
+      final chatMessages = [
+        {"role": "user", "content": userInput}
+      ];
+      final sendJson = jsonEncode({
+        "model": model,
+
+        "prompt": chatMessages.join('\n'), // ここを文字列にする
+        "temperature": 0.7,
+        "max_tokens": 1000,
+      });
+      msgModel = model;
+      msgSendLength = sendJson.length;
+      Logger.log(sendJson);
+      final response = await http.post(
+        Uri.parse(openAIUrlLegacy),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $apiKey',
+        },
+        body: sendJson,
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(utf8.decode(response.bodyBytes));
+        msgReceivedLength = response.bodyBytes.length;
+        final reply = data['choices'][0]['text'];
+        return reply.trim();
+      } else {
+        print('ChatGPT API error: ${response.body}');
+        return 'Sorry, ChatGPT did not respond.';
+      }
+    } catch (e) {
+      print('ChatGPT API error: $e');
+      return 'ChatGPT Error occurred.';
+    }
+  }
+
   static Future<String> _sendToChatGPT(String model, String userInput) async {
     msgSendLength = 0;
     msgReceivedLength = 0;
@@ -472,6 +593,7 @@ class ApiService {
         "model": model,
         "messages": [
           {'role': 'system', 'content': systemPrompt},
+          //   {'role': 'developer', 'content': systemPrompt},
           {"role": "user", "content": userInput}
         ],
         "temperature": 0.7,

@@ -569,10 +569,10 @@ class _ChatScreenState extends State<ChatScreen> {
                                 onPressed: () {
                                   Clipboard.setData(
                                       ClipboardData(text: msg.content));
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                        content: Text('Copied to clipboard')),
-                                  );
+                                  //     ScaffoldMessenger.of(context).showSnackBar(
+                                  //       SnackBar(
+                                  //          content: Text('Copied to clipboard')),
+                                  //    );
                                 },
                               ),
                               IconButton(
