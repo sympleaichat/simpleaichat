@@ -97,6 +97,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<void> _sendMessage(String content, bool web) async {
+    setState(() {});
     if (_sendModeThread) {
       await _sendThreadMessage(content, web);
     } else {
@@ -122,9 +123,11 @@ class _ChatScreenState extends State<ChatScreen> {
     _controller.clear();
     String assistantReply = '';
     if (web) {
-      assistantReply = await ApiService.sendMessageWeb(content);
+      assistantReply =
+          await ApiService.sendMessageWeb(content, ApiService.currentEngine);
     } else {
-      assistantReply = await ApiService.sendMessage(content);
+      assistantReply =
+          await ApiService.sendMessage(content, ApiService.currentEngine);
     }
 
     final assistantMessage = Message(
@@ -164,9 +167,11 @@ class _ChatScreenState extends State<ChatScreen> {
     final allMessages = [..._messages];
     String assistantReply = '';
     if (web) {
-      assistantReply = await ApiService.sendMessageWithHistoryWeb(allMessages);
+      assistantReply = await ApiService.sendMessageWithHistoryWeb(
+          allMessages, ApiService.currentEngine);
     } else {
-      assistantReply = await ApiService.sendMessageWithHistory(allMessages);
+      assistantReply = await ApiService.sendMessageWithHistory(
+          allMessages, ApiService.currentEngine);
     }
     final isError = assistantReply.startsWith("Sorry") ||
         assistantReply.contains("Error") ||

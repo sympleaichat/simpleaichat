@@ -24,6 +24,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       TextEditingController();
   final TextEditingController _chatgpt35ApiKeyController =
       TextEditingController();
+  final TextEditingController _chatgpt4tApiKeyController =
+      TextEditingController();
 
   final TextEditingController _chatgpt4ApiKeyController =
       TextEditingController();
@@ -71,16 +73,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final chatgpt4oKey = await SettingService.loadApiKey(AIEngine.chatgpt_4o);
     final chatgpt35tKey =
         await SettingService.loadApiKey(AIEngine.chatgpt_35turbo);
-
+    final chatgpt4tKey =
+        await SettingService.loadApiKey(AIEngine.chatgpt_4turbo);
     final chatgpt4Key = await SettingService.loadApiKey(AIEngine.gpt4);
     final chatgptdavinci002Key =
         await SettingService.loadApiKey(AIEngine.chatgpt_davinci002);
-
     final geminiKey = await SettingService.loadApiKey(AIEngine.gemini);
     final claude35Key = await SettingService.loadApiKey(AIEngine.claude35);
     final claude37Key = await SettingService.loadApiKey(AIEngine.claude37);
     final groq3Key = await SettingService.loadApiKey(AIEngine.grok_3);
     final groq3miniKey = await SettingService.loadApiKey(AIEngine.grok_3mini);
+
     setState(() {
       _selectedEngine = engine;
       _isDarkMode = darkMode;
@@ -89,6 +92,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _chatgpt4omApiKeyController.text = chatgpt4omKey;
       _chatgpt4oApiKeyController.text = chatgpt4oKey;
       _chatgpt35ApiKeyController.text = chatgpt35tKey;
+      _chatgpt4tApiKeyController.text = chatgpt4tKey;
       _chatgpt4ApiKeyController.text = chatgpt4Key;
       _chatgptdavinci002ApiKeyController.text = chatgptdavinci002Key;
       _geminiApiKeyController.text = geminiKey;
@@ -180,6 +184,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _chatgpt4omApiKeyController.dispose();
     _chatgpt4oApiKeyController.dispose();
     _chatgpt35ApiKeyController.dispose();
+    _chatgpt4tApiKeyController.dispose();
     _chatgpt4ApiKeyController.dispose();
     _chatgptdavinci002ApiKeyController.dispose();
     _geminiApiKeyController.dispose();
@@ -273,6 +278,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         AIEngine.chatgpt_4o, _chatgpt4oApiKeyController),
                     _buildEngineCard(
                         AIEngine.chatgpt_35turbo, _chatgpt35ApiKeyController),
+                    _buildEngineCard(
+                        AIEngine.chatgpt_4turbo, _chatgpt4tApiKeyController),
                     _buildEngineCard(AIEngine.gpt4, _chatgpt4ApiKeyController),
                     _buildEngineCard(AIEngine.chatgpt_davinci002,
                         _chatgptdavinci002ApiKeyController),

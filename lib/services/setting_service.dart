@@ -36,6 +36,8 @@ class SettingService {
         return 'api_key_chatgpt4o';
       case AIEngine.chatgpt_35turbo:
         return 'api_key_chatgpt35t';
+      case AIEngine.chatgpt_4turbo:
+        return 'api_key_chatgpt4t';
       case AIEngine.gpt4:
         return 'api_key_chatgpt4';
       case AIEngine.chatgpt_davinci002:
@@ -65,6 +67,8 @@ class SettingService {
       return AIEngine.chatgpt_4o;
     } else if (engine == ApiService.STR_chatgpt_35turbo) {
       return AIEngine.chatgpt_35turbo;
+    } else if (engine == ApiService.STR_chatgpt_4turbo) {
+      return AIEngine.chatgpt_4turbo;
     } else if (engine == ApiService.STR_chatgpt_4) {
       return AIEngine.gpt4;
     } else if (engine == ApiService.STR_chatgpt_davinci002) {
