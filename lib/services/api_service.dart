@@ -415,7 +415,7 @@ class ApiService {
       final sendJson = jsonEncode({
         'model': model,
         'messages': chatMessages,
-        'max_tokens': 10000,
+        'max_tokens': 60000,
         'temperature': 0.7,
         "tools": [
           {
@@ -694,7 +694,7 @@ class ApiService {
           {'role': 'user', 'content': systemPrompt},
           {'role': 'user', 'content': userInput}
         ],
-        'max_tokens': 10000,
+        'max_tokens': 60000,
         'temperature': 0.7,
       });
       Logger.log(sendJson);
@@ -741,7 +741,7 @@ class ApiService {
           {'role': 'user', 'content': systemPrompt},
           {'role': 'user', 'content': userInput}
         ],
-        'max_tokens': 10000,
+        'max_tokens': 60000,
         'temperature': 0.7,
         "tools": [
           {
