@@ -1,6 +1,9 @@
+import 'dart:io';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+
 import 'setting_service.dart';
+
 import '../services/setting_system.dart';
 import '../models/message.dart';
 import '../utils/logger.dart';
@@ -21,6 +24,8 @@ enum AIEngine {
 }
 
 class ApiService {
+  static String? pdffilePath;
+  static String? pdffileName;
   static AIEngine currentEngine = AIEngine.chatgpt_4omini;
 
   static const String openAIUrl = 'https://api.openai.com/v1/chat/completions';
@@ -356,16 +361,66 @@ class ApiService {
     msgModel = '';
     try {
       final systemPrompt = await SystemService.loadSystem();
+      List<Map<String, dynamic>> chatMessages = [];
 
-      final chatMessages = [
-        {'role': 'user', 'content': systemPrompt},
-        ...messages.map((m) => {"role": m.role, "content": m.content}).toList(),
-      ];
+      if (ApiService.pdffilePath != "" && ApiService.pdffilePath != null) {
+        final file = File(ApiService.pdffilePath!);
+        final bytes = await file.readAsBytes();
+        final base64String = base64Encode(bytes);
+        chatMessages = [
+          {'role': 'user', 'content': systemPrompt},
+          ...messages.asMap().entries.map((entry) {
+            int index = entry.key;
+            var message = entry.value;
+
+            // Create the base message map
+            Map<String, dynamic> messageMap = {
+              "role": message.role,
+              "content": message.content,
+            };
+
+            // If it's the last message, append the document object
+            if (index == messages.length - 1) {
+              if (ApiService.pdffilePath != "" &&
+                  ApiService.pdffilePath != null) {
+                messageMap["content"] = [
+                  {
+                    "type": "document",
+                    "source": {
+                      "type": "base64",
+                      "media_type": "application/pdf",
+                      "data": base64String,
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "text": message.content,
+                  }
+                ];
+              }
+            }
+
+            return messageMap;
+          }).toList(),
+        ];
+      } else {
+        chatMessages = [
+          {'role': 'user', 'content': systemPrompt},
+          ...messages
+              .map((m) => {"role": m.role, "content": m.content})
+              .toList(),
+        ];
+      }
+
+      int maxtoken = 8000;
+      if (model == 'claude-3-7-sonnet-20250219') {
+        maxtoken = 60000;
+      }
 
       final sendJson = jsonEncode({
         'model': model,
         'messages': chatMessages,
-        'max_tokens': 1000,
+        'max_tokens': maxtoken,
         'temperature': 0.7,
       });
       Logger.log(sendJson);
@@ -380,7 +435,7 @@ class ApiService {
         },
         body: sendJson,
       );
-
+      ApiService.pdffilePath = "";
       if (response.statusCode == 200) {
         final json = jsonDecode(utf8.decode(response.bodyBytes));
         msgReceivedLength = response.bodyBytes.length;
@@ -407,15 +462,66 @@ class ApiService {
     try {
       final systemPrompt = await SystemService.loadSystem();
 
-      final chatMessages = [
-        {'role': 'user', 'content': systemPrompt},
-        ...messages.map((m) => {"role": m.role, "content": m.content}).toList(),
-      ];
+      List<Map<String, dynamic>> chatMessages = [];
+
+      if (ApiService.pdffilePath != "" && ApiService.pdffilePath != null) {
+        final file = File(ApiService.pdffilePath!);
+        final bytes = await file.readAsBytes();
+        final base64String = base64Encode(bytes);
+        chatMessages = [
+          {'role': 'user', 'content': systemPrompt},
+          ...messages.asMap().entries.map((entry) {
+            int index = entry.key;
+            var message = entry.value;
+
+            // Create the base message map
+            Map<String, dynamic> messageMap = {
+              "role": message.role,
+              "content": message.content,
+            };
+
+            // If it's the last message, append the document object
+            if (index == messages.length - 1) {
+              if (ApiService.pdffilePath != "" &&
+                  ApiService.pdffilePath != null) {
+                messageMap["content"] = [
+                  {
+                    "type": "document",
+                    "source": {
+                      "type": "base64",
+                      "media_type": "application/pdf",
+                      "data": base64String,
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "text": message.content,
+                  }
+                ];
+              }
+            }
+
+            return messageMap;
+          }).toList(),
+        ];
+      } else {
+        chatMessages = [
+          {'role': 'user', 'content': systemPrompt},
+          ...messages
+              .map((m) => {"role": m.role, "content": m.content})
+              .toList(),
+        ];
+      }
+
+      int maxtoken = 8000;
+      if (model == 'claude-3-7-sonnet-20250219') {
+        maxtoken = 60000;
+      }
 
       final sendJson = jsonEncode({
         'model': model,
         'messages': chatMessages,
-        'max_tokens': 60000,
+        'max_tokens': maxtoken,
         'temperature': 0.7,
         "tools": [
           {
@@ -437,7 +543,7 @@ class ApiService {
         },
         body: sendJson,
       );
-
+      ApiService.pdffilePath = "";
       if (response.statusCode == 200) {
         final json = jsonDecode(utf8.decode(response.bodyBytes));
         msgReceivedLength = response.bodyBytes.length;
@@ -687,16 +793,51 @@ class ApiService {
     msgModel = '';
     try {
       String systemPrompt = await SystemService.loadSystem();
+      int maxtoken = 8000;
+      if (model == 'claude-3-7-sonnet-20250219') {
+        maxtoken = 60000;
+      }
 
-      final sendJson = jsonEncode({
-        'model': model,
-        'messages': [
-          {'role': 'user', 'content': systemPrompt},
-          {'role': 'user', 'content': userInput}
-        ],
-        'max_tokens': 60000,
-        'temperature': 0.7,
-      });
+      String sendJson = "";
+
+      if (ApiService.pdffilePath != "" && ApiService.pdffilePath != null) {
+        final file = File(ApiService.pdffilePath!);
+        final bytes = await file.readAsBytes();
+        final base64String = base64Encode(bytes);
+        sendJson = jsonEncode({
+          'model': model,
+          'messages': [
+            {'role': 'user', 'content': systemPrompt},
+            {
+              "role": "user",
+              "content": [
+                {
+                  "type": "document",
+                  "source": {
+                    "type": "base64",
+                    "media_type": "application/pdf",
+                    "data": base64String
+                  }
+                },
+                {"type": "text", "text": userInput}
+              ]
+            }
+          ],
+          'max_tokens': maxtoken,
+          'temperature': 0.7,
+        });
+      } else {
+        sendJson = jsonEncode({
+          'model': model,
+          'messages': [
+            {'role': 'user', 'content': systemPrompt},
+            {'role': 'user', 'content': userInput}
+          ],
+          'max_tokens': maxtoken,
+          'temperature': 0.7,
+        });
+      }
+
       Logger.log(sendJson);
       msgSendLength = sendJson.length;
       msgModel = model;
@@ -709,7 +850,7 @@ class ApiService {
         },
         body: sendJson,
       );
-
+      ApiService.pdffilePath = "";
       if (response.statusCode == 200) {
         final json = jsonDecode(utf8.decode(response.bodyBytes));
         msgReceivedLength = response.bodyBytes.length;
@@ -734,26 +875,53 @@ class ApiService {
     msgModel = '';
     try {
       String systemPrompt = await SystemService.loadSystem();
+      int maxtoken = 8000;
+      if (model == 'claude-3-7-sonnet-20250219') {
+        maxtoken = 60000;
+      }
+      String sendJson = "";
 
-      final sendJson = jsonEncode({
-        'model': model,
-        'messages': [
-          {'role': 'user', 'content': systemPrompt},
-          {'role': 'user', 'content': userInput}
-        ],
-        'max_tokens': 60000,
-        'temperature': 0.7,
-        "tools": [
-          {
-            "type": "web_search_20250305",
-            "name": "web_search",
-            "max_uses": 5,
-          }
-        ],
-      });
+      if (ApiService.pdffilePath != "" && ApiService.pdffilePath != null) {
+        final file = File(ApiService.pdffilePath!);
+        final bytes = await file.readAsBytes();
+        final base64String = base64Encode(bytes);
+        sendJson = jsonEncode({
+          'model': model,
+          'messages': [
+            {'role': 'user', 'content': systemPrompt},
+            {
+              "role": "user",
+              "content": [
+                {
+                  "type": "document",
+                  "source": {
+                    "type": "base64",
+                    "media_type": "application/pdf",
+                    "data": base64String
+                  }
+                },
+                {"type": "text", "text": userInput}
+              ]
+            }
+          ],
+          'max_tokens': maxtoken,
+          'temperature': 0.7,
+        });
+      } else {
+        sendJson = jsonEncode({
+          'model': model,
+          'messages': [
+            {'role': 'user', 'content': systemPrompt},
+            {'role': 'user', 'content': userInput}
+          ],
+          'max_tokens': maxtoken,
+          'temperature': 0.7,
+        });
+      }
       Logger.log(sendJson);
       msgSendLength = sendJson.length;
       msgModel = model;
+
       final response = await http.post(
         Uri.parse('$claudeUrl?key=$apiKey'),
         headers: {
@@ -763,7 +931,7 @@ class ApiService {
         },
         body: sendJson,
       );
-
+      ApiService.pdffilePath = "";
       if (response.statusCode == 200) {
         final json = jsonDecode(utf8.decode(response.bodyBytes));
         msgReceivedLength = response.bodyBytes.length;
