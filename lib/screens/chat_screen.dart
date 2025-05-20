@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_highlight/flutter_highlight.dart';
 import 'package:flutter_highlight/themes/github.dart';
+import 'package:file_picker/file_picker.dart';
 import 'dart:convert';
+
 import '../services/api_service.dart';
 import '../services/storage_service.dart';
 import '../services/setting_service.dart';
@@ -10,7 +12,6 @@ import '../models/message.dart';
 import '../models/thread.dart';
 import '../screens/settings_screen.dart';
 import '../utils/dart_highlight_code.dart';
-
 import '../utils/constants.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -638,6 +639,40 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
                     ],
                   ),
+                if (ApiService.pdffilePath != "" &&
+                    ApiService.pdffilePath != null)
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                    padding: EdgeInsets.symmetric(vertical: 2, horizontal: 20),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.grey,
+                        width: 1,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          ApiService.pdffileName!,
+                        ),
+                        const SizedBox(
+                          width: 12,
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () {
+                            setState(() {
+                              ApiService.pdffilePath = "";
+                              ApiService.pdffileName = "";
+                            });
+                          },
+                          tooltip: 'cancel',
+                        ),
+                      ],
+                    ),
+                  ),
                 Padding(
                   padding: const EdgeInsets.only(
                       top: 12, right: 12, bottom: 4, left: 12),
@@ -667,17 +702,41 @@ class _ChatScreenState extends State<ChatScreen> {
                         tooltip: 'Send',
                         color: Theme.of(context).primaryColor,
                       ),
-                      if (ApiService.currentEngine == AIEngine.chatgpt_4o ||
-                          ApiService.currentEngine == AIEngine.claude35 ||
+                      if (ApiService.currentEngine == AIEngine.claude35 ||
                           ApiService.currentEngine == AIEngine.claude37)
                         const SizedBox(width: 8),
-                      if (ApiService.currentEngine == AIEngine.chatgpt_4o ||
-                          ApiService.currentEngine == AIEngine.claude35 ||
+                      if (ApiService.currentEngine == AIEngine.claude35 ||
                           ApiService.currentEngine == AIEngine.claude37)
                         IconButton(
-                          icon: Icon(Icons.language),
+                          icon: const Icon(Icons.language),
                           onPressed: () => _sendMessage(_controller.text, true),
                           tooltip: 'Web',
+                          color: Theme.of(context).primaryColor,
+                        ),
+                      if (ApiService.currentEngine == AIEngine.claude35 ||
+                          ApiService.currentEngine == AIEngine.claude37)
+                        const SizedBox(width: 8),
+                      if (ApiService.currentEngine == AIEngine.claude35 ||
+                          ApiService.currentEngine == AIEngine.claude37)
+                        IconButton(
+                          icon: const Icon(Icons.insert_drive_file_outlined),
+                          onPressed: () async {
+                            FilePickerResult? result =
+                                await FilePicker.platform.pickFiles(
+                              type: FileType.custom,
+                              allowedExtensions: ['pdf'],
+                            );
+
+                            if (result != null) {
+                              setState(() {
+                                ApiService.pdffilePath =
+                                    result.files.single.path;
+                                ApiService.pdffileName =
+                                    result.files.single.name;
+                              });
+                            } else {}
+                          },
+                          tooltip: 'Pdf',
                           color: Theme.of(context).primaryColor,
                         ),
                     ],
