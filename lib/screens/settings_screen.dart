@@ -26,13 +26,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
       TextEditingController();
   final TextEditingController _chatgpt4tApiKeyController =
       TextEditingController();
-
   final TextEditingController _chatgpt4ApiKeyController =
       TextEditingController();
   final TextEditingController _chatgptdavinci002ApiKeyController =
       TextEditingController();
 
-  final TextEditingController _geminiApiKeyController = TextEditingController();
+  final TextEditingController _gemini25flashApiKeyController =
+      TextEditingController();
+  final TextEditingController _gemini25proApiKeyController =
+      TextEditingController();
+  final TextEditingController _gemini20flashApiKeyController =
+      TextEditingController();
+  final TextEditingController _gemini15proApiKeyController =
+      TextEditingController();
+
   final TextEditingController _claude35ApiKeyController =
       TextEditingController();
   final TextEditingController _claude37ApiKeyController =
@@ -78,7 +85,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final chatgpt4Key = await SettingService.loadApiKey(AIEngine.gpt4);
     final chatgptdavinci002Key =
         await SettingService.loadApiKey(AIEngine.chatgpt_davinci002);
-    final geminiKey = await SettingService.loadApiKey(AIEngine.gemini);
+
+    final gemini25flashKey =
+        await SettingService.loadApiKey(AIEngine.gemini25flash);
+    final gemini25proKey =
+        await SettingService.loadApiKey(AIEngine.gemini25pro);
+    final gemini20flashKey =
+        await SettingService.loadApiKey(AIEngine.gemini20flash);
+    final gemini15proKey =
+        await SettingService.loadApiKey(AIEngine.gemini15pro);
+
     final claude35Key = await SettingService.loadApiKey(AIEngine.claude35);
     final claude37Key = await SettingService.loadApiKey(AIEngine.claude37);
     final groq3Key = await SettingService.loadApiKey(AIEngine.grok_3);
@@ -95,7 +111,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _chatgpt4tApiKeyController.text = chatgpt4tKey;
       _chatgpt4ApiKeyController.text = chatgpt4Key;
       _chatgptdavinci002ApiKeyController.text = chatgptdavinci002Key;
-      _geminiApiKeyController.text = geminiKey;
+
+      _gemini25flashApiKeyController.text = gemini25flashKey;
+      _gemini25proApiKeyController.text = gemini25proKey;
+      _gemini20flashApiKeyController.text = gemini20flashKey;
+      _gemini15proApiKeyController.text = gemini15proKey;
+
       _claude35ApiKeyController.text = claude35Key;
       _claude37ApiKeyController.text = claude37Key;
       _grok3ApiKeyController.text = groq3Key;
@@ -106,6 +127,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _onEngineChanged(AIEngine? newEngine) async {
+    ApiService.pdffilePath = "";
+    ApiService.pdffileName = "";
     if (newEngine != null) {
       await SettingService.saveEngine(newEngine);
       setState(() {
@@ -187,7 +210,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _chatgpt4tApiKeyController.dispose();
     _chatgpt4ApiKeyController.dispose();
     _chatgptdavinci002ApiKeyController.dispose();
-    _geminiApiKeyController.dispose();
+    _gemini25flashApiKeyController.dispose();
+    _gemini25proApiKeyController.dispose();
+    _gemini20flashApiKeyController.dispose();
+    _gemini15proApiKeyController.dispose();
     _claude35ApiKeyController.dispose();
     _claude37ApiKeyController.dispose();
     _grok3ApiKeyController.dispose();
@@ -283,7 +309,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     _buildEngineCard(AIEngine.gpt4, _chatgpt4ApiKeyController),
                     _buildEngineCard(AIEngine.chatgpt_davinci002,
                         _chatgptdavinci002ApiKeyController),
-                    _buildEngineCard(AIEngine.gemini, _geminiApiKeyController),
+                    _buildEngineCard(
+                        AIEngine.gemini25flash, _gemini25flashApiKeyController),
+                    _buildEngineCard(
+                        AIEngine.gemini25pro, _gemini25proApiKeyController),
+                    _buildEngineCard(
+                        AIEngine.gemini20flash, _gemini20flashApiKeyController),
+                    _buildEngineCard(
+                        AIEngine.gemini15pro, _gemini15proApiKeyController),
                     _buildEngineCard(
                         AIEngine.claude35, _claude35ApiKeyController),
                     _buildEngineCard(

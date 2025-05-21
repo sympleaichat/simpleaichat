@@ -16,7 +16,10 @@ enum AIEngine {
   chatgpt_4turbo,
   gpt4,
   chatgpt_davinci002,
-  gemini,
+  gemini25flash,
+  gemini25pro,
+  gemini20flash,
+  gemini15pro,
   claude35,
   claude37,
   grok_3,
@@ -31,6 +34,8 @@ class ApiService {
   static const String openAIUrl = 'https://api.openai.com/v1/chat/completions';
   static const String openAIUrlLegacy = 'https://api.openai.com/v1/completions';
   static const String geminiUrl =
+      'https://generativelanguage.googleapis.com/v1beta/models/';
+  static const String geminiUrl2 =
       'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent';
   static const String claudeUrl = 'https://api.anthropic.com/v1/messages';
   static const String grokUrl = 'https://api.x.ai/v1/messages';
@@ -44,24 +49,30 @@ class ApiService {
   static const String NAME_chatgpt_4turbo = 'ChatGPT 4-turbo';
   static const String NAME_chatgpt_4 = 'ChatGPT 4';
   static const String NAME_chatgpt_davinci002 = 'ChatGPT davinci002';
-  static const String NAME_gemini = 'Gemini 1.5 Pro';
+  static const String NAME_gemini25flash = 'Gemini 2.5 Flash';
+  static const String NAME_gemini25pro = 'Gemini 2.5 Pro';
+  static const String NAME_gemini20flash = 'Gemini 2.0 Flash';
+  static const String NAME_gemini15pro = 'Gemini 1.5 Pro';
   static const String NAME_claude35 = 'Claude 3.5 Haiku';
   static const String NAME_claude37 = 'Claude 3.7 Sonnet';
   static const String NAME_grok_3 = 'Grok 3';
   static const String NAME_grok_3mini = 'Grok 3 Mini';
 
-  static const String STR_chatgpt_41 = 'chatgpt_41';
-  static const String STR_chatgpt_4omini = 'chatgpt_4omini';
-  static const String STR_chatgpt_4o = 'chatgpt_4o';
-  static const String STR_chatgpt_35turbo = 'chatgpt_35turbo';
-  static const String STR_chatgpt_4turbo = 'chatgpt_4turbo';
-  static const String STR_chatgpt_4 = 'chatgpt_4';
-  static const String STR_chatgpt_davinci002 = 'chatgpt_davinci002';
-  static const String STR_gemini = 'gemini';
-  static const String STR_claude35 = 'claude35';
-  static const String STR_claude37 = 'claude37';
-  static const String STR_grok3 = 'grok3';
-  static const String STR_grok3mini = 'grok3mini';
+  static const String STR_chatgpt_41 = "gpt-4.1";
+  static const String STR_chatgpt_4omini = "gpt-4o-mini";
+  static const String STR_chatgpt_4o = "gpt-4o";
+  static const String STR_chatgpt_35turbo = "gpt-3.5-turbo";
+  static const String STR_chatgpt_4turbo = "gpt-4-turbo";
+  static const String STR_chatgpt_4 = "gpt-4";
+  static const String STR_chatgpt_davinci002 = "davinci-002";
+  static const String STR_gemini25flash = 'gemini-2.5-flash-preview-05-20';
+  static const String STR_gemini25pro = 'gemini-2.5-pro-preview-05-06';
+  static const String STR_gemini20flash = 'gemini-2.0-flash';
+  static const String STR_gemini15pro = 'gemini-1.5-pro';
+  static const String STR_claude35 = 'claude-3-5-haiku-20241022';
+  static const String STR_claude37 = 'claude-3-7-sonnet-20250219';
+  static const String STR_grok3 = 'grok-3-beta';
+  static const String STR_grok3mini = 'grok-3-mini-beta';
 
   static int msgSendLength = 0;
   static int msgReceivedLength = 0;
@@ -82,8 +93,14 @@ class ApiService {
         return NAME_chatgpt_4;
       case AIEngine.chatgpt_davinci002:
         return NAME_chatgpt_davinci002;
-      case AIEngine.gemini:
-        return NAME_gemini;
+      case AIEngine.gemini25flash:
+        return NAME_gemini25flash;
+      case AIEngine.gemini25pro:
+        return NAME_gemini25pro;
+      case AIEngine.gemini20flash:
+        return NAME_gemini20flash;
+      case AIEngine.gemini15pro:
+        return NAME_gemini15pro;
       case AIEngine.claude35:
         return NAME_claude35;
       case AIEngine.claude37:
@@ -111,8 +128,14 @@ class ApiService {
         return STR_chatgpt_4;
       case AIEngine.chatgpt_davinci002:
         return STR_chatgpt_davinci002;
-      case AIEngine.gemini:
-        return STR_gemini;
+      case AIEngine.gemini25flash:
+        return STR_gemini25flash;
+      case AIEngine.gemini25pro:
+        return STR_gemini25pro;
+      case AIEngine.gemini20flash:
+        return STR_gemini20flash;
+      case AIEngine.gemini15pro:
+        return NAME_gemini15pro;
       case AIEngine.claude35:
         return STR_claude35;
       case AIEngine.claude37:
@@ -125,31 +148,26 @@ class ApiService {
   }
 
   static Future<String> sendMessage(String userInput, AIEngine model) async {
+    final modelStr = getModelStr(model);
     final apiKey = await SettingService.loadApiKey(model);
-    if (model == AIEngine.chatgpt_41) {
-      return _sendToChatGPT("gpt-4.1", userInput, apiKey);
-    } else if (model == AIEngine.chatgpt_4omini) {
-      return _sendToChatGPT("gpt-4o", userInput, apiKey);
-    } else if (model == AIEngine.chatgpt_4o) {
-      return _sendToChatGPT("gpt-4o-mini", userInput, apiKey);
-    } else if (model == AIEngine.chatgpt_35turbo) {
-      return _sendToChatGPT("gpt-3.5-turbo", userInput, apiKey);
-    } else if (model == AIEngine.chatgpt_4turbo) {
-      return _sendToChatGPT("gpt-4-turbo", userInput, apiKey);
-    } else if (model == AIEngine.gpt4) {
-      return _sendToChatGPT("gpt-4", userInput, apiKey);
+    if (model == AIEngine.chatgpt_41 ||
+        model == AIEngine.chatgpt_4omini ||
+        model == AIEngine.chatgpt_4o ||
+        model == AIEngine.chatgpt_35turbo ||
+        model == AIEngine.chatgpt_4turbo ||
+        model == AIEngine.gpt4) {
+      return _sendToChatGPT(modelStr, userInput, apiKey);
     } else if (model == AIEngine.chatgpt_davinci002) {
-      return _sendToChatGPTLegacy("davinci-002", userInput, apiKey);
-    } else if (model == AIEngine.gemini) {
-      return _sendToGemini(userInput, apiKey);
-    } else if (model == AIEngine.claude35) {
-      return _sendToClaude('claude-3-5-haiku-20241022', userInput, apiKey);
-    } else if (model == AIEngine.claude37) {
-      return _sendToClaude('claude-3-7-sonnet-20250219', userInput, apiKey);
-    } else if (model == AIEngine.grok_3) {
-      return _sendToChatGrok('grok-3-beta', userInput, apiKey);
-    } else if (model == AIEngine.grok_3mini) {
-      return _sendToChatGrok('grok-3-mini-beta', userInput, apiKey);
+      return _sendToChatGPTLegacy(modelStr, userInput, apiKey);
+    } else if (model == AIEngine.gemini25flash ||
+        model == AIEngine.gemini25pro ||
+        model == AIEngine.gemini20flash ||
+        model == AIEngine.gemini15pro) {
+      return _sendToGemini(modelStr, userInput, apiKey);
+    } else if (model == AIEngine.claude35 || model == AIEngine.claude37) {
+      return _sendToClaude(modelStr, userInput, apiKey);
+    } else if (model == AIEngine.grok_3 || model == AIEngine.grok_3mini) {
+      return _sendToChatGrok(modelStr, userInput, apiKey);
     } else {
       return 'This model does not support Single mode yet.';
     }
@@ -157,45 +175,48 @@ class ApiService {
 
   static Future<String> sendMessageWithHistory(
       List<Message> messages, AIEngine model) async {
+    final modelStr = getModelStr(model);
     final apiKey = await SettingService.loadApiKey(model);
     if (model == AIEngine.chatgpt_41) {
-      return _sendToChatGPTWithHistory("gpt-4.1", messages, apiKey);
+      return _sendToChatGPTWithHistory(modelStr, messages, apiKey);
     } else if (model == AIEngine.chatgpt_4omini) {
-      return _sendToChatGPTWithHistory("gpt-4o-mini", messages, apiKey);
+      return _sendToChatGPTWithHistory(modelStr, messages, apiKey);
     } else if (model == AIEngine.chatgpt_4o) {
-      return _sendToChatGPTWithHistory("gpt-4o", messages, apiKey);
+      return _sendToChatGPTWithHistory(modelStr, messages, apiKey);
     } else if (model == AIEngine.chatgpt_35turbo) {
-      return _sendToChatGPTWithHistory("gpt-3.5-turbo", messages, apiKey);
+      return _sendToChatGPTWithHistory(modelStr, messages, apiKey);
     } else if (model == AIEngine.chatgpt_4turbo) {
-      return _sendToChatGPTWithHistory("gpt-4-turbo", messages, apiKey);
+      return _sendToChatGPTWithHistory(modelStr, messages, apiKey);
     } else if (model == AIEngine.gpt4) {
-      return _sendToChatGPTWithHistory("gpt-4", messages, apiKey);
+      return _sendToChatGPTWithHistory(modelStr, messages, apiKey);
     } else if (model == AIEngine.chatgpt_davinci002) {
       return 'This model does not support thread messages.';
       //   return _sendToChatGPTWithHistoryLegacy("davinci-002", messages);
-    } else if (model == AIEngine.gemini) {
-      return _sendToGeminiWithHistory(messages, apiKey);
+    } else if (model == AIEngine.gemini25flash ||
+        model == AIEngine.gemini25pro ||
+        model == AIEngine.gemini20flash ||
+        model == AIEngine.gemini15pro) {
+      return _sendToGeminiWithHistory(modelStr, messages, apiKey);
     } else if (model == AIEngine.claude35) {
-      return _sendToClaudeWithHistory(
-          'claude-3-5-haiku-20241022', messages, apiKey);
+      return _sendToClaudeWithHistory(modelStr, messages, apiKey);
     } else if (model == AIEngine.claude37) {
-      return _sendToClaudeWithHistory(
-          'claude-3-7-sonnet-20250219', messages, apiKey);
+      return _sendToClaudeWithHistory(modelStr, messages, apiKey);
     } else if (model == AIEngine.grok_3) {
-      return _sendToGrokWithHistory("grok-3-beta", messages, apiKey);
+      return _sendToGrokWithHistory(modelStr, messages, apiKey);
     } else if (model == AIEngine.grok_3mini) {
-      return _sendToGrokWithHistory("grok-3-mini-beta", messages, apiKey);
+      return _sendToGrokWithHistory(modelStr, messages, apiKey);
     } else {
       return 'This model does not support history yet.';
     }
   }
 
   static Future<String> sendMessageWeb(String userInput, AIEngine model) async {
+    final modelStr = getModelStr(model);
     final apiKey = await SettingService.loadApiKey(model);
     if (model == AIEngine.claude35) {
-      return _sendToClaudeWeb('claude-3-5-haiku-20241022', userInput, apiKey);
+      return _sendToClaudeWeb(modelStr, userInput, apiKey);
     } else if (model == AIEngine.claude37) {
-      return _sendToClaudeWeb('claude-3-7-sonnet-20250219', userInput, apiKey);
+      return _sendToClaudeWeb(modelStr, userInput, apiKey);
     } else {
       return 'This model does not support history yet.';
     }
@@ -203,13 +224,12 @@ class ApiService {
 
   static Future<String> sendMessageWithHistoryWeb(
       List<Message> messages, AIEngine model) async {
+    final modelStr = getModelStr(model);
     final apiKey = await SettingService.loadApiKey(model);
     if (model == AIEngine.claude35) {
-      return _sendToClaudeWithHistoryWeb(
-          'claude-3-5-haiku-20241022', messages, apiKey);
+      return _sendToClaudeWithHistoryWeb(modelStr, messages, apiKey);
     } else if (model == AIEngine.claude37) {
-      return _sendToClaudeWithHistoryWeb(
-          'claude-3-7-sonnet-20250219', messages, apiKey);
+      return _sendToClaudeWithHistoryWeb(modelStr, messages, apiKey);
     } else {
       return 'This model does not support history yet.';
     }
@@ -308,7 +328,7 @@ class ApiService {
   }
 
   static Future<String> _sendToGeminiWithHistory(
-      List<Message> messages, String apiKey) async {
+      String model, List<Message> messages, String apiKey) async {
     msgSendLength = 0;
     msgReceivedLength = 0;
     msgModel = '';
@@ -332,7 +352,8 @@ class ApiService {
       msgSendLength = sendJson.length;
       msgModel = 'Gemini';
       final response = await http.post(
-        Uri.parse('$geminiUrl?key=$apiKey'),
+        //   Uri.parse('$geminiUrl?key=$apiKey'),
+        Uri.parse(geminiUrl + model + ':generateContent?key=$apiKey'),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -743,7 +764,8 @@ class ApiService {
     }
   }
 
-  static Future<String> _sendToGemini(String userInput, String apiKey) async {
+  static Future<String> _sendToGemini(
+      String model, String userInput, String apiKey) async {
     msgSendLength = 0;
     msgReceivedLength = 0;
     msgModel = '';
@@ -764,7 +786,7 @@ class ApiService {
       msgSendLength = sendJson.length;
       msgModel = 'gemini';
       final response = await http.post(
-        Uri.parse('$geminiUrl?key=$apiKey'),
+        Uri.parse(geminiUrl + model + ':generateContent?key=$apiKey'),
         headers: {
           'Content-Type': 'application/json',
         },

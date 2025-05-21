@@ -44,6 +44,8 @@ class _ChatScreenState extends State<ChatScreen> {
     _loadThreads();
     _loadMessages();
 
+    ApiService.pdffilePath = "";
+    ApiService.pdffileName = "";
     if (!SettingService.isInit) {
       Future(() {
         SettingService.isInit = true;
