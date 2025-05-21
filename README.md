@@ -6,8 +6,6 @@ Designed for Claude, ChatGPT, Gemini — with full message editing and local his
 
 🔔Added thread copy function🔔
 
-🔔Added support ChatGPT-4.1, ChatGPT-4, ChatGPT-davinci002, Grok 3, Grok 3 Mini🔔
-
 Download for Desktop<br>
 ([Windows](https://github.com/sympleaichat/simpleaichat/raw/refs/heads/main/SimpleAIChatSetup.exe)) 
 
