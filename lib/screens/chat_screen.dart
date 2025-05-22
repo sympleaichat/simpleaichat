@@ -704,10 +704,18 @@ class _ChatScreenState extends State<ChatScreen> {
                         tooltip: 'Send',
                         color: Theme.of(context).primaryColor,
                       ),
-                      if (ApiService.currentEngine == AIEngine.claude35 ||
+                      if (ApiService.currentEngine == AIEngine.chatgpt_4o ||
+                          ApiService.currentEngine == AIEngine.chatgpt_4omini ||
+                          ApiService.currentEngine == AIEngine.claude40opus ||
+                          ApiService.currentEngine == AIEngine.claude40sonnet ||
+                          ApiService.currentEngine == AIEngine.claude35 ||
                           ApiService.currentEngine == AIEngine.claude37)
                         const SizedBox(width: 8),
-                      if (ApiService.currentEngine == AIEngine.claude35 ||
+                      if (ApiService.currentEngine == AIEngine.chatgpt_4o ||
+                          ApiService.currentEngine == AIEngine.chatgpt_4omini ||
+                          ApiService.currentEngine == AIEngine.claude40opus ||
+                          ApiService.currentEngine == AIEngine.claude40sonnet ||
+                          ApiService.currentEngine == AIEngine.claude35 ||
                           ApiService.currentEngine == AIEngine.claude37)
                         IconButton(
                           icon: const Icon(Icons.language),
@@ -715,10 +723,14 @@ class _ChatScreenState extends State<ChatScreen> {
                           tooltip: 'Web',
                           color: Theme.of(context).primaryColor,
                         ),
-                      if (ApiService.currentEngine == AIEngine.claude35 ||
+                      if (ApiService.currentEngine == AIEngine.claude40opus ||
+                          ApiService.currentEngine == AIEngine.claude40sonnet ||
+                          ApiService.currentEngine == AIEngine.claude35 ||
                           ApiService.currentEngine == AIEngine.claude37)
                         const SizedBox(width: 8),
-                      if (ApiService.currentEngine == AIEngine.claude35 ||
+                      if (ApiService.currentEngine == AIEngine.claude40opus ||
+                          ApiService.currentEngine == AIEngine.claude40sonnet ||
+                          ApiService.currentEngine == AIEngine.claude35 ||
                           ApiService.currentEngine == AIEngine.claude37)
                         IconButton(
                           icon: const Icon(Icons.insert_drive_file_outlined),

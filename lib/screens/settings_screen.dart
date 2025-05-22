@@ -40,6 +40,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final TextEditingController _gemini15proApiKeyController =
       TextEditingController();
 
+  final TextEditingController _claude40oApiKeyController =
+      TextEditingController();
+  final TextEditingController _claude40sApiKeyController =
+      TextEditingController();
   final TextEditingController _claude35ApiKeyController =
       TextEditingController();
   final TextEditingController _claude37ApiKeyController =
@@ -95,6 +99,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final gemini15proKey =
         await SettingService.loadApiKey(AIEngine.gemini15pro);
 
+    final claude40oKey = await SettingService.loadApiKey(AIEngine.claude40opus);
+    final claude40sKey =
+        await SettingService.loadApiKey(AIEngine.claude40sonnet);
     final claude35Key = await SettingService.loadApiKey(AIEngine.claude35);
     final claude37Key = await SettingService.loadApiKey(AIEngine.claude37);
     final groq3Key = await SettingService.loadApiKey(AIEngine.grok_3);
@@ -117,6 +124,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _gemini20flashApiKeyController.text = gemini20flashKey;
       _gemini15proApiKeyController.text = gemini15proKey;
 
+      _claude40oApiKeyController.text = claude40oKey;
+      _claude40sApiKeyController.text = claude40sKey;
       _claude35ApiKeyController.text = claude35Key;
       _claude37ApiKeyController.text = claude37Key;
       _grok3ApiKeyController.text = groq3Key;
@@ -214,6 +223,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _gemini25proApiKeyController.dispose();
     _gemini20flashApiKeyController.dispose();
     _gemini15proApiKeyController.dispose();
+    _claude40oApiKeyController.dispose();
+    _claude40sApiKeyController.dispose();
     _claude35ApiKeyController.dispose();
     _claude37ApiKeyController.dispose();
     _grok3ApiKeyController.dispose();
@@ -254,6 +265,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 style: TextStyle(fontWeight: FontWeight.bold)),
             value: _isDarkMode,
             onChanged: _onDarkModeChanged,
+            //    activeTrackColor: Colors.blue[800],
+            //   inactiveTrackColor: Colors.blue[200],
           ),
           const SizedBox(height: 6),
           ListTile(
@@ -317,6 +330,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         AIEngine.gemini20flash, _gemini20flashApiKeyController),
                     _buildEngineCard(
                         AIEngine.gemini15pro, _gemini15proApiKeyController),
+                    _buildEngineCard(
+                        AIEngine.claude40opus, _claude40oApiKeyController),
+                    _buildEngineCard(
+                        AIEngine.claude40sonnet, _claude40sApiKeyController),
                     _buildEngineCard(
                         AIEngine.claude35, _claude35ApiKeyController),
                     _buildEngineCard(

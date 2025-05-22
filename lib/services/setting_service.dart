@@ -50,6 +50,10 @@ class SettingService {
         return 'api_key_gemini20flash';
       case AIEngine.gemini15pro:
         return 'api_key_gemini15pro';
+      case AIEngine.claude40opus:
+        return 'api_key_claude40opus';
+      case AIEngine.claude40sonnet:
+        return 'api_key_claude40sonnet';
       case AIEngine.claude35:
         return 'api_key_claude35';
       case AIEngine.claude37:
@@ -87,6 +91,10 @@ class SettingService {
       return AIEngine.gemini20flash;
     } else if (engine == ApiService.STR_gemini15pro) {
       return AIEngine.gemini15pro;
+    } else if (engine == ApiService.STR_claude40opus) {
+      return AIEngine.claude40opus;
+    } else if (engine == ApiService.STR_claude40sonnet) {
+      return AIEngine.claude40sonnet;
     } else if (engine == ApiService.STR_claude35) {
       return AIEngine.claude35;
     } else if (engine == ApiService.STR_claude37) {

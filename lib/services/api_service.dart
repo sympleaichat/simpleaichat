@@ -20,6 +20,8 @@ enum AIEngine {
   gemini25pro,
   gemini20flash,
   gemini15pro,
+  claude40opus,
+  claude40sonnet,
   claude35,
   claude37,
   grok_3,
@@ -53,6 +55,8 @@ class ApiService {
   static const String NAME_gemini25pro = 'Gemini 2.5 Pro';
   static const String NAME_gemini20flash = 'Gemini 2.0 Flash';
   static const String NAME_gemini15pro = 'Gemini 1.5 Pro';
+  static const String NAME_claude40opus = 'Claude Opus 4';
+  static const String NAME_claude40sonnet = 'Claude Sonnet 4';
   static const String NAME_claude35 = 'Claude 3.5 Haiku';
   static const String NAME_claude37 = 'Claude 3.7 Sonnet';
   static const String NAME_grok_3 = 'Grok 3';
@@ -60,7 +64,9 @@ class ApiService {
 
   static const String STR_chatgpt_41 = "gpt-4.1";
   static const String STR_chatgpt_4omini = "gpt-4o-mini";
+  static const String STR_chatgpt_4omini_web = "gpt-4o-mini-search-preview";
   static const String STR_chatgpt_4o = "gpt-4o";
+  static const String STR_chatgpt_4o_web = "gpt-4o-search-preview";
   static const String STR_chatgpt_35turbo = "gpt-3.5-turbo";
   static const String STR_chatgpt_4turbo = "gpt-4-turbo";
   static const String STR_chatgpt_4 = "gpt-4";
@@ -69,6 +75,8 @@ class ApiService {
   static const String STR_gemini25pro = 'gemini-2.5-pro-preview-05-06';
   static const String STR_gemini20flash = 'gemini-2.0-flash';
   static const String STR_gemini15pro = 'gemini-1.5-pro';
+  static const String STR_claude40opus = 'claude-opus-4-20250514';
+  static const String STR_claude40sonnet = 'claude-sonnet-4-20250514';
   static const String STR_claude35 = 'claude-3-5-haiku-20241022';
   static const String STR_claude37 = 'claude-3-7-sonnet-20250219';
   static const String STR_grok3 = 'grok-3-beta';
@@ -101,6 +109,10 @@ class ApiService {
         return NAME_gemini20flash;
       case AIEngine.gemini15pro:
         return NAME_gemini15pro;
+      case AIEngine.claude40opus:
+        return NAME_claude40opus;
+      case AIEngine.claude40sonnet:
+        return NAME_claude40sonnet;
       case AIEngine.claude35:
         return NAME_claude35;
       case AIEngine.claude37:
@@ -135,7 +147,11 @@ class ApiService {
       case AIEngine.gemini20flash:
         return STR_gemini20flash;
       case AIEngine.gemini15pro:
-        return NAME_gemini15pro;
+        return STR_gemini15pro;
+      case AIEngine.claude40opus:
+        return STR_claude40opus;
+      case AIEngine.claude40sonnet:
+        return STR_claude40sonnet;
       case AIEngine.claude35:
         return STR_claude35;
       case AIEngine.claude37:
@@ -164,7 +180,10 @@ class ApiService {
         model == AIEngine.gemini20flash ||
         model == AIEngine.gemini15pro) {
       return _sendToGemini(modelStr, userInput, apiKey);
-    } else if (model == AIEngine.claude35 || model == AIEngine.claude37) {
+    } else if (model == AIEngine.claude35 ||
+        model == AIEngine.claude37 ||
+        model == AIEngine.claude40opus ||
+        model == AIEngine.claude40sonnet) {
       return _sendToClaude(modelStr, userInput, apiKey);
     } else if (model == AIEngine.grok_3 || model == AIEngine.grok_3mini) {
       return _sendToChatGrok(modelStr, userInput, apiKey);
@@ -197,9 +216,10 @@ class ApiService {
         model == AIEngine.gemini20flash ||
         model == AIEngine.gemini15pro) {
       return _sendToGeminiWithHistory(modelStr, messages, apiKey);
-    } else if (model == AIEngine.claude35) {
-      return _sendToClaudeWithHistory(modelStr, messages, apiKey);
-    } else if (model == AIEngine.claude37) {
+    } else if (model == AIEngine.claude35 ||
+        model == AIEngine.claude37 ||
+        model == AIEngine.claude40opus ||
+        model == AIEngine.claude40sonnet) {
       return _sendToClaudeWithHistory(modelStr, messages, apiKey);
     } else if (model == AIEngine.grok_3) {
       return _sendToGrokWithHistory(modelStr, messages, apiKey);
@@ -213,9 +233,14 @@ class ApiService {
   static Future<String> sendMessageWeb(String userInput, AIEngine model) async {
     final modelStr = getModelStr(model);
     final apiKey = await SettingService.loadApiKey(model);
-    if (model == AIEngine.claude35) {
-      return _sendToClaudeWeb(modelStr, userInput, apiKey);
-    } else if (model == AIEngine.claude37) {
+    if (model == AIEngine.chatgpt_4omini) {
+      return _sendToChatGPTWeb(STR_chatgpt_4omini_web, userInput, apiKey);
+    } else if (model == AIEngine.chatgpt_4o) {
+      return _sendToChatGPTWeb(STR_chatgpt_4o_web, userInput, apiKey);
+    } else if (model == AIEngine.claude35 ||
+        model == AIEngine.claude37 ||
+        model == AIEngine.claude40opus ||
+        model == AIEngine.claude40sonnet) {
       return _sendToClaudeWeb(modelStr, userInput, apiKey);
     } else {
       return 'This model does not support history yet.';
@@ -226,9 +251,15 @@ class ApiService {
       List<Message> messages, AIEngine model) async {
     final modelStr = getModelStr(model);
     final apiKey = await SettingService.loadApiKey(model);
-    if (model == AIEngine.claude35) {
-      return _sendToClaudeWithHistoryWeb(modelStr, messages, apiKey);
-    } else if (model == AIEngine.claude37) {
+    if (model == AIEngine.chatgpt_4omini) {
+      return _sendToChatGPTWithHistoryWeb(
+          STR_chatgpt_4omini_web, messages, apiKey);
+    } else if (model == AIEngine.chatgpt_4o) {
+      return _sendToChatGPTWithHistoryWeb(STR_chatgpt_4o_web, messages, apiKey);
+    } else if (model == AIEngine.claude35 ||
+        model == AIEngine.claude37 ||
+        model == AIEngine.claude40opus ||
+        model == AIEngine.claude40sonnet) {
       return _sendToClaudeWithHistoryWeb(modelStr, messages, apiKey);
     } else {
       return 'This model does not support history yet.';
@@ -273,6 +304,78 @@ class ApiService {
       } else {
         print('ChatGPT API error: ${response.body}');
         return 'Sorry, ChatGPT did not respond.';
+      }
+    } catch (e) {
+      print('ChatGPT API error: $e');
+      return 'ChatGPT Error occurred.';
+    }
+  }
+
+  static Future<String> _sendToChatGPTWithHistoryWeb(
+      String model, List<Message> messages, String apiKey) async {
+    msgSendLength = 0;
+    msgReceivedLength = 0;
+    msgModel = '';
+    try {
+      String systemPrompt = await SystemService.loadSystem();
+
+      final chatMessages = [
+        {'role': 'system', 'content': systemPrompt},
+        ...messages.map((m) => {'role': m.role, 'content': m.content}).toList(),
+      ];
+      final sendJson = jsonEncode({
+        "model": model,
+        'web_search_options': {},
+        "messages": chatMessages,
+        // "temperature": 0.7,
+      });
+      msgModel = model;
+      msgSendLength = sendJson.length;
+      final response = await http.post(
+        Uri.parse(openAIUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $apiKey',
+        },
+        body: sendJson,
+      );
+
+      if (response.statusCode == 200) {
+        Logger.log(response.body);
+        final data = jsonDecode(utf8.decode(response.bodyBytes));
+        msgReceivedLength = response.bodyBytes.length;
+
+        if (data['choices'] != null && data['choices'].isNotEmpty) {
+          final message = data['choices'][0]['message'];
+          final content = message['content']?.toString() ?? '';
+
+          if (message['annotations'] != null &&
+              message['annotations'] is List) {
+            final annotations = message['annotations'] as List;
+            if (annotations.isNotEmpty) {
+              final StringBuffer annotated = StringBuffer(content.trim());
+              annotated.write(' [');
+              for (int i = 0; i < annotations.length; i++) {
+                if (i > 0) annotated.write(', ');
+                final annotation = annotations[i];
+                if (annotation['type'] == 'url_citation' &&
+                    annotation['url_citation'] != null &&
+                    annotation['url_citation']['title'] != null) {
+                  annotated.write(annotation['url_citation']['title']);
+                }
+              }
+              annotated.write(']');
+              return annotated.toString();
+            }
+          }
+
+          return content.trim();
+        } else {
+          return '(No choices returned from ChatGPT)';
+        }
+      } else {
+        print('ChatGPT API error: ${response.body}');
+        return 'Sorry, ChatGPT did not respond. ${response.statusCode}';
       }
     } catch (e) {
       print('ChatGPT API error: $e');
@@ -764,6 +867,78 @@ class ApiService {
     }
   }
 
+  static Future<String> _sendToChatGPTWeb(
+      String model, String userInput, String apiKey) async {
+    msgSendLength = 0;
+    msgReceivedLength = 0;
+    msgModel = '';
+
+    try {
+      String systemPrompt = await SystemService.loadSystem();
+      final sendJson = jsonEncode({
+        "model": model,
+        'web_search_options': {},
+        "messages": [
+          {'role': 'developer', 'content': systemPrompt},
+          {"role": "user", "content": userInput}
+        ],
+        // "temperature": 0.7,
+      });
+      Logger.log(sendJson);
+      msgSendLength = sendJson.length;
+      msgModel = model;
+      final response = await http.post(
+        Uri.parse(openAIUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $apiKey',
+        },
+        body: sendJson,
+      );
+
+      if (response.statusCode == 200) {
+        Logger.log(response.body);
+        final data = jsonDecode(utf8.decode(response.bodyBytes));
+        msgReceivedLength = response.bodyBytes.length;
+
+        if (data['choices'] != null && data['choices'].isNotEmpty) {
+          final message = data['choices'][0]['message'];
+          final content = message['content']?.toString() ?? '';
+
+          if (message['annotations'] != null &&
+              message['annotations'] is List) {
+            final annotations = message['annotations'] as List;
+            if (annotations.isNotEmpty) {
+              final StringBuffer annotated = StringBuffer(content.trim());
+              annotated.write(' [');
+              for (int i = 0; i < annotations.length; i++) {
+                if (i > 0) annotated.write(', ');
+                final annotation = annotations[i];
+                if (annotation['type'] == 'url_citation' &&
+                    annotation['url_citation'] != null &&
+                    annotation['url_citation']['title'] != null) {
+                  annotated.write(annotation['url_citation']['title']);
+                }
+              }
+              annotated.write(']');
+              return annotated.toString();
+            }
+          }
+
+          return content.trim();
+        } else {
+          return '(No choices returned from ChatGPT)';
+        }
+      } else {
+        print('ChatGPT API error: ${response.body}');
+        return 'Sorry, ChatGPT did not respond. ${response.statusCode}';
+      }
+    } catch (e) {
+      print('ChatGPT API error: $e');
+      return 'ChatGPT Error occurred.';
+    }
+  }
+
   static Future<String> _sendToGemini(
       String model, String userInput, String apiKey) async {
     msgSendLength = 0;
@@ -938,6 +1113,13 @@ class ApiService {
           ],
           'max_tokens': maxtoken,
           'temperature': 0.7,
+          "tools": [
+            {
+              "type": "web_search_20250305",
+              "name": "web_search",
+              "max_uses": 5,
+            }
+          ]
         });
       }
       Logger.log(sendJson);
@@ -953,6 +1135,7 @@ class ApiService {
         },
         body: sendJson,
       );
+
       ApiService.pdffilePath = "";
       if (response.statusCode == 200) {
         final json = jsonDecode(utf8.decode(response.bodyBytes));
