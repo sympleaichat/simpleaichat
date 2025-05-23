@@ -2,7 +2,7 @@
 [Repositories](https://github.com/sympleaichat/simpleaichat)
 
 A fast, ad-free, fully local AI chat client for Windows.  
-Designed for Claude, ChatGPT, Gemini — with full message editing and local history.
+Designed for Claude, ChatGPT, Gemini, Grok, DeepSeek — with full message editing and local history.
 
 🔔supported　Claude Opus 4,　Claude Sonnet 4,　openai web search, deepseek🔔
 
@@ -12,7 +12,7 @@ Download for Desktop<br>
 ---
 ## Why SimpleAIChat?
 
-Most LLMs today — whether OpenAI's GPT, Anthropic's Claude, Grok, or Google's Gemini — are accessed through hosted web interfaces that abstract away the details of message formatting, memory control, and backend behavior.
+Most LLMs today — whether OpenAI's GPT, Anthropic's Claude, Grok, Gemini, DeepSeek — are accessed through hosted web interfaces that abstract away the details of message formatting, memory control, and backend behavior.
 
 That’s convenient — but not always ideal.
 
@@ -40,7 +40,7 @@ Pull requests and ideas are welcome!
 
 ## ✨ Features
 
-🧠 Works with Claude, ChatGPT, Gemini, Grok  
+🧠 Works with Claude, ChatGPT, Gemini, Grok, DeepSeek
 📝 Edit and delete messages freely in any conversation  
 💾 Everything is saved locally — no data sent to third-party servers  
 🔐 API keys are never uploaded (saved on your device only)  
@@ -79,7 +79,7 @@ The character count of messages at the time of sending can be checked.
 ## 🚀 Getting Started
 
 1. Launch the app
-2. Enter your API key for Claude / ChatGPT / Gemini
+2. Enter your API key for Claude / ChatGPT / Gemini / Grok / DeepSeek
 3. Start chatting, editing, and exploring — all saved locally
 
 ---
