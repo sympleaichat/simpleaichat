@@ -2,6 +2,7 @@
 [Repositories](https://github.com/sympleaichat/simpleaichat)
 
 A fast, ad-free, fully local AI chat client for Windows.  
+
 Designed for Claude, ChatGPT, Gemini, Grok, DeepSeek — with full message editing and local history.
 
 🔔supported　Claude Opus 4,　Claude Sonnet 4,　openai web search, deepseek🔔
