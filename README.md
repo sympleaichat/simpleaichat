@@ -114,6 +114,7 @@ gemini https://ai.google.dev/gemini-api/docs
 
 Grok https://x.ai/api
 
+deepseek https://api-docs.deepseek.com/
 
 ---
 
