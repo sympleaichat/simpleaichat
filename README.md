@@ -101,7 +101,7 @@ MIT License — see [LICENSE](LICENSE).
 ## 🔍 Disclaimer
 
 This is an **independent, unofficial client**.  
-It is **not affiliated with OpenAI, Google, or Anthropic**.  
+It is **not affiliated with OpenAI, Google, Anthropic, Grok, deepseek **.  
 All API keys are stored locally and never shared.  
 Use is subject to each provider’s terms of service.
 
