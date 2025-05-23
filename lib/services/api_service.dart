@@ -26,6 +26,8 @@ enum AIEngine {
   claude37,
   grok_3,
   grok_3mini,
+  deepseek_chat,
+  deepseek_reasoner
 }
 
 class ApiService {
@@ -41,6 +43,7 @@ class ApiService {
       'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent';
   static const String claudeUrl = 'https://api.anthropic.com/v1/messages';
   static const String grokUrl = 'https://api.x.ai/v1/messages';
+  static const String deepseekUrl = 'https://api.deepseek.com/chat/completions';
   static const String llamaUrl =
       'https://api.llama.com/compat/v1/chat/completions';
 
@@ -61,6 +64,8 @@ class ApiService {
   static const String NAME_claude37 = 'Claude 3.7 Sonnet';
   static const String NAME_grok_3 = 'Grok 3';
   static const String NAME_grok_3mini = 'Grok 3 Mini';
+  static const String NAME_deepseek_chat = 'deepseek-chat';
+  static const String NAME_deepseek_reasoner = 'deepseek-reasoner';
 
   static const String STR_chatgpt_41 = "gpt-4.1";
   static const String STR_chatgpt_4omini = "gpt-4o-mini";
@@ -81,6 +86,8 @@ class ApiService {
   static const String STR_claude37 = 'claude-3-7-sonnet-20250219';
   static const String STR_grok3 = 'grok-3-beta';
   static const String STR_grok3mini = 'grok-3-mini-beta';
+  static const String STR_deepseek_chat = 'deepseek-chat';
+  static const String STR_deepseek_reasoner = 'deepseek-reasoner';
 
   static int msgSendLength = 0;
   static int msgReceivedLength = 0;
@@ -121,6 +128,10 @@ class ApiService {
         return NAME_grok_3;
       case AIEngine.grok_3mini:
         return NAME_grok_3mini;
+      case AIEngine.deepseek_chat:
+        return NAME_deepseek_chat;
+      case AIEngine.deepseek_reasoner:
+        return NAME_deepseek_reasoner;
     }
   }
 
@@ -160,6 +171,10 @@ class ApiService {
         return STR_grok3;
       case AIEngine.grok_3mini:
         return STR_grok3mini;
+      case AIEngine.deepseek_chat:
+        return STR_deepseek_chat;
+      case AIEngine.deepseek_reasoner:
+        return STR_deepseek_reasoner;
     }
   }
 
@@ -187,6 +202,9 @@ class ApiService {
       return _sendToClaude(modelStr, userInput, apiKey);
     } else if (model == AIEngine.grok_3 || model == AIEngine.grok_3mini) {
       return _sendToChatGrok(modelStr, userInput, apiKey);
+    } else if (model == AIEngine.deepseek_chat ||
+        model == AIEngine.deepseek_reasoner) {
+      return _sendToChatDeepSeek(modelStr, userInput, apiKey);
     } else {
       return 'This model does not support Single mode yet.';
     }
@@ -225,6 +243,9 @@ class ApiService {
       return _sendToGrokWithHistory(modelStr, messages, apiKey);
     } else if (model == AIEngine.grok_3mini) {
       return _sendToGrokWithHistory(modelStr, messages, apiKey);
+    } else if (model == AIEngine.deepseek_chat ||
+        model == AIEngine.deepseek_reasoner) {
+      return _sendToDeepSeekWithHistory(modelStr, messages, apiKey);
     } else {
       return 'This model does not support history yet.';
     }
@@ -536,9 +557,11 @@ class ApiService {
         ];
       }
 
-      int maxtoken = 8000;
-      if (model == 'claude-3-7-sonnet-20250219') {
-        maxtoken = 60000;
+      int maxtoken = 60000;
+      if (model == STR_claude35) {
+        maxtoken = 8000;
+      } else if (model == STR_claude40opus) {
+        maxtoken = 30000;
       }
 
       final sendJson = jsonEncode({
@@ -637,9 +660,11 @@ class ApiService {
         ];
       }
 
-      int maxtoken = 8000;
-      if (model == 'claude-3-7-sonnet-20250219') {
-        maxtoken = 60000;
+      int maxtoken = 60000;
+      if (model == STR_claude35) {
+        maxtoken = 8000;
+      } else if (model == STR_claude40opus) {
+        maxtoken = 30000;
       }
 
       final sendJson = jsonEncode({
@@ -774,6 +799,55 @@ class ApiService {
     } catch (e) {
       print('grok API error: $e');
       return 'grok Error occurred.';
+    }
+  }
+
+  static Future<String> _sendToDeepSeekWithHistory(
+      String model, List<Message> messages, String apiKey) async {
+    Logger.log('_sendToDeepseeqWithHistory start');
+    msgSendLength = 0;
+    msgReceivedLength = 0;
+    msgModel = '';
+    try {
+      String systemPrompt = await SystemService.loadSystem();
+
+      final chatMessages = [
+        {'role': 'system', 'content': systemPrompt},
+        ...messages.map((m) => {'role': m.role, 'content': m.content}).toList(),
+      ];
+
+      final sendJson = jsonEncode({
+        "model": model,
+        "messages": chatMessages,
+        "temperature": 0.7,
+        "max_tokens": 4000,
+        "stream": false,
+      });
+
+      msgModel = model;
+      msgSendLength = sendJson.length;
+      Logger.log(sendJson);
+      final response = await http.post(
+        Uri.parse(deepseekUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $apiKey',
+        },
+        body: sendJson,
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(utf8.decode(response.bodyBytes));
+        msgReceivedLength = response.bodyBytes.length;
+        final reply = data['choices'][0]['message']['content'];
+        return reply.trim();
+      } else {
+        print('DeepSeek API error: ${response.body}');
+        return 'Sorry, DeepSeek did not respond.';
+      }
+    } catch (e) {
+      print('DeepSeek API error: $e');
+      return 'DeepSeek Error occurred.';
     }
   }
 
@@ -990,9 +1064,11 @@ class ApiService {
     msgModel = '';
     try {
       String systemPrompt = await SystemService.loadSystem();
-      int maxtoken = 8000;
-      if (model == 'claude-3-7-sonnet-20250219') {
-        maxtoken = 60000;
+      int maxtoken = 60000;
+      if (model == STR_claude35) {
+        maxtoken = 8000;
+      } else if (model == STR_claude40opus) {
+        maxtoken = 30000;
       }
 
       String sendJson = "";
@@ -1072,10 +1148,13 @@ class ApiService {
     msgModel = '';
     try {
       String systemPrompt = await SystemService.loadSystem();
-      int maxtoken = 8000;
-      if (model == 'claude-3-7-sonnet-20250219') {
-        maxtoken = 60000;
+      int maxtoken = 60000;
+      if (model == STR_claude35) {
+        maxtoken = 8000;
+      } else if (model == STR_claude40opus) {
+        maxtoken = 30000;
       }
+
       String sendJson = "";
 
       if (ApiService.pdffilePath != "" && ApiService.pdffilePath != null) {
@@ -1244,6 +1323,51 @@ class ApiService {
     } catch (e) {
       print('Grok API error: $e');
       return 'Grok Error occurred.';
+    }
+  }
+
+  static Future<String> _sendToChatDeepSeek(
+      String model, String userInput, String apiKey) async {
+    msgSendLength = 0;
+    msgReceivedLength = 0;
+    msgModel = '';
+
+    try {
+      String systemPrompt = await SystemService.loadSystem();
+      final sendJson = jsonEncode({
+        "model": model,
+        "messages": [
+          {'role': 'system', 'content': systemPrompt},
+          {"role": "user", "content": userInput}
+        ],
+        "temperature": 0.7,
+        "max_tokens": 4000,
+        "stream": false,
+      });
+      Logger.log(sendJson);
+      msgSendLength = sendJson.length;
+      msgModel = model;
+      final response = await http.post(
+        Uri.parse(deepseekUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $apiKey',
+        },
+        body: sendJson,
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(utf8.decode(response.bodyBytes));
+        msgReceivedLength = response.bodyBytes.length;
+        final reply = data['choices'][0]['message']['content'];
+        return reply.trim();
+      } else {
+        print('DeepSeek API error: ${response.body}');
+        return 'Sorry, DeepSeek did not respond.';
+      }
+    } catch (e) {
+      print('DeepSeek API error: $e');
+      return 'DeepSeek Error occurred.';
     }
   }
 

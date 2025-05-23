@@ -30,7 +30,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       TextEditingController();
   final TextEditingController _chatgptdavinci002ApiKeyController =
       TextEditingController();
-
   final TextEditingController _gemini25flashApiKeyController =
       TextEditingController();
   final TextEditingController _gemini25proApiKeyController =
@@ -39,7 +38,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       TextEditingController();
   final TextEditingController _gemini15proApiKeyController =
       TextEditingController();
-
   final TextEditingController _claude40oApiKeyController =
       TextEditingController();
   final TextEditingController _claude40sApiKeyController =
@@ -50,6 +48,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       TextEditingController();
   final TextEditingController _grok3ApiKeyController = TextEditingController();
   final TextEditingController _grok3miniApiKeyController =
+      TextEditingController();
+
+  final TextEditingController _deepseek_chat_ApiKeyController =
+      TextEditingController();
+  final TextEditingController _deepseek_reasoner_ApiKeyController =
       TextEditingController();
 
   String _historyFilePath = '';
@@ -89,7 +92,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final chatgpt4Key = await SettingService.loadApiKey(AIEngine.gpt4);
     final chatgptdavinci002Key =
         await SettingService.loadApiKey(AIEngine.chatgpt_davinci002);
-
     final gemini25flashKey =
         await SettingService.loadApiKey(AIEngine.gemini25flash);
     final gemini25proKey =
@@ -98,7 +100,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         await SettingService.loadApiKey(AIEngine.gemini20flash);
     final gemini15proKey =
         await SettingService.loadApiKey(AIEngine.gemini15pro);
-
     final claude40oKey = await SettingService.loadApiKey(AIEngine.claude40opus);
     final claude40sKey =
         await SettingService.loadApiKey(AIEngine.claude40sonnet);
@@ -106,6 +107,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final claude37Key = await SettingService.loadApiKey(AIEngine.claude37);
     final groq3Key = await SettingService.loadApiKey(AIEngine.grok_3);
     final groq3miniKey = await SettingService.loadApiKey(AIEngine.grok_3mini);
+
+    final deepseek_chat_Key =
+        await SettingService.loadApiKey(AIEngine.deepseek_chat);
+    final deepseek_reasoner_Key =
+        await SettingService.loadApiKey(AIEngine.deepseek_reasoner);
 
     setState(() {
       _selectedEngine = engine;
@@ -118,18 +124,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _chatgpt4tApiKeyController.text = chatgpt4tKey;
       _chatgpt4ApiKeyController.text = chatgpt4Key;
       _chatgptdavinci002ApiKeyController.text = chatgptdavinci002Key;
-
       _gemini25flashApiKeyController.text = gemini25flashKey;
       _gemini25proApiKeyController.text = gemini25proKey;
       _gemini20flashApiKeyController.text = gemini20flashKey;
       _gemini15proApiKeyController.text = gemini15proKey;
-
       _claude40oApiKeyController.text = claude40oKey;
       _claude40sApiKeyController.text = claude40sKey;
       _claude35ApiKeyController.text = claude35Key;
       _claude37ApiKeyController.text = claude37Key;
       _grok3ApiKeyController.text = groq3Key;
       _grok3miniApiKeyController.text = groq3miniKey;
+
+      _deepseek_chat_ApiKeyController.text = deepseek_chat_Key;
+      _deepseek_reasoner_ApiKeyController.text = deepseek_reasoner_Key;
 
       _loading = false;
     });
@@ -212,6 +219,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   void dispose() {
+    _claude40oApiKeyController.dispose();
+    _claude40sApiKeyController.dispose();
+    _claude35ApiKeyController.dispose();
+    _claude37ApiKeyController.dispose();
     _chatgpt41ApiKeyController.dispose();
     _chatgpt4omApiKeyController.dispose();
     _chatgpt4oApiKeyController.dispose();
@@ -223,12 +234,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _gemini25proApiKeyController.dispose();
     _gemini20flashApiKeyController.dispose();
     _gemini15proApiKeyController.dispose();
-    _claude40oApiKeyController.dispose();
-    _claude40sApiKeyController.dispose();
-    _claude35ApiKeyController.dispose();
-    _claude37ApiKeyController.dispose();
     _grok3ApiKeyController.dispose();
     _grok3miniApiKeyController.dispose();
+
+    _deepseek_chat_ApiKeyController.dispose();
+    _deepseek_reasoner_ApiKeyController.dispose();
 
     _scrollController.dispose();
     super.dispose();
@@ -310,6 +320,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: Column(
                   children: [
                     _buildEngineCard(
+                        AIEngine.claude40opus, _claude40oApiKeyController),
+                    _buildEngineCard(
+                        AIEngine.claude40sonnet, _claude40sApiKeyController),
+                    _buildEngineCard(
+                        AIEngine.claude35, _claude35ApiKeyController),
+                    _buildEngineCard(
+                        AIEngine.claude37, _claude37ApiKeyController),
+                    _buildEngineCard(
                         AIEngine.chatgpt_41, _chatgpt41ApiKeyController),
                     _buildEngineCard(
                         AIEngine.chatgpt_4omini, _chatgpt4omApiKeyController),
@@ -330,17 +348,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         AIEngine.gemini20flash, _gemini20flashApiKeyController),
                     _buildEngineCard(
                         AIEngine.gemini15pro, _gemini15proApiKeyController),
-                    _buildEngineCard(
-                        AIEngine.claude40opus, _claude40oApiKeyController),
-                    _buildEngineCard(
-                        AIEngine.claude40sonnet, _claude40sApiKeyController),
-                    _buildEngineCard(
-                        AIEngine.claude35, _claude35ApiKeyController),
-                    _buildEngineCard(
-                        AIEngine.claude37, _claude37ApiKeyController),
                     _buildEngineCard(AIEngine.grok_3, _grok3ApiKeyController),
                     _buildEngineCard(
                         AIEngine.grok_3mini, _grok3miniApiKeyController),
+                    _buildEngineCard(AIEngine.deepseek_chat,
+                        _deepseek_chat_ApiKeyController),
+                    _buildEngineCard(AIEngine.deepseek_reasoner,
+                        _deepseek_reasoner_ApiKeyController),
                   ],
                 ),
               ),

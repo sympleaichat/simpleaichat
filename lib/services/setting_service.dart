@@ -62,6 +62,10 @@ class SettingService {
         return 'api_key_grok3';
       case AIEngine.grok_3mini:
         return 'api_key_grok3mini';
+      case AIEngine.deepseek_chat:
+        return 'api_key_deepseek_chat';
+      case AIEngine.deepseek_reasoner:
+        return 'api_key_deepseek_reasoner';
     }
   }
 
@@ -103,6 +107,10 @@ class SettingService {
       return AIEngine.grok_3;
     } else if (engine == ApiService.STR_grok3mini) {
       return AIEngine.grok_3mini;
+    } else if (engine == ApiService.STR_deepseek_chat) {
+      return AIEngine.deepseek_chat;
+    } else if (engine == ApiService.STR_deepseek_reasoner) {
+      return AIEngine.deepseek_reasoner;
     } else {
       return AIEngine.chatgpt_4omini;
     }
