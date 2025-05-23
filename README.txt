@@ -30,11 +30,17 @@ engine = chatgpt
 api_key_chatgpt4om = your_chatgpt_api_key_here
 api_key_chatgpt4o = your_chatgpt_api_key_here
 api_key_chatgpt35t = your_chatgpt_api_key_here
+api_key_chatgpt4t = your_chatgpt_api_key_here
 api_key_chatgpt4 = your_chatgpt_api_key_here
 api_key_chatgptdavinci002 = your_chatgpt_api_key_here
-api_key_gemini = your_gemini_api_key_here
+api_key_gemini25flash = your_gemini_api_key_here
+api_key_gemini25pro = your_gemini_api_key_here
+api_key_gemini20flash = your_gemini_api_key_here
+api_key_gemini15pro = your_gemini_api_key_here
 api_key_claude35 = your_claude_api_key_here
 api_key_claude37 = your_claude_api_key_here
+api_key_grok3 = your_grok_api_key_here
+api_key_grok3mini = your_grok_api_key_here
 dark_mode = false
 
 ### Setting Descriptions
@@ -46,13 +52,21 @@ dark_mode = false
 | api_key_chatgpt4om  | API key for ChatGPT-4 Omni                    | api_key_chatgpt4om = sk-xxxxxx |
 | api_key_chatgpt4o   | API key for ChatGPT-4 O                       | api_key_chatgpt4o = sk-xxxxxx  |
 | api_key_chatgpt35t  | API key for ChatGPT-3.5turbo                  | api_key_chatgpt35t = sk-xxxxxx |
+| api_key_chatgpt4t   | API key for ChatGPT-4 turbo                   | api_key_chatgpt4t = sk-xxxxxx  |
 | api_key_chatgpt4    | API key for ChatGPT-4                         | api_key_chatgpt4   = sk-xxxxxx |
 | api_key_chatgptdavinci002  | API key for ChatGPT-davinci-002        | api_key_chatgptdavinci002 = sk-xxxxxx |
-| api_key_gemini      | API key for Gemini                            | api_key_gemini = gemini-xxxxxx |
-| api_key_claude35    | API key for Claude 3.5 Haiku                  | api_key_claude35 = sk-xxxxxx   |
-| api_key_claude37    | API key for Claude 3.7 Sonnet                 | api_key_claude37 = sk-xxxxxx   |
-| api_key_grok3       | API key for Grok 3                            | api_key_grok3 = xai-xxxx       |
-| api_key_grok3mini   | API key for Grok 3 Mini Sonnet                | api_key_grok3mini = xai-xxxxx  |
+| api_key_gemini25flash      | API key for Gemini 2.5 Flash           | api_key_gemini = AIxxxxxx      |
+| api_key_gemini25pro        | API key for Gemini 2.5 Pro             | api_key_gemini = AIxxxxxx      |
+| api_key_gemini25flash      | API key for Gemini 2.0 Flash           | api_key_gemini = AIxxxxxx      |
+| api_key_gemini15pro        | API key for Gemini 1.5 Pro             | api_key_gemini = AIxxxxxx      |
+| api_key_claude40opus| API key for Claude Opus 4                  | api_key_claude = sk-xxxxxx   |
+| api_key_claude40sonnet    | API key for Claude Sonnet 4                 | api_key_claude = sk-xxxxxx   |
+| api_key_claude35    | API key for Claude 3.5 Haiku                  | api_key_claude = sk-xxxxxx   |
+| api_key_claude37    | API key for Claude 3.7 Sonnet                 | api_key_claude = sk-xxxxxx   |
+| api_key_grok3       | API key for Grok 3                            | api_key_grok = xai-xxxx       |
+| api_key_grok3mini   | API key for Grok 3 Mini Sonnet                | api_key_grok = xai-xxxxx  |
+| api_key_deepseek_chat       | API key for deepseek-chat             | api_key_deepseek = sk-xxxx     |
+| api_key_deepseek_reasoner   | API key for deepseek-reasoner         | api_key_deepseek = sk-xxxxx    |
 | dark_mode           | UI theme: true for dark mode, false for light | dark_mode = true               |
 
 ⚠ Important Notes
@@ -78,13 +92,21 @@ ChatGPT-4.1
 ChatGPT o4-mini
 ChatGPT o4
 ChatGPT 3.5-turbo
+ChatGPT 4-turbo
 ChatGPT 4
 ChatGPT davinci-002
+Gemini 2.5 Flash
+Gemini 2.5 Pro
+Gemini 2.0 Flash
 Gemini 1.5 Pro
+Claude Opus 4
+Claude Sonnet 4
 Claude 3.5 Haiku
 Claude 3.7 Sonnet
 Grok 3
 Grok 3 Mini
+deepseek-chat
+deepseek-reasoner
 
 ■ Requirements
 - Internet connection is required for AI interaction.
