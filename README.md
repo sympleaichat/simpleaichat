@@ -1,3 +1,5 @@
+![screenshot1](screenshot/1.jpg)  
+
 # SimpleAIChat
 [Repositories](https://github.com/sympleaichat/simpleaichat)
 
@@ -60,9 +62,6 @@ Messages can be sent in either thread mode or single message mode.
 Messages can be deleted or edited individually.  
 The character count of messages at the time of sending can be checked.  
 ![screenshot2](screenshot/3.jpg) 
-
-### 🎯 Multi-LLM Support with Syntax Highlighting
-![screenshot1](screenshot/1.jpg)  
 
 ## 🛠️ Installation
 
