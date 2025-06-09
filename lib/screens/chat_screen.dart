@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_highlight/flutter_highlight.dart';
 import 'package:flutter_highlight/themes/github.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+
 import 'package:file_picker/file_picker.dart';
 import 'dart:convert';
-
+import '../utils/logger.dart';
 import '../services/api_service.dart';
 import '../services/storage_service.dart';
 import '../services/setting_service.dart';
 import '../models/message.dart';
 import '../models/thread.dart';
+import '../models/folder.dart';
 import '../screens/settings_screen.dart';
 import '../utils/dart_highlight_code.dart';
 import '../utils/constants.dart';
@@ -25,24 +28,39 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   List<Thread> _threads = [];
+  List<Folder> _folders = [];
   List<Message> _messages = [];
-  final TextEditingController _controller = TextEditingController();
+  List<Thread> _filteredThreads = [];
 
+  final TextEditingController _controller = TextEditingController();
+  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _editController = TextEditingController();
   late String _activeThreadId;
 
   String? _backupJson;
-
   String? _editingMessageId;
-  final TextEditingController _editController = TextEditingController();
+
+  List<int> _searchHits = [];
+  int _currentHitIndex = 0;
+
   bool _isLoading = false;
   bool _sendModeThread = true;
   bool _isSidebarVisible = true;
-  @override
+
+  String _searchQuery = '';
+  final ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollCahtController = ScrollController();
+
+  final ItemScrollController _itemScrollController = ItemScrollController();
+  final ItemPositionsListener _itemPositionsListener =
+      ItemPositionsListener.create();
+
   void initState() {
     super.initState();
     _activeThreadId = widget.threadId ?? StorageService.generateRandomId();
     _loadThreads();
     _loadMessages();
+    _loadFolders();
 
     ApiService.pdffilePath = "";
     ApiService.pdffileName = "";
@@ -55,12 +73,37 @@ class _ChatScreenState extends State<ChatScreen> {
         );
       });
     }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_messages.isNotEmpty) {
+        _itemScrollController.scrollTo(
+          index: _messages.length - 1,
+          duration: Duration(milliseconds: 0), // 即時スクロール
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _scrollCahtController.dispose();
+    _controller.dispose();
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadThreads() async {
     final loadedThreads = await StorageService.loadAllThreads();
     setState(() {
       _threads = loadedThreads;
+    });
+  }
+
+  Future<void> _loadFolders() async {
+    final loadedFolders = await StorageService.loadFolders();
+    setState(() {
+      _folders = loadedFolders;
     });
   }
 
@@ -264,6 +307,208 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
+  void _filterThreads(String query) {
+    setState(() {
+      _searchQuery = query;
+      _filteredThreads = _threads.where((thread) {
+        bool titleMatch = thread.title.contains(query);
+        bool messageMatch = thread.messages.any((message) {
+          return message.content.contains(query);
+        });
+        return titleMatch || messageMatch;
+      }).toList();
+    });
+  }
+
+  void _createNewFolder() async {
+    final controller = TextEditingController();
+
+    final result = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('New folder nmae'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          decoration: const InputDecoration(hintText: 'Folder nmae'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, null),
+            child: const Text('cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, controller.text.trim()),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+
+    if (result != null && result.isNotEmpty) {
+      final newFolder = Folder(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        name: result,
+        createdAt: DateTime.now(),
+      );
+
+      setState(() {
+        _folders.add(newFolder);
+      });
+
+      await StorageService.saveAllData(_threads, _folders);
+    }
+  }
+
+  void _deleteFolder(Folder folder) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirm'),
+        content: Text(
+            'Are you sure you want to delete the folder "${folder.name}"?\nThreads will be moved out of the folder.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    setState(() {
+      _folders.removeWhere((f) => f.id == folder.id);
+      for (final thread in _threads) {
+        if (thread.folderId == folder.id) {
+          thread.folderId = '';
+        }
+      }
+    });
+
+    await StorageService.saveAllData(_threads, _folders);
+  }
+
+  void _renameFolder(Folder folder) async {
+    final controller = TextEditingController(text: folder.name);
+
+    final newName = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Rename Folder'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          decoration: InputDecoration(labelText: 'Folder Name'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final text = controller.text.trim();
+              if (text.isNotEmpty) {
+                Navigator.pop(context, text);
+              }
+            },
+            child: const Text('Rename'),
+          ),
+        ],
+      ),
+    );
+
+    if (newName == null || newName == folder.name) return;
+
+    setState(() {
+      folder.name = newName;
+    });
+
+    await StorageService.saveAllData(_threads, _folders);
+  }
+
+  void _scrollToMessage(String keyword) {
+    final index = _messages.indexWhere((msg) => msg.content.contains(keyword));
+    if (index == -1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('No matching messages found')),
+      );
+      return;
+    }
+
+    _itemScrollController.scrollTo(
+      index: index,
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      alignment: 0.5,
+    );
+  }
+
+  void _scrollToIndex(int index) {
+    _itemScrollController.scrollTo(
+      index: index,
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      alignment: 0.5,
+    );
+  }
+
+  void _searchMessages(String keyword) {
+    final hits = <int>[];
+
+    if (keyword == '') {
+      setState(() {
+        _searchHits = [];
+        _currentHitIndex = 0;
+      });
+      return;
+    }
+    for (int i = 0; i < _messages.length; i++) {
+      if (_messages[i].content.contains(keyword)) {
+        hits.add(i);
+      }
+    }
+
+    if (hits.isNotEmpty) {
+      setState(() {
+        _searchHits = hits;
+        _currentHitIndex = 0;
+      });
+      _scrollToIndex(hits[0]);
+    } else {
+      setState(() {
+        _searchHits = [];
+        _currentHitIndex = 0;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('No matching messages found')),
+      );
+    }
+  }
+
+  void _goToNextHit() {
+    if (_searchHits.isEmpty) return;
+    _currentHitIndex = (_currentHitIndex + 1) % _searchHits.length;
+    _scrollToIndex(_searchHits[_currentHitIndex]);
+
+    setState(() {});
+  }
+
+  void _goToPreviousHit() {
+    if (_searchHits.isEmpty) return;
+    _currentHitIndex =
+        (_currentHitIndex - 1 + _searchHits.length) % _searchHits.length;
+    _scrollToIndex(_searchHits[_currentHitIndex]);
+
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -335,106 +580,144 @@ class _ChatScreenState extends State<ChatScreen> {
         children: [
           if (_isSidebarVisible)
             Container(
-              width: 220,
+              width: 240,
               color: Theme.of(context).brightness == Brightness.dark
                   ? Color(0xFF2a2d32)
                   : Colors.grey[200],
               child: Column(
                 children: [
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        left: 10, top: 12, right: 6, bottom: 10),
+                    child: TextField(
+                      style: TextStyle(fontSize: 13),
+                      decoration: InputDecoration(
+                        hintText: 'Search',
+                        prefixIcon: Icon(Icons.search, size: 18),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        isDense: true,
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                      ),
+                      onChanged: _filterThreads,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.create_new_folder, size: 20),
+                        tooltip: 'Create Folder',
+                        onPressed: _createNewFolder,
+                      ),
+                      const Text(
+                        'Create Folder',
+                        style: TextStyle(fontSize: 12),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
                   Expanded(
-                    child: ListView.builder(
-                      itemCount: _threads.length,
-                      itemBuilder: (context, index) {
-                        final thread = _threads[index];
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
-                          child: ListTile(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8)),
-                              contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 6),
-                              tileColor: thread.threadId == _activeThreadId
-                                  ? Theme.of(context)
-                                      .primaryColor
-                                      .withOpacity(0.2)
-                                  : thread.isUnread
-                                      ? Theme.of(context)
-                                          .primaryColor
-                                          .withOpacity(0.1)
-                                      : Colors.transparent,
-                              hoverColor: Theme.of(context)
-                                  .primaryColor
-                                  .withOpacity(0.2),
-                              title: Text(
-                                thread.title,
-                                style: TextStyle(
-                                  fontWeight: thread.threadId == _activeThreadId
-                                      ? FontWeight.bold
-                                      : FontWeight.w500,
-                                  fontSize: 14,
-                                  color: thread.threadId == _activeThreadId
-                                      ? Theme.of(context).primaryColor
-                                      : null,
+                    child: Scrollbar(
+                      controller: _scrollController,
+                      thumbVisibility: true,
+                      child: ListView(
+                        controller: _scrollController,
+                        children: [
+                          ..._folders.map((folder) {
+                            final folderThreads = (_searchQuery
+                                        .trim()
+                                        .isNotEmpty
+                                    ? _filteredThreads
+                                    : _threads)
+                                .where((thread) => thread.folderId == folder.id)
+                                .toList();
+
+                            return DragTarget<Thread>(
+                              onAccept: (draggedThread) async {
+                                setState(() {
+                                  draggedThread.folderId = folder.id;
+                                });
+                                updateThreadFolderId(draggedThread, folder.id);
+                                await StorageService.saveAllData(
+                                    _threads, _folders);
+                              },
+                              builder: (context, candidateData, rejectedData) =>
+                                  Theme(
+                                data: Theme.of(context).copyWith(
+                                  dividerColor: Colors.transparent,
+                                ),
+                                child: ExpansionTile(
+                                  leading: Icon(Icons.folder, size: 18),
+                                  title: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          folder.name,
+                                          style: TextStyle(fontSize: 13),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      IconButton(
+                                        icon: Icon(Icons.edit, size: 16),
+                                        onPressed: () => _renameFolder(folder),
+                                      ),
+                                      IconButton(
+                                        icon: Icon(Icons.delete, size: 16),
+                                        onPressed: () => _deleteFolder(folder),
+                                      ),
+                                    ],
+                                  ),
+                                  tilePadding: EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 0),
+                                  childrenPadding: EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 2),
+                                  children: folderThreads
+                                      .map(_buildDraggableThreadTile)
+                                      .toList(),
                                 ),
                               ),
-                              trailing: PopupMenuButton<String>(
-                                onSelected: (value) async {
-                                  if (value == 'rename') {
-                                    final newTitle =
-                                        await _showRenameDialog(thread.title);
-                                    if (newTitle != null &&
-                                        newTitle.trim().isNotEmpty) {
-                                      setState(() {
-                                        _threads[index] = Thread(
-                                          threadId: thread.threadId,
-                                          title: newTitle.trim(),
-                                          messages: thread.messages,
-                                        );
-                                      });
-                                      await StorageService.saveAllThreads(
-                                          _threads);
-                                      //  ScaffoldMessenger.of(context)
-                                      //      .showSnackBar(
-                                      //  SnackBar(
-                                      //       content: Text('Thread renamed')),
-                                      // );
-                                    }
-                                  } else if (value == 'delete') {
-                                    final confirm =
-                                        await _showConfirmDeleteDialog();
-                                    if (confirm == true) {
-                                      setState(() {
-                                        _threads.removeAt(index);
-                                      });
-                                      await StorageService.saveAllThreads(
-                                          _threads);
-                                      //   ScaffoldMessenger.of(context).showSnackBar(
-                                      //    SnackBar(content: Text('Thread deleted')),
-                                      //  );
-                                    }
-                                  } else if (value == 'copy') {
-                                    await _copyThread(thread.threadId);
-                                    setState(() {});
-                                  }
-                                },
-                                itemBuilder: (context) => [
-                                  PopupMenuItem(
-                                      value: 'rename', child: Text('Rename')),
-                                  PopupMenuItem(
-                                      value: 'delete', child: Text('Delete')),
-                                  PopupMenuItem(
-                                      value: 'copy', child: Text('copy')),
-                                ],
+                            );
+                          }).toList(),
+
+                          const SizedBox(height: 6),
+
+                          // Thread outside folder
+                          DragTarget<Thread>(
+                            onAccept: (draggedThread) async {
+                              setState(() {
+                                draggedThread.folderId = null;
+                              });
+                              updateThreadFolderId(draggedThread, '');
+                              await StorageService.saveAllData(
+                                  _threads, _folders);
+                            },
+                            builder: (context, candidateData, rejectedData) =>
+                                Container(
+                              constraints: const BoxConstraints(minHeight: 160),
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              color: candidateData.isNotEmpty
+                                  ? Colors.blue.withOpacity(0.1)
+                                  : Colors.transparent,
+                              child: Column(
+                                children: (_searchQuery.trim().isNotEmpty
+                                        ? _filteredThreads
+                                        : _threads)
+                                    .where((thread) =>
+                                        (thread.folderId == null ||
+                                            thread.folderId == ''))
+                                    .map((thread) =>
+                                        _buildDraggableThreadTile(thread))
+                                    .toList(),
                               ),
-                              onTap: () {
-                                setState(() {
-                                  _activeThreadId = thread.threadId;
-                                });
-                                _loadMessages();
-                              }),
-                        );
-                      },
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   Divider(height: 1),
@@ -482,89 +765,89 @@ class _ChatScreenState extends State<ChatScreen> {
           Expanded(
             child: Column(
               children: [
+                Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          left: 12, top: 12, right: 12, bottom: 12),
+                      child: TextField(
+                        controller: _searchController,
+                        onSubmitted: (query) => _searchMessages(query),
+                        style: TextStyle(fontSize: 13),
+                        decoration: InputDecoration(
+                          hintText: 'Search messages...',
+                          prefixIcon: Icon(Icons.search, size: 18),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          isDense: true,
+                          contentPadding:
+                              EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                        ),
+                        // onChanged: _filterThreads,
+                      ),
+                    ),
+                    if (_searchHits.isNotEmpty)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                              '${_currentHitIndex + 1} / ${_searchHits.length} '),
+                          IconButton(
+                            icon: Icon(Icons.arrow_upward),
+                            onPressed: _goToPreviousHit,
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.arrow_downward),
+                            onPressed: _goToNextHit,
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 6),
                 Expanded(
-                  child: ListView.builder(
-                    padding: EdgeInsets.all(12),
-                    reverse: false,
+                  child: ScrollablePositionedList.builder(
                     itemCount: _messages.length,
+                    itemScrollController: _itemScrollController,
+                    itemPositionsListener: _itemPositionsListener,
+                    padding: EdgeInsets.all(12),
                     itemBuilder: (context, index) {
                       final msg = _messages[index];
                       final isUser = msg.role == 'user';
+                      final isHighlighted = _searchHits.isNotEmpty &&
+                          _searchHits[_currentHitIndex] == index;
 
                       return Column(
                         crossAxisAlignment: isUser
                             ? CrossAxisAlignment.end
                             : CrossAxisAlignment.start,
                         children: [
-                          _editingMessageId == msg.messageId
-                              ? Row(
-                                  children: [
-                                    Expanded(
-                                      child: TextField(
-                                        controller: _editController
-                                          ..text = msg.content,
-                                        autofocus: true,
-                                        maxLines: null,
-                                        keyboardType: TextInputType.multiline,
-                                        decoration: InputDecoration(
-                                          fillColor: Theme.of(context)
-                                              .cardColor
-                                              .withOpacity(0.12),
-                                          filled: true,
-                                        ),
-                                      ),
-                                    ),
-                                    IconButton(
-                                      icon: Icon(Icons.check),
-                                      onPressed: () async {
-                                        setState(() {
-                                          _editingMessageId = '';
-                                          _messages[index] = Message(
-                                            messageId: msg.messageId,
-                                            role: msg.role,
-                                            content: _editController.text,
-                                          );
-                                        });
-                                        await StorageService.saveThread(
-                                            _activeThreadId, _messages);
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                              content: Text('Message updated')),
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                )
-                              : Container(
-                                  margin: EdgeInsets.symmetric(vertical: 6),
-                                  padding: EdgeInsets.all(12),
-                                  constraints: BoxConstraints(
-                                    maxWidth:
-                                        MediaQuery.of(context).size.width *
-                                            0.75,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: isUser
-                                        ? Theme.of(context)
-                                            .primaryColor
-                                            .withOpacity(0.2)
-                                        : Theme.of(context)
-                                            .cardColor
-                                            .withOpacity(0.85),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-
-                                  /*
-                                  child: SelectableText(
-                                    msg.content,
-                                    style: TextStyle(fontSize: 15),
-                                  ),
-                                  */
-                                  child: DartHighlightedCode(
-                                    code: msg.content,
-                                  ),
-                                ),
+                          Container(
+                            margin: EdgeInsets.symmetric(vertical: 6),
+                            padding: EdgeInsets.all(12),
+                            constraints: BoxConstraints(
+                              maxWidth:
+                                  MediaQuery.of(context).size.width * 0.75,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isHighlighted
+                                  ? Theme.of(context)
+                                      .primaryColor
+                                      .withOpacity(0.5)
+                                  : isUser
+                                      ? Theme.of(context)
+                                          .primaryColor
+                                          .withOpacity(0.2)
+                                      : Theme.of(context)
+                                          .cardColor
+                                          .withOpacity(0.85),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: DartHighlightedCode(
+                              code: msg.content,
+                            ),
+                          ),
                           Row(
                             mainAxisAlignment: isUser
                                 ? MainAxisAlignment.end
@@ -577,34 +860,23 @@ class _ChatScreenState extends State<ChatScreen> {
                                 onPressed: () {
                                   Clipboard.setData(
                                       ClipboardData(text: msg.content));
-                                  //     ScaffoldMessenger.of(context).showSnackBar(
-                                  //       SnackBar(
-                                  //          content: Text('Copied to clipboard')),
-                                  //    );
                                 },
                               ),
                               IconButton(
                                 icon: Icon(Icons.delete, size: 18),
                                 tooltip: 'Delete',
                                 onPressed: () async {
-                                  setState(() {
-                                    _messages.removeAt(index);
-                                  });
+                                  _messages.removeAt(index);
                                   await StorageService.saveThread(
                                       _activeThreadId, _messages);
-                                  // ScaffoldMessenger.of(context).showSnackBar(
-                                  //   SnackBar(content: Text('Message deleted')),
-                                  // );
                                 },
                               ),
                               IconButton(
                                 icon: Icon(Icons.edit, size: 18),
                                 tooltip: 'Edit',
                                 onPressed: () {
-                                  setState(() {
-                                    _editingMessageId = msg.messageId;
-                                    _editController.text = msg.content;
-                                  });
+                                  _editingMessageId = msg.messageId;
+                                  _editController.text = msg.content;
                                 },
                               ),
                             ],
@@ -790,6 +1062,120 @@ class _ChatScreenState extends State<ChatScreen> {
         ],
       ),
     );
+  }
+
+// Draggable thread tile generation function
+  Widget _buildDraggableThreadTile(Thread thread) {
+    final index = _threads.indexWhere((t) => t.threadId == thread.threadId);
+
+    return Draggable<Thread>(
+      data: thread,
+      feedback: Material(
+        color: Colors.transparent,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 300),
+          child: _buildThreadTile(thread),
+        ),
+      ),
+      childWhenDragging: Opacity(opacity: 0.5, child: _buildThreadTile(thread)),
+      child: _buildThreadTile(thread),
+    );
+  }
+
+  Widget _buildThreadTile(Thread thread) {
+    final index = _threads.indexWhere((t) => t.threadId == thread.threadId);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+      child: ListTile(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 1),
+        tileColor: thread.threadId == _activeThreadId
+            ? Theme.of(context).primaryColor.withOpacity(0.15)
+            : thread.isUnread
+                ? Theme.of(context).primaryColor.withOpacity(0.08)
+                : Colors.transparent,
+        hoverColor: Theme.of(context).primaryColor.withOpacity(0.1),
+        title: Text(
+          thread.title,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontWeight: thread.threadId == _activeThreadId
+                ? FontWeight.bold
+                : FontWeight.w500,
+            fontSize: 12,
+            color: thread.threadId == _activeThreadId
+                ? Theme.of(context).primaryColor
+                : null,
+          ),
+        ),
+        trailing: PopupMenuButton<String>(
+          padding: EdgeInsets.zero,
+          iconSize: 18,
+          onSelected: (value) async {
+            if (value == 'rename') {
+              final newTitle = await _showRenameDialog(thread.title);
+              if (newTitle != null && newTitle.trim().isNotEmpty) {
+                setState(() {
+                  _threads[index] = Thread(
+                    threadId: thread.threadId,
+                    title: newTitle.trim(),
+                    messages: thread.messages,
+                    folderId: thread.folderId,
+                    isUnread: thread.isUnread,
+                  );
+                });
+                await StorageService.saveAllData(_threads, _folders);
+              }
+            } else if (value == 'delete') {
+              final confirm = await _showConfirmDeleteDialog();
+              if (confirm == true) {
+                setState(() {
+                  _threads.removeAt(index);
+                  _filteredThreads
+                      .removeWhere((t) => t.threadId == thread.threadId);
+                });
+                await StorageService.saveAllData(_threads, _folders);
+              }
+            } else if (value == 'copy') {
+              await _copyThread(thread.threadId);
+              setState(() {});
+            }
+          },
+          itemBuilder: (context) => const [
+            PopupMenuItem(
+              value: 'rename',
+              child: Text('Rename', style: TextStyle(fontSize: 13)),
+            ),
+            PopupMenuItem(
+              value: 'delete',
+              child: Text('Delete', style: TextStyle(fontSize: 13)),
+            ),
+            PopupMenuItem(
+              value: 'copy',
+              child: Text('Copy', style: TextStyle(fontSize: 13)),
+            ),
+          ],
+        ),
+        onTap: () {
+          setState(() {
+            _activeThreadId = thread.threadId;
+            thread.isUnread = false;
+          });
+          _loadMessages();
+        },
+      ),
+    );
+  }
+
+  void updateThreadFolderId(Thread srcThread, String folderid) {
+    for (int i = 0; i < _threads.length; i++) {
+      if (_threads[i].threadId == srcThread.threadId) {
+        _threads[i].folderId = folderid;
+        break;
+      }
+    }
   }
 
   Future<String?> _showRenameDialog(String currentTitle) async {

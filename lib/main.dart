@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         brightness: Brightness.light,
         scaffoldBackgroundColor: Color(0xfff5f5f7),
-        primaryColor: Color(0xff1565c0),
+        primaryColor: const Color(0xff1565c0),
         appBarTheme: AppBarTheme(
           backgroundColor: Color(0xffe0e0e0),
           foregroundColor: Color(0xff2c2c2c),
@@ -44,6 +44,12 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.dark,
         scaffoldBackgroundColor: const Color(0xff252526), //
         primaryColor: const Color(0xff64b5f6), //
+        //  switchTheme: SwitchThemeData(
+        //thumbColor: MaterialStatePropertyAll(const Color(0xff1565c0)),
+        //   trackColor: MaterialStatePropertyAll(
+        //    const Color.fromARGB(255, 141, 141, 141)),
+        // ),
+
         appBarTheme: const AppBarTheme(
           backgroundColor: Color(0xff2f3237), //
           foregroundColor: Color(0xffffffff), //

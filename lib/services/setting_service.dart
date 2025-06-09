@@ -145,7 +145,7 @@ class SettingService {
     await file.writeAsString(config.toString());
   }
 
-  // APIキー保存
+  // API Key
   static Future<void> saveApiKey(AIEngine engine, String apiKey) async {
     final file = await _getIniFile();
     final config = await _loadConfig();

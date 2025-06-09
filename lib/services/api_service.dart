@@ -837,6 +837,7 @@ class ApiService {
       );
 
       if (response.statusCode == 200) {
+        Logger.log(response.body);
         final data = jsonDecode(utf8.decode(response.bodyBytes));
         msgReceivedLength = response.bodyBytes.length;
         final reply = data['choices'][0]['message']['content'];

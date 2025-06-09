@@ -2,15 +2,17 @@ import 'message.dart';
 
 class Thread {
   final String threadId;
-  String title;
-  List<Message> messages;
+  final String title;
+  final List<Message> messages;
+  String? folderId;
   bool isUnread;
 
   Thread({
     required this.threadId,
     this.title = '',
     this.messages = const [],
-    this.isUnread = true,
+    this.folderId = '',
+    this.isUnread = false,
   });
 
   // Convert to JSON
@@ -20,6 +22,7 @@ class Thread {
       'title': title,
       'messages': messages.map((m) => m.toJson()).toList(),
       'is_unread': isUnread,
+      'folder_id': folderId,
     };
   }
 
@@ -31,6 +34,7 @@ class Thread {
       messages:
           (json['messages'] as List).map((m) => Message.fromJson(m)).toList(),
       isUnread: json['is_unread'] ?? true,
+      folderId: json['folder_id'] ?? '',
     );
   }
 }

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import '../models/thread.dart';
 import '../models/message.dart';
+import '../models/folder.dart';
 
 class StorageService {
   static Future<String> _getFilePath() async {
@@ -14,6 +15,7 @@ class StorageService {
   static Future<void> saveThread(
       String threadId, List<Message> messages) async {
     List<Thread> threads = await loadAllThreads();
+    final folders = await loadFolders();
 
     final index = threads.indexWhere((t) => t.threadId == threadId);
     if (index != -1) {
@@ -23,9 +25,11 @@ class StorageService {
         messages: messages,
       );
 
-      await saveAllThreads(threads);
+      await saveAllData(threads, folders);
     }
   }
+
+/*
 
   static Future<List<Thread>> loadAllThreads() async {
     try {
@@ -55,9 +59,10 @@ class StorageService {
     final jsonData = threads.map((thread) => thread.toJson()).toList();
     await file.writeAsString(jsonEncode(jsonData));
   }
-
+*/
   static Future<void> saveMessage(String threadId, Message message) async {
     final threads = await loadAllThreads();
+    final folders = await loadFolders();
 
     final index = threads.indexWhere((t) => t.threadId == threadId);
 
@@ -73,12 +78,13 @@ class StorageService {
       threads.insert(0, newThread);
     }
 
-    await saveAllThreads(threads);
+    await saveAllData(threads, folders);
   }
 
   static Future<void> saveMessageData(
       String threadId, Message message, String title) async {
     final threads = await loadAllThreads();
+    final folders = await loadFolders();
 
     final index = threads.indexWhere((t) => t.threadId == threadId);
 
@@ -97,12 +103,12 @@ class StorageService {
       threads.insert(0, newThread);
     }
 
-    await saveAllThreads(threads);
+    await saveAllData(threads, folders);
   }
 
   static Future<void> copyThread(String srcThreadId, String dstThreadId) async {
     final loadedThreads = await StorageService.loadAllThreads();
-
+    final folders = await loadFolders();
     final srcThreadIndex =
         loadedThreads.indexWhere((t) => t.threadId == srcThreadId);
 
@@ -131,7 +137,7 @@ class StorageService {
 
     loadedThreads.insert(0, newThread);
 
-    await saveAllThreads(loadedThreads);
+    await saveAllData(loadedThreads, folders);
   }
 
   static Future<void> createNewThread(String threadId) async {
@@ -151,6 +157,7 @@ class StorageService {
 
   static Future<List<Message>> loadThread(String threadId) async {
     final threads = await loadAllThreads();
+    final folders = await loadFolders();
     final thread = threads.firstWhere(
       (t) => t.threadId == threadId,
       orElse: () => Thread(
@@ -162,18 +169,20 @@ class StorageService {
 
   static Future<void> deleteMessage(String threadId, String messageId) async {
     final threads = await loadAllThreads();
+    final folders = await loadFolders();
     final index = threads.indexWhere((t) => t.threadId == threadId);
 
     if (index != -1) {
       threads[index].messages.removeWhere((m) => m.messageId == messageId);
-      await saveAllThreads(threads);
+      await saveAllData(threads, folders);
     }
   }
 
   static Future<void> deleteThread(String threadId) async {
     final threads = await loadAllThreads();
+    final folders = await loadFolders();
     threads.removeWhere((t) => t.threadId == threadId);
-    await saveAllThreads(threads);
+    await saveAllData(threads, folders);
   }
 
   static String _generateDefaultTitle() {
@@ -196,4 +205,109 @@ class StorageService {
     return List.generate(8, (index) => chars[random.nextInt(chars.length)])
         .join();
   }
+
+  static Future<String> _getFolderPath() async {
+    final directory = await getApplicationDocumentsDirectory();
+    return '${directory.path}/folders.json';
+  }
+
+  static Future<void> saveAllData(
+      List<Thread> threads, List<Folder> folders) async {
+    final path = await _getFilePath();
+    final file = File(path);
+
+    final data = {
+      'threads': threads.map((t) => t.toJson()).toList(),
+      'folders': folders.map((f) => f.toJson()).toList(),
+    };
+
+    await file.writeAsString(jsonEncode(data));
+  }
+
+  static Future<List<Thread>> loadAllThreads() async {
+    try {
+      final path = await _getFilePath();
+      final file = File(path);
+
+      if (!await file.exists()) {
+        await file.writeAsString(jsonEncode({'threads': [], 'folders': []}));
+      }
+
+      final contents = await file.readAsString();
+      final decoded = jsonDecode(contents);
+
+      if (decoded is List) {
+        // Old style (list of threads only)
+        // print(decoded.map<Thread>((data) => Thread.fromJson(data)).toList());
+        return decoded.map<Thread>((data) => Thread.fromJson(data)).toList();
+      } else if (decoded is Map<String, dynamic>) {
+        final threads = (decoded['threads'] as List<dynamic>? ?? [])
+            .map((data) => Thread.fromJson(data))
+            .toList();
+
+        return threads;
+      } else {
+        return [];
+      }
+    } catch (e) {
+      return [];
+    }
+  }
+
+  static Future<List<Folder>> loadFolders() async {
+    try {
+      final path = await _getFilePath();
+      final file = File(path);
+
+      if (!await file.exists()) {
+        await file.writeAsString(jsonEncode({'threads': [], 'folders': []}));
+      }
+
+      final contents = await file.readAsString();
+      final decoded = jsonDecode(contents);
+
+      if (decoded is Map<String, dynamic>) {
+        final folders = (decoded['folders'] as List<dynamic>? ?? [])
+            .map((data) => Folder.fromJson(data))
+            .toList();
+
+        return folders;
+      } else {
+        // The old format does not have folder information
+        return [];
+      }
+    } catch (e) {
+      return [];
+    }
+  }
+
+/*
+  static Future<void> saveFolders(List<Folder> folders) async {
+    final path = await _getFolderPath();
+    final file = File(path);
+    final jsonData = folders.map((folder) => folder.toJson()).toList();
+    await file.writeAsString(jsonEncode(jsonData));
+  }
+
+  static Future<List<Folder>> loadFolders() async {
+    final path = await _getFolderPath();
+    final file = File(path);
+
+    if (!await file.exists()) {
+      await file.writeAsString('[]');
+    }
+
+    final contents = await file.readAsString();
+    final List<dynamic> jsonData = jsonDecode(contents);
+    return jsonData.map((data) => Folder.fromJson(data)).toList();
+  }
+
+
+  static Future<void> saveThreads(List<Thread> threads) async {
+    final path = await _getFilePath();
+    final file = File(path);
+    final jsonData = threads.map((thread) => thread.toJson()).toList();
+    await file.writeAsString(jsonEncode(jsonData));
+  }
+  */
 }
