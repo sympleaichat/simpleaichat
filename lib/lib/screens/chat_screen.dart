@@ -586,7 +586,6 @@ class _ChatScreenState extends State<ChatScreen> {
                   : Colors.grey[200],
               child: Column(
                 children: [
-                  // 検索欄
                   Padding(
                     padding: const EdgeInsets.only(
                         left: 10, top: 12, right: 6, bottom: 10),
@@ -766,7 +765,6 @@ class _ChatScreenState extends State<ChatScreen> {
           Expanded(
             child: Column(
               children: [
-                // 検索ボックス + コントロール UI
                 Column(
                   children: [
                     Padding(
@@ -794,7 +792,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                              '${_currentHitIndex + 1} / ${_searchHits.length} 件'),
+                              '${_currentHitIndex + 1} / ${_searchHits.length} '),
                           IconButton(
                             icon: Icon(Icons.arrow_upward),
                             onPressed: _goToPreviousHit,
@@ -808,7 +806,6 @@ class _ChatScreenState extends State<ChatScreen> {
                   ],
                 ),
                 const SizedBox(height: 6),
-// チャット表示部
                 Expanded(
                   child: ScrollablePositionedList.builder(
                     itemCount: _messages.length,
@@ -847,9 +844,8 @@ class _ChatScreenState extends State<ChatScreen> {
                                           .withOpacity(0.85),
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: Text(
-                              msg.content,
-                              style: TextStyle(fontSize: 15),
+                            child: DartHighlightedCode(
+                              code: msg.content,
                             ),
                           ),
                           Row(
@@ -870,7 +866,9 @@ class _ChatScreenState extends State<ChatScreen> {
                                 icon: Icon(Icons.delete, size: 18),
                                 tooltip: 'Delete',
                                 onPressed: () async {
-                                  _messages.removeAt(index);
+                                  setState(() {
+                                    _messages.removeAt(index);
+                                  });
                                   await StorageService.saveThread(
                                       _activeThreadId, _messages);
                                 },
@@ -879,8 +877,10 @@ class _ChatScreenState extends State<ChatScreen> {
                                 icon: Icon(Icons.edit, size: 18),
                                 tooltip: 'Edit',
                                 onPressed: () {
-                                  _editingMessageId = msg.messageId;
-                                  _editController.text = msg.content;
+                                  setState(() {
+                                    _editingMessageId = msg.messageId;
+                                    _editController.text = msg.content;
+                                  });
                                 },
                               ),
                             ],
