@@ -866,7 +866,9 @@ class _ChatScreenState extends State<ChatScreen> {
                                 icon: Icon(Icons.delete, size: 18),
                                 tooltip: 'Delete',
                                 onPressed: () async {
-                                  _messages.removeAt(index);
+                                  setState(() {
+                                    _messages.removeAt(index);
+                                  });
                                   await StorageService.saveThread(
                                       _activeThreadId, _messages);
                                 },
@@ -875,8 +877,10 @@ class _ChatScreenState extends State<ChatScreen> {
                                 icon: Icon(Icons.edit, size: 18),
                                 tooltip: 'Edit',
                                 onPressed: () {
-                                  _editingMessageId = msg.messageId;
-                                  _editController.text = msg.content;
+                                  setState(() {
+                                    _editingMessageId = msg.messageId;
+                                    _editController.text = msg.content;
+                                  });
                                 },
                               ),
                             ],
