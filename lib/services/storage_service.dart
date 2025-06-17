@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import '../models/thread.dart';
 import '../models/message.dart';
 import '../models/folder.dart';
+import '../utils/logger.dart';
 
 class StorageService {
   static Future<String> _getFilePath() async {
@@ -214,6 +215,12 @@ class StorageService {
   static Future<void> saveAllData(
       List<Thread> threads, List<Folder> folders) async {
     final path = await _getFilePath();
+
+    await saveAllDataSub(threads, folders, path);
+  }
+
+  static Future<void> saveAllDataSub(
+      List<Thread> threads, List<Folder> folders, String path) async {
     final file = File(path);
 
     final data = {
@@ -225,8 +232,13 @@ class StorageService {
   }
 
   static Future<List<Thread>> loadAllThreads() async {
+    final path = await _getFilePath();
+
+    return loadAllThreadsSub(path);
+  }
+
+  static Future<List<Thread>> loadAllThreadsSub(String path) async {
     try {
-      final path = await _getFilePath();
       final file = File(path);
 
       if (!await file.exists()) {
@@ -255,8 +267,13 @@ class StorageService {
   }
 
   static Future<List<Folder>> loadFolders() async {
+    final path = await _getFilePath();
+
+    return loadFoldersSub(path);
+  }
+
+  static Future<List<Folder>> loadFoldersSub(String path) async {
     try {
-      final path = await _getFilePath();
       final file = File(path);
 
       if (!await file.exists()) {
@@ -274,9 +291,11 @@ class StorageService {
         return folders;
       } else {
         // The old format does not have folder information
+        Logger.log("The old format does not have folder information");
         return [];
       }
     } catch (e) {
+      Logger.log(e);
       return [];
     }
   }

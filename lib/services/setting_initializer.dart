@@ -7,10 +7,10 @@ import 'setting_system.dart';
 class SettingInitializer {
   static const _fileName = 'chatconf.ini';
   static const _fileNameSystem = 'system_prompt.txt';
+  static String appDirectoryPath = '';
   static Future<void> initializeSettings() async {
     final dir = await getApplicationDocumentsDirectory();
     final configFile = File('${dir.path}/$_fileName');
-
     if (await configFile.exists()) {
       SettingService.isInit = true;
       return;
@@ -23,7 +23,7 @@ class SettingInitializer {
   static Future<void> initializeSystem() async {
     final dir = await getApplicationDocumentsDirectory();
     final configFile = File('${dir.path}/$_fileNameSystem');
-
+    appDirectoryPath = '${dir.path}';
     if (await configFile.exists()) {
       SystemService.isInit = true;
       return;

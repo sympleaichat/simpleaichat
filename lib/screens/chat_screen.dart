@@ -10,6 +10,7 @@ import '../utils/logger.dart';
 import '../services/api_service.dart';
 import '../services/storage_service.dart';
 import '../services/setting_service.dart';
+import '../services/setting_initializer.dart';
 import '../models/message.dart';
 import '../models/thread.dart';
 import '../models/folder.dart';
@@ -260,51 +261,62 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
-  void _backupData() {
-    final backup = {
-      'threads': _threads.map((t) => {'threadId': t.threadId}).toList(),
-      'messages': _messages
-          .map((m) => {
-                'messageId': m.messageId,
-                'role': m.role,
-                'content': m.content,
-              })
-          .toList(),
-    };
-    setState(() {
-      _backupJson = jsonEncode(backup);
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Backup created (memory only).')),
-    );
+  void _backupData() async {
+    String? pickedSaveFilePath;
+    try {
+      pickedSaveFilePath = await FilePicker.platform.saveFile(
+        type: FileType.custom,
+        allowedExtensions: ['json'],
+        dialogTitle: 'backup json file',
+        initialDirectory: '${SettingInitializer.appDirectoryPath}',
+      );
+
+      if (!pickedSaveFilePath!.contains('.json')) {
+        pickedSaveFilePath = pickedSaveFilePath + '.json';
+      }
+
+      await StorageService.saveAllDataSub(
+          _threads, _folders, pickedSaveFilePath!);
+    } on PlatformException catch (e) {
+      print('Unsupported operation: $e');
+    } catch (e) {
+      print(e.toString());
+    }
   }
 
-  void _restoreData() {
-    if (_backupJson == null) return;
+  void printInDebug(Object object) => debugPrint(object.toString());
+  List<PlatformFile>? pickedFiles;
+  void _restoreData() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.any,
+        allowMultiple: false,
+        onFileLoading: (FilePickerStatus status) => printInDebug(status),
+        allowedExtensions: ['json'],
+        dialogTitle: 'select json file',
+        initialDirectory: '${SettingInitializer.appDirectoryPath}',
+        withData: true,
+      );
 
-    final Map<String, dynamic> restored = jsonDecode(_backupJson!);
-
-    final restoredThreads = (restored['threads'] as List)
-        .map((t) => Thread(
-              threadId: t['threadId'],
-            ))
-        .toList();
-    final restoredMessages = (restored['messages'] as List)
-        .map((m) => Message(
-              messageId: m['messageId'],
-              role: m['role'],
-              content: m['content'],
-            ))
-        .toList();
-
-    setState(() {
-      _threads = restoredThreads;
-      _messages = restoredMessages;
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Data restored from backup.')),
-    );
+      String? filepath = result!.files.first.path;
+      final loadedThreads = await StorageService.loadAllThreadsSub(filepath!);
+      final loadedFolders = await StorageService.loadFoldersSub(filepath!);
+      if (_threads.length > 0) {
+        _activeThreadId = loadedThreads[0].threadId;
+      } else {
+        _activeThreadId = StorageService.generateRandomId();
+      }
+      final loadedMessages = await StorageService.loadThread(_activeThreadId);
+      setState(() {
+        _threads = loadedThreads;
+        _folders = loadedFolders;
+        _messages = loadedMessages;
+      });
+    } on PlatformException catch (e) {
+      Logger.log('Unsupported operation: $e');
+    } catch (e) {
+      Logger.log(e.toString());
+    }
   }
 
   void _filterThreads(String query) {
@@ -558,7 +570,7 @@ class _ChatScreenState extends State<ChatScreen> {
               tooltip: 'Backup',
               onPressed: _backupData),
           IconButton(
-              icon: Icon(Icons.folder_open),
+              icon: Icon(Icons.file_upload_outlined),
               tooltip: 'Restore',
               onPressed: _restoreData),
           IconButton(
