@@ -41,29 +41,29 @@ This project started as a personal tool to get closer to how LLMs really behave 
 If you’ve ever wished for a simpler, more direct way to interact with your preferred models, give it a try.  
 Pull requests and ideas are welcome!
 
-## ✨ Features
+##  Features
 
-🧠 Works with Claude, ChatGPT, Gemini, Grok, DeepSeek
-📝 Edit and delete messages freely in any conversation  
-💾 Everything is saved locally — no data sent to third-party servers  
-🔐 API keys are never uploaded (saved on your device only)  
-🖥️ Windows-native .exe app — no Electron, no browser dependency  
-🧵 Multi-threaded chat interface (thread switcher & history)  
-🌙 Clean, minimal UI with dark mode  
-📦 Lightweight build — launches instantly  
-🧠 Custom system prompt support via external file  
-🔁 Full chat history is sent with each request for better context understanding  
+ Works with Claude, ChatGPT, Gemini, Grok, DeepSeek
+ Edit and delete messages freely in any conversation  
+ Everything is saved locally — no data sent to third-party servers  
+ API keys are never uploaded (saved on your device only)  
+ Windows-native .exe app — no Electron, no browser dependency  
+ Multi-threaded chat interface (thread switcher & history)  
+ Clean, minimal UI with dark mode  
+ Lightweight build — launches instantly  
+ Custom system prompt support via external file  
+ Full chat history is sent with each request for better context understanding  
 
 ---
 
-### 💡 There are many helpful features for chatting with LLMs
+###  There are many helpful features for chatting with LLMs
 Configuration information such as API keys, message history, and system prompts can be stored locally and edited.  
 Messages can be sent in either thread mode or single message mode.  
 Messages can be deleted or edited individually.  
 The character count of messages at the time of sending can be checked.  
 ![screenshot2](screenshot/3.jpg) 
 
-## 🛠️ Installation
+##  Installation
 
 1. Download the latest `.exe` from the [Releases](https://github.com/your-username/SimpleAIChat/releases) page.
 2. Run `SimpleAIChat.exe`.
@@ -71,7 +71,7 @@ The character count of messages at the time of sending can be checked.
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 1. Launch the app
 2. Enter your API key for Claude / ChatGPT / Gemini / Grok / DeepSeek
@@ -79,7 +79,7 @@ The character count of messages at the time of sending can be checked.
 
 ---
 
-## ⚠️ Important Notes
+##  Important Notes
 
 - Messages you **edit** are stored only on your device.
 - If you re-send an edited message to an API provider (e.g., OpenAI or Anthropic), you are responsible for that content.
@@ -87,20 +87,20 @@ The character count of messages at the time of sending can be checked.
 
 ---
 
-## 📄 License
+##  License
 
 MIT License — see [LICENSE](LICENSE).
 
 ---
 
-## 🔍 Disclaimer
+##  Disclaimer
 
 This is an **independent, unofficial client**.  
 It is **not affiliated with OpenAI, Google, Anthropic, Grok, deepseek **.  
 All API keys are stored locally and never shared.  
 Use is subject to each provider’s terms of service.
 
-## ✨ Link
+##  Link
 anthropic https://www.anthropic.com/api
 
 OpenAI https://openai.com/api/
