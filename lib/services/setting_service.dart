@@ -66,6 +66,12 @@ class SettingService {
         return 'api_key_deepseek_chat';
       case AIEngine.deepseek_reasoner:
         return 'api_key_deepseek_reasoner';
+      case AIEngine.mistral_large:
+        return 'api_key_mistral_large';
+      case AIEngine.mistral_medium:
+        return 'api_key_mistral_medium';
+      case AIEngine.mistral_small:
+        return 'api_key_mistral_small';
     }
   }
 
@@ -111,6 +117,12 @@ class SettingService {
       return AIEngine.deepseek_chat;
     } else if (engine == ApiService.STR_deepseek_reasoner) {
       return AIEngine.deepseek_reasoner;
+    } else if (engine == ApiService.STR_mistral_large) {
+      return AIEngine.mistral_large;
+    } else if (engine == ApiService.STR_mistral_medium) {
+      return AIEngine.mistral_medium;
+    } else if (engine == ApiService.STR_mistral_small) {
+      return AIEngine.mistral_small;
     } else {
       return AIEngine.chatgpt_4omini;
     }

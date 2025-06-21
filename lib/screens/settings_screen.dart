@@ -49,10 +49,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final TextEditingController _grok3ApiKeyController = TextEditingController();
   final TextEditingController _grok3miniApiKeyController =
       TextEditingController();
-
   final TextEditingController _deepseek_chat_ApiKeyController =
       TextEditingController();
   final TextEditingController _deepseek_reasoner_ApiKeyController =
+      TextEditingController();
+  final TextEditingController _mistral_large_ApiKeyController =
+      TextEditingController();
+  final TextEditingController _mistral_medium_ApiKeyController =
+      TextEditingController();
+  final TextEditingController _mistral_small_ApiKeyController =
       TextEditingController();
 
   String _historyFilePath = '';
@@ -107,11 +112,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final claude37Key = await SettingService.loadApiKey(AIEngine.claude37);
     final groq3Key = await SettingService.loadApiKey(AIEngine.grok_3);
     final groq3miniKey = await SettingService.loadApiKey(AIEngine.grok_3mini);
-
     final deepseek_chat_Key =
         await SettingService.loadApiKey(AIEngine.deepseek_chat);
     final deepseek_reasoner_Key =
         await SettingService.loadApiKey(AIEngine.deepseek_reasoner);
+    final mistral_large_Key =
+        await SettingService.loadApiKey(AIEngine.mistral_large);
+    final mistral_medium_Key =
+        await SettingService.loadApiKey(AIEngine.mistral_medium);
+    final mistral_small_Key =
+        await SettingService.loadApiKey(AIEngine.mistral_small);
 
     setState(() {
       _selectedEngine = engine;
@@ -134,9 +144,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _claude37ApiKeyController.text = claude37Key;
       _grok3ApiKeyController.text = groq3Key;
       _grok3miniApiKeyController.text = groq3miniKey;
-
       _deepseek_chat_ApiKeyController.text = deepseek_chat_Key;
       _deepseek_reasoner_ApiKeyController.text = deepseek_reasoner_Key;
+      _mistral_large_ApiKeyController.text = mistral_large_Key;
+      _mistral_medium_ApiKeyController.text = mistral_medium_Key;
+      _mistral_small_ApiKeyController.text = mistral_small_Key;
 
       _loading = false;
     });
@@ -236,9 +248,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _gemini15proApiKeyController.dispose();
     _grok3ApiKeyController.dispose();
     _grok3miniApiKeyController.dispose();
-
     _deepseek_chat_ApiKeyController.dispose();
     _deepseek_reasoner_ApiKeyController.dispose();
+    _mistral_large_ApiKeyController.dispose();
+    _mistral_medium_ApiKeyController.dispose();
+    _mistral_small_ApiKeyController.dispose();
 
     _scrollController.dispose();
     super.dispose();
@@ -355,6 +369,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         _deepseek_chat_ApiKeyController),
                     _buildEngineCard(AIEngine.deepseek_reasoner,
                         _deepseek_reasoner_ApiKeyController),
+                    _buildEngineCard(AIEngine.mistral_medium,
+                        _mistral_medium_ApiKeyController),
+                    _buildEngineCard(AIEngine.mistral_small,
+                        _mistral_small_ApiKeyController),
+                    _buildEngineCard(AIEngine.mistral_large,
+                        _mistral_large_ApiKeyController),
                   ],
                 ),
               ),

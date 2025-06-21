@@ -27,7 +27,10 @@ enum AIEngine {
   grok_3,
   grok_3mini,
   deepseek_chat,
-  deepseek_reasoner
+  deepseek_reasoner,
+  mistral_large,
+  mistral_medium,
+  mistral_small,
 }
 
 class ApiService {
@@ -46,6 +49,7 @@ class ApiService {
   static const String deepseekUrl = 'https://api.deepseek.com/chat/completions';
   static const String llamaUrl =
       'https://api.llama.com/compat/v1/chat/completions';
+  static const String mistralUrl = 'https://api.mistral.ai/v1';
 
   static const String NAME_chatgpt_41 = 'ChatGPT 4.1';
   static const String NAME_chatgpt_4omini = 'ChatGPT o4-mini';
@@ -66,6 +70,9 @@ class ApiService {
   static const String NAME_grok_3mini = 'Grok 3 Mini';
   static const String NAME_deepseek_chat = 'deepseek-chat';
   static const String NAME_deepseek_reasoner = 'deepseek-reasoner';
+  static const String NAME_mistral_large = 'Mistral Large';
+  static const String NAME_mistral_medium = 'Mistral Medium';
+  static const String NAME_mistral_small = 'Mistral Small';
 
   static const String STR_chatgpt_41 = "gpt-4.1";
   static const String STR_chatgpt_4omini = "gpt-4o-mini";
@@ -88,6 +95,9 @@ class ApiService {
   static const String STR_grok3mini = 'grok-3-mini-beta';
   static const String STR_deepseek_chat = 'deepseek-chat';
   static const String STR_deepseek_reasoner = 'deepseek-reasoner';
+  static const String STR_mistral_large = 'mistral-large-latest';
+  static const String STR_mistral_medium = 'mistral-medium-latest';
+  static const String STR_mistral_small = 'mistral-small-latest';
 
   static int msgSendLength = 0;
   static int msgReceivedLength = 0;
@@ -132,6 +142,12 @@ class ApiService {
         return NAME_deepseek_chat;
       case AIEngine.deepseek_reasoner:
         return NAME_deepseek_reasoner;
+      case AIEngine.mistral_large:
+        return NAME_mistral_large;
+      case AIEngine.mistral_medium:
+        return NAME_mistral_medium;
+      case AIEngine.mistral_small:
+        return NAME_mistral_small;
     }
   }
 
@@ -175,38 +191,49 @@ class ApiService {
         return STR_deepseek_chat;
       case AIEngine.deepseek_reasoner:
         return STR_deepseek_reasoner;
+      case AIEngine.mistral_large:
+        return STR_mistral_large;
+      case AIEngine.mistral_medium:
+        return STR_mistral_medium;
+      case AIEngine.mistral_small:
+        return STR_mistral_small;
     }
   }
 
   static Future<String> sendMessage(String userInput, AIEngine model) async {
     final modelStr = getModelStr(model);
     final apiKey = await SettingService.loadApiKey(model);
-    if (model == AIEngine.chatgpt_41 ||
-        model == AIEngine.chatgpt_4omini ||
-        model == AIEngine.chatgpt_4o ||
-        model == AIEngine.chatgpt_35turbo ||
-        model == AIEngine.chatgpt_4turbo ||
-        model == AIEngine.gpt4) {
-      return _sendToChatGPT(modelStr, userInput, apiKey);
-    } else if (model == AIEngine.chatgpt_davinci002) {
-      return _sendToChatGPTLegacy(modelStr, userInput, apiKey);
-    } else if (model == AIEngine.gemini25flash ||
-        model == AIEngine.gemini25pro ||
-        model == AIEngine.gemini20flash ||
-        model == AIEngine.gemini15pro) {
-      return _sendToGemini(modelStr, userInput, apiKey);
-    } else if (model == AIEngine.claude35 ||
-        model == AIEngine.claude37 ||
-        model == AIEngine.claude40opus ||
-        model == AIEngine.claude40sonnet) {
-      return _sendToClaude(modelStr, userInput, apiKey);
-    } else if (model == AIEngine.grok_3 || model == AIEngine.grok_3mini) {
-      return _sendToChatGrok(modelStr, userInput, apiKey);
-    } else if (model == AIEngine.deepseek_chat ||
-        model == AIEngine.deepseek_reasoner) {
-      return _sendToChatDeepSeek(modelStr, userInput, apiKey);
-    } else {
-      return 'This model does not support Single mode yet.';
+
+    switch (model) {
+      case AIEngine.chatgpt_41:
+      case AIEngine.chatgpt_4omini:
+      case AIEngine.chatgpt_4o:
+      case AIEngine.chatgpt_35turbo:
+      case AIEngine.chatgpt_4turbo:
+      case AIEngine.gpt4:
+        return _sendToChatGPT(modelStr, userInput, apiKey);
+      case AIEngine.chatgpt_davinci002:
+        return _sendToChatGPTLegacy(modelStr, userInput, apiKey);
+      case AIEngine.gemini25flash:
+      case AIEngine.gemini25pro:
+      case AIEngine.gemini20flash:
+      case AIEngine.gemini15pro:
+        return _sendToGemini(modelStr, userInput, apiKey);
+      case AIEngine.claude40opus:
+      case AIEngine.claude40sonnet:
+      case AIEngine.claude35:
+      case AIEngine.claude37:
+        return _sendToClaude(modelStr, userInput, apiKey);
+      case AIEngine.grok_3:
+      case AIEngine.grok_3mini:
+        return _sendToChatGrok(modelStr, userInput, apiKey);
+      case AIEngine.deepseek_chat:
+      case AIEngine.deepseek_reasoner:
+        return _sendToChatDeepSeek(modelStr, userInput, apiKey);
+      case AIEngine.mistral_large:
+      case AIEngine.mistral_medium:
+      case AIEngine.mistral_small:
+        return _sendToChatMistral(modelStr, userInput, apiKey);
     }
   }
 
@@ -214,40 +241,37 @@ class ApiService {
       List<Message> messages, AIEngine model) async {
     final modelStr = getModelStr(model);
     final apiKey = await SettingService.loadApiKey(model);
-    if (model == AIEngine.chatgpt_41) {
-      return _sendToChatGPTWithHistory(modelStr, messages, apiKey);
-    } else if (model == AIEngine.chatgpt_4omini) {
-      return _sendToChatGPTWithHistory(modelStr, messages, apiKey);
-    } else if (model == AIEngine.chatgpt_4o) {
-      return _sendToChatGPTWithHistory(modelStr, messages, apiKey);
-    } else if (model == AIEngine.chatgpt_35turbo) {
-      return _sendToChatGPTWithHistory(modelStr, messages, apiKey);
-    } else if (model == AIEngine.chatgpt_4turbo) {
-      return _sendToChatGPTWithHistory(modelStr, messages, apiKey);
-    } else if (model == AIEngine.gpt4) {
-      return _sendToChatGPTWithHistory(modelStr, messages, apiKey);
-    } else if (model == AIEngine.chatgpt_davinci002) {
-      return 'This model does not support thread messages.';
-      //   return _sendToChatGPTWithHistoryLegacy("davinci-002", messages);
-    } else if (model == AIEngine.gemini25flash ||
-        model == AIEngine.gemini25pro ||
-        model == AIEngine.gemini20flash ||
-        model == AIEngine.gemini15pro) {
-      return _sendToGeminiWithHistory(modelStr, messages, apiKey);
-    } else if (model == AIEngine.claude35 ||
-        model == AIEngine.claude37 ||
-        model == AIEngine.claude40opus ||
-        model == AIEngine.claude40sonnet) {
-      return _sendToClaudeWithHistory(modelStr, messages, apiKey);
-    } else if (model == AIEngine.grok_3) {
-      return _sendToGrokWithHistory(modelStr, messages, apiKey);
-    } else if (model == AIEngine.grok_3mini) {
-      return _sendToGrokWithHistory(modelStr, messages, apiKey);
-    } else if (model == AIEngine.deepseek_chat ||
-        model == AIEngine.deepseek_reasoner) {
-      return _sendToDeepSeekWithHistory(modelStr, messages, apiKey);
-    } else {
-      return 'This model does not support history yet.';
+
+    switch (model) {
+      case AIEngine.chatgpt_41:
+      case AIEngine.chatgpt_4omini:
+      case AIEngine.chatgpt_4o:
+      case AIEngine.chatgpt_35turbo:
+      case AIEngine.chatgpt_4turbo:
+      case AIEngine.gpt4:
+        return _sendToChatGPTWithHistory(modelStr, messages, apiKey);
+      case AIEngine.chatgpt_davinci002:
+        return 'This model does not support thread messages.';
+      case AIEngine.gemini25flash:
+      case AIEngine.gemini25pro:
+      case AIEngine.gemini20flash:
+      case AIEngine.gemini15pro:
+        return _sendToGeminiWithHistory(modelStr, messages, apiKey);
+      case AIEngine.claude40opus:
+      case AIEngine.claude40sonnet:
+      case AIEngine.claude35:
+      case AIEngine.claude37:
+        return _sendToClaudeWithHistory(modelStr, messages, apiKey);
+      case AIEngine.grok_3:
+      case AIEngine.grok_3mini:
+        return _sendToGrokWithHistory(modelStr, messages, apiKey);
+      case AIEngine.deepseek_chat:
+      case AIEngine.deepseek_reasoner:
+        return _sendToDeepSeekWithHistory(modelStr, messages, apiKey);
+      case AIEngine.mistral_large:
+      case AIEngine.mistral_medium:
+      case AIEngine.mistral_small:
+        return _sendToMistralWithHistory(modelStr, messages, apiKey);
     }
   }
 
@@ -898,6 +922,51 @@ class ApiService {
     }
   }
 
+  static Future<String> _sendToMistralWithHistory(
+      String model, List<Message> messages, String apiKey) async {
+    msgSendLength = 0;
+    msgReceivedLength = 0;
+    msgModel = '';
+    try {
+      String systemPrompt = await SystemService.loadSystem();
+
+      final chatMessages = [
+        {'role': 'system', 'content': systemPrompt},
+        ...messages.map((m) => {'role': m.role, 'content': m.content}).toList(),
+      ];
+      final sendJson = jsonEncode({
+        "model": model,
+        "messages": chatMessages,
+        "temperature": 0.6,
+        "max_tokens": 8000,
+      });
+      msgModel = model;
+      msgSendLength = sendJson.length;
+      Logger.log(sendJson);
+      final response = await http.post(
+        Uri.parse(mistralUrl + '/chat/completions'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $apiKey',
+        },
+        body: sendJson,
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(utf8.decode(response.bodyBytes));
+        msgReceivedLength = response.bodyBytes.length;
+        final reply = data['choices'][0]['message']['content'];
+        return reply.trim();
+      } else {
+        print('Mistral API error: ${response.body}');
+        return 'Sorry, Mistral did not respond.';
+      }
+    } catch (e) {
+      print('Mistral API error: $e');
+      return 'Mistral Error occurred.';
+    }
+  }
+
   static Future<String> _sendToChatGPT(
       String model, String userInput, String apiKey) async {
     msgSendLength = 0;
@@ -1369,6 +1438,49 @@ class ApiService {
     } catch (e) {
       print('DeepSeek API error: $e');
       return 'DeepSeek Error occurred.';
+    }
+  }
+
+  static Future<String> _sendToChatMistral(
+      String model, String userInput, String apiKey) async {
+    msgSendLength = 0;
+    msgReceivedLength = 0;
+    msgModel = '';
+
+    try {
+      String systemPrompt = await SystemService.loadSystem();
+      final sendJson = jsonEncode({
+        "model": model,
+        "messages": [
+          {'role': 'system', 'content': systemPrompt},
+          {"role": "user", "content": userInput}
+        ],
+        "temperature": 0.7,
+      });
+      Logger.log(sendJson);
+      msgSendLength = sendJson.length;
+      msgModel = model;
+      final response = await http.post(
+        Uri.parse(mistralUrl + '/chat/completions'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $apiKey',
+        },
+        body: sendJson,
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(utf8.decode(response.bodyBytes));
+        msgReceivedLength = response.bodyBytes.length;
+        final reply = data['choices'][0]['message']['content'];
+        return reply.trim();
+      } else {
+        print('Mistral API error: ${response.body}');
+        return 'Sorry, Mistral did not respond.';
+      }
+    } catch (e) {
+      print('Mistral API error: $e');
+      return 'Mistral Error occurred.';
     }
   }
 
