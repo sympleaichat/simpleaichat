@@ -5,9 +5,9 @@
 
 A fast, ad-free, fully local AI chat client for Windows.  
 
-Designed for Claude, ChatGPT, Gemini, Grok, DeepSeek — with full message editing and local history.
+Designed for Claude, ChatGPT, Gemini, Grok, DeepSeek, Mistral — with full message editing and local history.
 
-🔔supported　Claude Opus 4,　Claude Sonnet 4,　openai web search, deepseek🔔
+🔔[news] supported　Mistral🔔
 
 Download for Desktop<br>
 ([Windows](https://github.com/sympleaichat/simpleaichat/raw/refs/heads/main/SimpleAIChatSetup.exe)) 
@@ -15,7 +15,7 @@ Download for Desktop<br>
 ---
 ## Why SimpleAIChat?
 
-Most LLMs today — whether OpenAI's GPT, Anthropic's Claude, Grok, Gemini, DeepSeek — are accessed through hosted web interfaces that abstract away the details of message formatting, memory control, and backend behavior.
+Most LLMs today — whether GPT, Claude, Grok, Gemini, DeepSeek, Mistral — are accessed through hosted web interfaces that abstract away the details of message formatting, memory control, and backend behavior.
 
 That’s convenient — but not always ideal.
 
@@ -26,7 +26,6 @@ That’s convenient — but not always ideal.
 - LLM is treated as a stateless engine by default, with all memory and personalization stored and editable on the PC.
 - Minimize UI friction: no login, no telemetry, no branding — just your models and your prompts.
 - Make it easy to extend, customize, and connect to other tools.
-- Support OpenAI, Claude, and Gemini backends with a unified, consistent interface.
 
 ## Roadmap / Ideas
 
@@ -43,7 +42,7 @@ Pull requests and ideas are welcome!
 
 ##  Features
 
- Works with Claude, ChatGPT, Gemini, Grok, DeepSeek
+ Works with Claude, ChatGPT, Gemini, Grok, DeepSeek, Mistral
  Edit and delete messages freely in any conversation  
  Everything is saved locally — no data sent to third-party servers  
  API keys are never uploaded (saved on your device only)  
@@ -74,7 +73,7 @@ The character count of messages at the time of sending can be checked.
 ##  Getting Started
 
 1. Launch the app
-2. Enter your API key for Claude / ChatGPT / Gemini / Grok / DeepSeek
+2. Enter your API key for Claude / ChatGPT / Gemini / Grok / DeepSeek / Mistral
 3. Start chatting, editing, and exploring — all saved locally
 
 ---
@@ -96,7 +95,7 @@ MIT License — see [LICENSE](LICENSE).
 ##  Disclaimer
 
 This is an **independent, unofficial client**.  
-It is **not affiliated with OpenAI, Google, Anthropic, Grok, deepseek **.  
+It is **not affiliated with OpenAI, Google, Anthropic, Grok, deepseek,  Mistral **.  
 All API keys are stored locally and never shared.  
 Use is subject to each provider’s terms of service.
 
@@ -110,6 +109,9 @@ gemini https://ai.google.dev/gemini-api/docs
 Grok https://x.ai/api
 
 deepseek https://api-docs.deepseek.com/
+
+Mistral https://docs.mistral.ai/api/
+
 
 ---
 
