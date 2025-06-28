@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class Message {
   final String messageId;
   final String role;
@@ -25,5 +27,10 @@ class Message {
       role: json['role'],
       content: json['content'],
     );
+  }
+
+  @override
+  String toString() {
+    return 'Message(messageId: $messageId, role: $role, content: $content)';
   }
 }

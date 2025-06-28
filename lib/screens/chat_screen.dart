@@ -14,6 +14,7 @@ import '../services/setting_initializer.dart';
 import '../models/message.dart';
 import '../models/thread.dart';
 import '../models/folder.dart';
+import '../models/memory.dart';
 import '../screens/settings_screen.dart';
 import '../utils/dart_highlight_code.dart';
 import '../utils/constants.dart';
@@ -30,6 +31,7 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   List<Thread> _threads = [];
   List<Folder> _folders = [];
+  List<Memory> _memories = [];
   List<Message> _messages = [];
   List<Thread> _filteredThreads = [];
 
@@ -51,10 +53,15 @@ class _ChatScreenState extends State<ChatScreen> {
   String _searchQuery = '';
   final ScrollController _scrollController = ScrollController();
   final ScrollController _scrollCahtController = ScrollController();
+  final ScrollController _scrollMemoryController = ScrollController();
 
   final ItemScrollController _itemScrollController = ItemScrollController();
   final ItemPositionsListener _itemPositionsListener =
       ItemPositionsListener.create();
+
+  bool _isMemoriesExpanded = false; // 初期値は展開
+  // 選択されたメモリのIDを保持するセット
+  Set<String> _selectedMemories = {};
 
   void initState() {
     super.initState();
@@ -62,7 +69,7 @@ class _ChatScreenState extends State<ChatScreen> {
     _loadThreads();
     _loadMessages();
     _loadFolders();
-
+    _loadMemorys();
     ApiService.pdffilePath = "";
     ApiService.pdffileName = "";
     if (!SettingService.isInit) {
@@ -79,7 +86,7 @@ class _ChatScreenState extends State<ChatScreen> {
       if (_messages.isNotEmpty) {
         _itemScrollController.scrollTo(
           index: _messages.length - 1,
-          duration: Duration(milliseconds: 0), // 即時スクロール
+          duration: Duration(milliseconds: 0),
         );
       }
     });
@@ -89,8 +96,10 @@ class _ChatScreenState extends State<ChatScreen> {
   void dispose() {
     _scrollController.dispose();
     _scrollCahtController.dispose();
+    _scrollMemoryController.dispose();
     _controller.dispose();
     _searchController.dispose();
+
     super.dispose();
   }
 
@@ -105,6 +114,13 @@ class _ChatScreenState extends State<ChatScreen> {
     final loadedFolders = await StorageService.loadFolders();
     setState(() {
       _folders = loadedFolders;
+    });
+  }
+
+  Future<void> _loadMemorys() async {
+    final loadedMemoris = await StorageService.loadMemoris();
+    setState(() {
+      _memories = loadedMemoris;
     });
   }
 
@@ -168,13 +184,14 @@ class _ChatScreenState extends State<ChatScreen> {
 
     await StorageService.saveMessage(_activeThreadId, userMessage);
     _controller.clear();
+    final sendcontent = Memory.buildMessageWithMemories(_memories, content);
     String assistantReply = '';
     if (web) {
-      assistantReply =
-          await ApiService.sendMessageWeb(content, ApiService.currentEngine);
+      assistantReply = await ApiService.sendMessageWeb(
+          sendcontent, ApiService.currentEngine);
     } else {
       assistantReply =
-          await ApiService.sendMessage(content, ApiService.currentEngine);
+          await ApiService.sendMessage(sendcontent, ApiService.currentEngine);
     }
 
     final assistantMessage = Message(
@@ -197,22 +214,32 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> _sendThreadMessage(String content, bool web) async {
     if (content.trim().isEmpty) return;
+    final sendcontent = Memory.buildMessageWithMemories(_memories, content);
 
-    final userMessage = Message(
+    List<Message> deepCopiedMessages =
+        _messages.map((message) => Message.fromJson(message.toJson())).toList();
+    final orgMessage = Message(
       messageId: StorageService.generateRandomId(),
       role: 'user',
       content: content.trim(),
     );
 
+    final userMessage = Message(
+      messageId: StorageService.generateRandomId(),
+      role: 'user',
+      content: sendcontent.trim(),
+    );
+
     setState(() {
-      _messages.add(userMessage);
+      _messages.add(orgMessage);
       _isLoading = true;
     });
-
+    deepCopiedMessages.add(userMessage);
     _controller.clear();
 
-    final allMessages = [..._messages];
+    final allMessages = [...deepCopiedMessages];
     String assistantReply = '';
+
     if (web) {
       assistantReply = await ApiService.sendMessageWithHistoryWeb(
           allMessages, ApiService.currentEngine);
@@ -276,7 +303,7 @@ class _ChatScreenState extends State<ChatScreen> {
       }
 
       await StorageService.saveAllDataSub(
-          _threads, _folders, pickedSaveFilePath!);
+          _threads, _folders, _memories, pickedSaveFilePath!);
     } on PlatformException catch (e) {
       print('Unsupported operation: $e');
     } catch (e) {
@@ -368,7 +395,7 @@ class _ChatScreenState extends State<ChatScreen> {
         _folders.add(newFolder);
       });
 
-      await StorageService.saveAllData(_threads, _folders);
+      await StorageService.saveAllData(_threads, _folders, _memories);
     }
   }
 
@@ -403,7 +430,7 @@ class _ChatScreenState extends State<ChatScreen> {
       }
     });
 
-    await StorageService.saveAllData(_threads, _folders);
+    await StorageService.saveAllData(_threads, _folders, _memories);
   }
 
   void _renameFolder(Folder folder) async {
@@ -442,7 +469,7 @@ class _ChatScreenState extends State<ChatScreen> {
       folder.name = newName;
     });
 
-    await StorageService.saveAllData(_threads, _folders);
+    await StorageService.saveAllData(_threads, _folders, _memories);
   }
 
   void _scrollToMessage(String keyword) {
@@ -519,6 +546,146 @@ class _ChatScreenState extends State<ChatScreen> {
     _scrollToIndex(_searchHits[_currentHitIndex]);
 
     setState(() {});
+  }
+
+  void _toggleMemorySelection(String memoryId, bool? value) async {
+    setState(() {
+      final memory = _memories.firstWhere((item) => item.id == memoryId);
+      memory.select = value ?? false;
+
+      if (memory.select) {
+        _selectedMemories.add(memoryId);
+      } else {
+        _selectedMemories.remove(memoryId);
+      }
+      print('Selected memories: $_selectedMemories');
+    });
+
+    await StorageService.saveAllData(_threads, _folders, _memories);
+  }
+
+  Future<void> _addNewMemory() async {
+    String? newMemoryContent = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        String _tempContent = '';
+        return AlertDialog(
+          title: const Text('Add memory'),
+          content: TextField(
+            maxLines: null,
+            keyboardType: TextInputType.multiline,
+            onChanged: (value) {
+              _tempContent = value;
+            },
+            decoration: const InputDecoration(hintText: 'Enter contents'),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            ElevatedButton(
+              child: const Text('Add'),
+              onPressed: () {
+                Navigator.of(context).pop(_tempContent);
+              },
+            ),
+          ],
+        );
+      },
+    );
+
+    if (newMemoryContent != null && newMemoryContent.isNotEmpty) {
+      setState(() {
+        _memories.add(Memory(
+          id: StorageService.generateRandomId(),
+          content: newMemoryContent,
+        ));
+      });
+
+      await StorageService.saveAllData(_threads, _folders, _memories);
+    }
+  }
+
+  void _deleteMemory(Memory memory) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        String _tempContent = '';
+        return AlertDialog(
+          title: const Text('Add memory'),
+          content: Text(
+            memory.content,
+            maxLines: 4,
+            overflow: TextOverflow.ellipsis,
+            // style: const TextStyle(fontSize: 11),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+            ),
+            ElevatedButton(
+              child: const Text('Delete'),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+            ),
+          ],
+        );
+      },
+    );
+    if (confirm != true) return;
+    setState(() {
+      _memories.removeWhere((item) => item.id == memory.id);
+      _selectedMemories.remove(memory.id);
+    });
+
+    await StorageService.saveAllData(_threads, _folders, _memories);
+  }
+
+  Future<void> _editMemory(Memory memory) async {
+    String? updatedContent = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        TextEditingController _controller =
+            TextEditingController(text: memory.content);
+        return AlertDialog(
+          title: const Text('Edit memory'),
+          content: TextField(
+            maxLines: null,
+            keyboardType: TextInputType.multiline,
+            controller: _controller,
+            decoration: const InputDecoration(hintText: 'Edit contents'),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            ElevatedButton(
+              child: const Text('Save'),
+              onPressed: () {
+                Navigator.of(context).pop(_controller.text);
+              },
+            ),
+          ],
+        );
+      },
+    );
+
+    if (updatedContent != null && updatedContent.isNotEmpty) {
+      setState(() {
+        memory.content = updatedContent;
+      });
+      await StorageService.saveAllData(_threads, _folders, _memories);
+    }
   }
 
   @override
@@ -632,6 +799,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                   const SizedBox(height: 8),
                   Expanded(
+                    flex: 3,
                     child: Scrollbar(
                       controller: _scrollController,
                       thumbVisibility: true,
@@ -654,7 +822,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                 });
                                 updateThreadFolderId(draggedThread, folder.id);
                                 await StorageService.saveAllData(
-                                    _threads, _folders);
+                                    _threads, _folders, _memories);
                               },
                               builder: (context, candidateData, rejectedData) =>
                                   Theme(
@@ -706,7 +874,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               });
                               updateThreadFolderId(draggedThread, '');
                               await StorageService.saveAllData(
-                                  _threads, _folders);
+                                  _threads, _folders, _memories);
                             },
                             builder: (context, candidateData, rejectedData) =>
                                 Container(
@@ -732,6 +900,124 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 8),
+                  Divider(height: 1),
+                  const SizedBox(height: 4),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _isMemoriesExpanded = !_isMemoriesExpanded;
+                        });
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Memory list',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color:
+                                  Theme.of(context).textTheme.bodyLarge?.color,
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.add_box, size: 20),
+                                tooltip: 'add new memory',
+                                onPressed: _addNewMemory,
+                              ),
+                              const SizedBox(width: 6),
+                              Icon(
+                                _isMemoriesExpanded
+                                    ? Icons.expand_more
+                                    : Icons.expand_less,
+                                size: 20,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  (_isMemoriesExpanded)
+                      ? Expanded(
+                          flex: 2,
+                          child: Scrollbar(
+                            controller: _scrollMemoryController,
+                            thumbVisibility: true,
+                            child: ListView.builder(
+                              controller: _scrollMemoryController,
+                              itemCount: _memories.length,
+                              itemBuilder: (context, index) {
+                                final memory = _memories[index];
+                                return Card(
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 4),
+                                  elevation: 1,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Row(
+                                      children: [
+                                        Checkbox(
+                                          value: memory.select,
+                                          onChanged: (bool? value) {
+                                            _toggleMemorySelection(
+                                                memory.id, value);
+                                          },
+                                        ),
+                                        const SizedBox(
+                                          width: 4,
+                                        ),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                memory.content,
+                                                maxLines: 3,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                    fontSize: 11),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        PopupMenuButton<String>(
+                                          icon: const Icon(Icons.more_vert,
+                                              size: 20),
+                                          onSelected: (String result) {
+                                            if (result == 'edit') {
+                                              _editMemory(memory);
+                                            } else if (result == 'delete') {
+                                              _deleteMemory(memory);
+                                            }
+                                          },
+                                          itemBuilder: (BuildContext context) =>
+                                              <PopupMenuEntry<String>>[
+                                            const PopupMenuItem<String>(
+                                              value: 'edit',
+                                              child: Text('Edit'),
+                                            ),
+                                            const PopupMenuItem<String>(
+                                              value: 'delete',
+                                              child: Text('Delete'),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ))
+                      : Container(),
                   Divider(height: 1),
                   SwitchListTile(
                     title: (!_sendModeThread)
@@ -835,31 +1121,75 @@ class _ChatScreenState extends State<ChatScreen> {
                             ? CrossAxisAlignment.end
                             : CrossAxisAlignment.start,
                         children: [
-                          Container(
-                            margin: EdgeInsets.symmetric(vertical: 6),
-                            padding: EdgeInsets.all(12),
-                            constraints: BoxConstraints(
-                              maxWidth:
-                                  MediaQuery.of(context).size.width * 0.75,
-                            ),
-                            decoration: BoxDecoration(
-                              color: isHighlighted
-                                  ? Theme.of(context)
-                                      .primaryColor
-                                      .withOpacity(0.5)
-                                  : isUser
-                                      ? Theme.of(context)
-                                          .primaryColor
-                                          .withOpacity(0.2)
-                                      : Theme.of(context)
-                                          .cardColor
-                                          .withOpacity(0.85),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: DartHighlightedCode(
-                              code: msg.content,
-                            ),
-                          ),
+                          _editingMessageId == msg.messageId
+                              ? Row(
+                                  children: [
+                                    Expanded(
+                                      child: TextField(
+                                        controller: _editController
+                                          ..text = msg.content,
+                                        autofocus: true,
+                                        maxLines: null,
+                                        keyboardType: TextInputType.multiline,
+                                        decoration: InputDecoration(
+                                          fillColor: Theme.of(context)
+                                              .cardColor
+                                              .withOpacity(0.12),
+                                          filled: true,
+                                        ),
+                                      ),
+                                    ),
+                                    IconButton(
+                                      icon: Icon(Icons.check),
+                                      onPressed: () async {
+                                        setState(() {
+                                          _editingMessageId = '';
+                                          _messages[index] = Message(
+                                            messageId: msg.messageId,
+                                            role: msg.role,
+                                            content: _editController.text,
+                                          );
+                                        });
+                                        await StorageService.saveThread(
+                                            _activeThreadId, _messages);
+                                        //  ScaffoldMessenger.of(context)
+                                        //      .showSnackBar(
+                                        //     SnackBar(
+                                        //        content: Text('Message updated')),
+                                        //  );
+                                      },
+                                    ),
+                                  ],
+                                )
+                              : Container(
+                                  margin: EdgeInsets.symmetric(vertical: 6),
+                                  padding: EdgeInsets.all(12),
+                                  constraints: BoxConstraints(
+                                    maxWidth:
+                                        MediaQuery.of(context).size.width *
+                                            0.75,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: isUser
+                                        ? Theme.of(context)
+                                            .primaryColor
+                                            .withOpacity(0.2)
+                                        : Theme.of(context)
+                                            .cardColor
+                                            .withOpacity(0.85),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+
+                                  /*
+                                  child: SelectableText(
+                                    msg.content,
+                                    style: TextStyle(fontSize: 15),
+                                  ),
+                                  */
+                                  child: DartHighlightedCode(
+                                    code: msg.content,
+                                  ),
+                                ),
                           Row(
                             mainAxisAlignment: isUser
                                 ? MainAxisAlignment.end
@@ -1142,7 +1472,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     isUnread: thread.isUnread,
                   );
                 });
-                await StorageService.saveAllData(_threads, _folders);
+                await StorageService.saveAllData(_threads, _folders, _memories);
               }
             } else if (value == 'delete') {
               final confirm = await _showConfirmDeleteDialog();
@@ -1152,7 +1482,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   _filteredThreads
                       .removeWhere((t) => t.threadId == thread.threadId);
                 });
-                await StorageService.saveAllData(_threads, _folders);
+                await StorageService.saveAllData(_threads, _folders, _memories);
               }
             } else if (value == 'copy') {
               await _copyThread(thread.threadId);

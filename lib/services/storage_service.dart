@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import '../models/thread.dart';
 import '../models/message.dart';
 import '../models/folder.dart';
+import '../models/memory.dart';
 import '../utils/logger.dart';
 
 class StorageService {
@@ -17,6 +18,7 @@ class StorageService {
       String threadId, List<Message> messages) async {
     List<Thread> threads = await loadAllThreads();
     final folders = await loadFolders();
+    final memoris = await loadMemoris();
 
     final index = threads.indexWhere((t) => t.threadId == threadId);
     if (index != -1) {
@@ -26,45 +28,14 @@ class StorageService {
         messages: messages,
       );
 
-      await saveAllData(threads, folders);
+      await saveAllData(threads, folders, memoris);
     }
   }
 
-/*
-
-  static Future<List<Thread>> loadAllThreads() async {
-    try {
-      final path = await _getFilePath();
-      final file = File(path);
-
-      if (!await file.exists()) {
-        await file.writeAsString('[]');
-      }
-
-      final contents = await file.readAsString();
-      final List<dynamic> jsonData = jsonDecode(contents);
-
-      return jsonData.map((data) => Thread.fromJson(data)).toList();
-    } catch (e) {
-      final path = await _getFilePath();
-      final file = File(path);
-      await file.writeAsString('[]');
-      return [];
-    }
-  }
-
-  static Future<void> saveAllThreads(List<Thread> threads) async {
-    final path = await _getFilePath();
-    final file = File(path);
-
-    final jsonData = threads.map((thread) => thread.toJson()).toList();
-    await file.writeAsString(jsonEncode(jsonData));
-  }
-*/
   static Future<void> saveMessage(String threadId, Message message) async {
     final threads = await loadAllThreads();
     final folders = await loadFolders();
-
+    final memoris = await loadMemoris();
     final index = threads.indexWhere((t) => t.threadId == threadId);
 
     if (index != -1) {
@@ -79,13 +50,14 @@ class StorageService {
       threads.insert(0, newThread);
     }
 
-    await saveAllData(threads, folders);
+    await saveAllData(threads, folders, memoris);
   }
 
   static Future<void> saveMessageData(
       String threadId, Message message, String title) async {
     final threads = await loadAllThreads();
     final folders = await loadFolders();
+    final memoris = await loadMemoris();
 
     final index = threads.indexWhere((t) => t.threadId == threadId);
 
@@ -104,12 +76,14 @@ class StorageService {
       threads.insert(0, newThread);
     }
 
-    await saveAllData(threads, folders);
+    await saveAllData(threads, folders, memoris);
   }
 
   static Future<void> copyThread(String srcThreadId, String dstThreadId) async {
     final loadedThreads = await StorageService.loadAllThreads();
     final folders = await loadFolders();
+    final memoris = await loadMemoris();
+
     final srcThreadIndex =
         loadedThreads.indexWhere((t) => t.threadId == srcThreadId);
 
@@ -138,7 +112,7 @@ class StorageService {
 
     loadedThreads.insert(0, newThread);
 
-    await saveAllData(loadedThreads, folders);
+    await saveAllData(loadedThreads, folders, memoris);
   }
 
   static Future<void> createNewThread(String threadId) async {
@@ -158,7 +132,7 @@ class StorageService {
 
   static Future<List<Message>> loadThread(String threadId) async {
     final threads = await loadAllThreads();
-    final folders = await loadFolders();
+
     final thread = threads.firstWhere(
       (t) => t.threadId == threadId,
       orElse: () => Thread(
@@ -171,19 +145,24 @@ class StorageService {
   static Future<void> deleteMessage(String threadId, String messageId) async {
     final threads = await loadAllThreads();
     final folders = await loadFolders();
+    final memoris = await loadMemoris();
+
     final index = threads.indexWhere((t) => t.threadId == threadId);
 
     if (index != -1) {
       threads[index].messages.removeWhere((m) => m.messageId == messageId);
-      await saveAllData(threads, folders);
+      await saveAllData(threads, folders, memoris);
     }
   }
 
   static Future<void> deleteThread(String threadId) async {
     final threads = await loadAllThreads();
     final folders = await loadFolders();
+    final memoris = await loadMemoris();
+
     threads.removeWhere((t) => t.threadId == threadId);
-    await saveAllData(threads, folders);
+
+    await saveAllData(threads, folders, memoris);
   }
 
   static String _generateDefaultTitle() {
@@ -207,25 +186,21 @@ class StorageService {
         .join();
   }
 
-  static Future<String> _getFolderPath() async {
-    final directory = await getApplicationDocumentsDirectory();
-    return '${directory.path}/folders.json';
-  }
-
   static Future<void> saveAllData(
-      List<Thread> threads, List<Folder> folders) async {
+      List<Thread> threads, List<Folder> folders, List<Memory> memoris) async {
     final path = await _getFilePath();
 
-    await saveAllDataSub(threads, folders, path);
+    await saveAllDataSub(threads, folders, memoris, path);
   }
 
-  static Future<void> saveAllDataSub(
-      List<Thread> threads, List<Folder> folders, String path) async {
+  static Future<void> saveAllDataSub(List<Thread> threads, List<Folder> folders,
+      List<Memory> memoris, String path) async {
     final file = File(path);
 
     final data = {
       'threads': threads.map((t) => t.toJson()).toList(),
       'folders': folders.map((f) => f.toJson()).toList(),
+      'memoris': memoris.map((f) => f.toJson()).toList(),
     };
 
     await file.writeAsString(jsonEncode(data));
@@ -242,7 +217,8 @@ class StorageService {
       final file = File(path);
 
       if (!await file.exists()) {
-        await file.writeAsString(jsonEncode({'threads': [], 'folders': []}));
+        await file.writeAsString(
+            jsonEncode({'threads': [], 'folders': [], 'memory': []}));
       }
 
       final contents = await file.readAsString();
@@ -277,7 +253,8 @@ class StorageService {
       final file = File(path);
 
       if (!await file.exists()) {
-        await file.writeAsString(jsonEncode({'threads': [], 'folders': []}));
+        await file.writeAsString(
+            jsonEncode({'threads': [], 'folders': [], 'memory': []}));
       }
 
       final contents = await file.readAsString();
@@ -300,33 +277,38 @@ class StorageService {
     }
   }
 
-/*
-  static Future<void> saveFolders(List<Folder> folders) async {
-    final path = await _getFolderPath();
-    final file = File(path);
-    final jsonData = folders.map((folder) => folder.toJson()).toList();
-    await file.writeAsString(jsonEncode(jsonData));
-  }
-
-  static Future<List<Folder>> loadFolders() async {
-    final path = await _getFolderPath();
-    final file = File(path);
-
-    if (!await file.exists()) {
-      await file.writeAsString('[]');
-    }
-
-    final contents = await file.readAsString();
-    final List<dynamic> jsonData = jsonDecode(contents);
-    return jsonData.map((data) => Folder.fromJson(data)).toList();
-  }
-
-
-  static Future<void> saveThreads(List<Thread> threads) async {
+  static Future<List<Memory>> loadMemoris() async {
     final path = await _getFilePath();
-    final file = File(path);
-    final jsonData = threads.map((thread) => thread.toJson()).toList();
-    await file.writeAsString(jsonEncode(jsonData));
+
+    return loadMemorisSub(path);
   }
-  */
+
+  static Future<List<Memory>> loadMemorisSub(String path) async {
+    try {
+      final file = File(path);
+
+      if (!await file.exists()) {
+        await file.writeAsString(
+            jsonEncode({'threads': [], 'folders': [], 'memoris': []}));
+      }
+
+      final contents = await file.readAsString();
+      final decoded = jsonDecode(contents);
+
+      if (decoded is Map<String, dynamic>) {
+        final memoris = (decoded['memoris'] as List<dynamic>? ?? [])
+            .map((data) => Memory.fromJson(data))
+            .toList();
+
+        return memoris;
+      } else {
+        // The old format does not have folder information
+        Logger.log("The old format does not have folder information");
+        return [];
+      }
+    } catch (e) {
+      Logger.log(e);
+      return [];
+    }
+  }
 }
