@@ -1,4 +1,4 @@
-![screenshot1](screenshot/5.jpg)  
+![screenshot1](screenshot/6.jpg)  
 
 # SimpleAIChat
 [Repositories](https://github.com/sympleaichat/simpleaichat)
