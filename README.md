@@ -64,9 +64,6 @@ The character count of messages at the time of sending can be checked.
 
 By using the memory function, the information registered by the user will be added when sending a request. The data to be sent can be specified using the checkboxes.
 
-![screenshot1](screenshot/7.jpg)  
-
-
 ##  Installation
 
 1. Download the latest `.exe` from the [Releases](https://github.com/your-username/SimpleAIChat/releases) page.
