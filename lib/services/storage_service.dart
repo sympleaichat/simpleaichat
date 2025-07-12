@@ -23,10 +23,10 @@ class StorageService {
     final index = threads.indexWhere((t) => t.threadId == threadId);
     if (index != -1) {
       threads[index] = Thread(
-        threadId: threadId,
-        title: threads[index].title,
-        messages: messages,
-      );
+          threadId: threadId,
+          title: threads[index].title,
+          messages: messages,
+          folderId: threads[index].folderId);
 
       await saveAllData(threads, folders, memoris);
     }
@@ -200,7 +200,7 @@ class StorageService {
     final data = {
       'threads': threads.map((t) => t.toJson()).toList(),
       'folders': folders.map((f) => f.toJson()).toList(),
-      'memoris': memoris.map((f) => f.toJson()).toList(),
+      'memoris': memoris.map((m) => m.toJson()).toList(),
     };
 
     await file.writeAsString(jsonEncode(data));
@@ -232,7 +232,6 @@ class StorageService {
         final threads = (decoded['threads'] as List<dynamic>? ?? [])
             .map((data) => Thread.fromJson(data))
             .toList();
-
         return threads;
       } else {
         return [];

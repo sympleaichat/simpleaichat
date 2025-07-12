@@ -59,8 +59,8 @@ class _ChatScreenState extends State<ChatScreen> {
   final ItemPositionsListener _itemPositionsListener =
       ItemPositionsListener.create();
 
-  bool _isMemoriesExpanded = false; // 初期値は展開
-  // 選択されたメモリのIDを保持するセット
+  bool _isMemoriesExpanded = false;
+
   Set<String> _selectedMemories = {};
 
   void initState() {
@@ -759,7 +759,7 @@ class _ChatScreenState extends State<ChatScreen> {
         children: [
           if (_isSidebarVisible)
             Container(
-              width: 240,
+              width: 260,
               color: Theme.of(context).brightness == Brightness.dark
                   ? Color(0xFF2a2d32)
                   : Colors.grey[200],
@@ -915,7 +915,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Memory list',
+                            'Memory list  (${_countSelectMemories()}/${_memories.length})',
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
@@ -1586,5 +1586,16 @@ class _ChatScreenState extends State<ChatScreen> {
     );
 
     return current.title.isNotEmpty ? current.title : current.threadId;
+  }
+
+  int _countSelectMemories() {
+    int count = 0;
+    _memories.forEach((item) {
+      if (item.select) {
+        count++;
+      }
+    });
+
+    return count;
   }
 }
