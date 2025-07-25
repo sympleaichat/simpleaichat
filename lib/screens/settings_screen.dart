@@ -46,6 +46,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
       TextEditingController();
   final TextEditingController _claude37ApiKeyController =
       TextEditingController();
+
+  final TextEditingController _grok4ApiKeyController = TextEditingController();
+  final TextEditingController _grok3fastApiKeyController =
+      TextEditingController();
+  final TextEditingController _grok3fastminiApiKeyController =
+      TextEditingController();
+
   final TextEditingController _grok3ApiKeyController = TextEditingController();
   final TextEditingController _grok3miniApiKeyController =
       TextEditingController();
@@ -110,6 +117,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
         await SettingService.loadApiKey(AIEngine.claude40sonnet);
     final claude35Key = await SettingService.loadApiKey(AIEngine.claude35);
     final claude37Key = await SettingService.loadApiKey(AIEngine.claude37);
+
+    final groq4Key = await SettingService.loadApiKey(AIEngine.grok_4);
+    final grok3fastKey = await SettingService.loadApiKey(AIEngine.grok_3_fast);
+    final grok3fastminiKey =
+        await SettingService.loadApiKey(AIEngine.grok_3_fast_mini);
+
     final groq3Key = await SettingService.loadApiKey(AIEngine.grok_3);
     final groq3miniKey = await SettingService.loadApiKey(AIEngine.grok_3mini);
     final deepseek_chat_Key =
@@ -142,6 +155,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _claude40sApiKeyController.text = claude40sKey;
       _claude35ApiKeyController.text = claude35Key;
       _claude37ApiKeyController.text = claude37Key;
+
+      _grok4ApiKeyController.text = groq4Key;
+      _grok3fastApiKeyController.text = grok3fastKey;
+      _grok3fastminiApiKeyController.text = grok3fastminiKey;
+
       _grok3ApiKeyController.text = groq3Key;
       _grok3miniApiKeyController.text = groq3miniKey;
       _deepseek_chat_ApiKeyController.text = deepseek_chat_Key;
@@ -246,6 +264,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _gemini25proApiKeyController.dispose();
     _gemini20flashApiKeyController.dispose();
     _gemini15proApiKeyController.dispose();
+    _grok4ApiKeyController.dispose();
+    _grok3fastApiKeyController.dispose();
+    _grok3fastminiApiKeyController.dispose();
     _grok3ApiKeyController.dispose();
     _grok3miniApiKeyController.dispose();
     _deepseek_chat_ApiKeyController.dispose();
@@ -362,6 +383,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         AIEngine.gemini20flash, _gemini20flashApiKeyController),
                     _buildEngineCard(
                         AIEngine.gemini15pro, _gemini15proApiKeyController),
+                    _buildEngineCard(AIEngine.grok_4, _grok4ApiKeyController),
+                    _buildEngineCard(
+                        AIEngine.grok_3_fast, _grok3fastApiKeyController),
+                    _buildEngineCard(AIEngine.grok_3_fast_mini,
+                        _grok3fastminiApiKeyController),
                     _buildEngineCard(AIEngine.grok_3, _grok3ApiKeyController),
                     _buildEngineCard(
                         AIEngine.grok_3mini, _grok3miniApiKeyController),

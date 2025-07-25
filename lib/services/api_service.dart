@@ -26,6 +26,9 @@ enum AIEngine {
   claude37,
   grok_3,
   grok_3mini,
+  grok_4,
+  grok_3_fast,
+  grok_3_fast_mini,
   deepseek_chat,
   deepseek_reasoner,
   mistral_large,
@@ -68,6 +71,9 @@ class ApiService {
   static const String NAME_claude37 = 'Claude 3.7 Sonnet';
   static const String NAME_grok_3 = 'Grok 3';
   static const String NAME_grok_3mini = 'Grok 3 Mini';
+  static const String NAME_grok4 = 'Grok 4';
+  static const String NAME_grok3_fast = 'Grok 3 fast';
+  static const String NAME_grok3_fast_mini = 'Grok 3 Mini fast';
   static const String NAME_deepseek_chat = 'deepseek-chat';
   static const String NAME_deepseek_reasoner = 'deepseek-reasoner';
   static const String NAME_mistral_large = 'Mistral Large';
@@ -91,8 +97,11 @@ class ApiService {
   static const String STR_claude40sonnet = 'claude-sonnet-4-20250514';
   static const String STR_claude35 = 'claude-3-5-haiku-20241022';
   static const String STR_claude37 = 'claude-3-7-sonnet-20250219';
-  static const String STR_grok3 = 'grok-3-beta';
-  static const String STR_grok3mini = 'grok-3-mini-beta';
+  static const String STR_grok4 = 'grok-4';
+  static const String STR_grok3_fast = 'grok-3-fast';
+  static const String STR_grok3_fast_mini = 'grok-3-mini-fast';
+  static const String STR_grok3 = 'grok-3';
+  static const String STR_grok3mini = 'grok-3-mini';
   static const String STR_deepseek_chat = 'deepseek-chat';
   static const String STR_deepseek_reasoner = 'deepseek-reasoner';
   static const String STR_mistral_large = 'mistral-large-latest';
@@ -138,6 +147,12 @@ class ApiService {
         return NAME_grok_3;
       case AIEngine.grok_3mini:
         return NAME_grok_3mini;
+      case AIEngine.grok_4:
+        return NAME_grok4;
+      case AIEngine.grok_3_fast:
+        return NAME_grok3_fast;
+      case AIEngine.grok_3_fast_mini:
+        return NAME_grok3_fast_mini;
       case AIEngine.deepseek_chat:
         return NAME_deepseek_chat;
       case AIEngine.deepseek_reasoner:
@@ -187,6 +202,12 @@ class ApiService {
         return STR_grok3;
       case AIEngine.grok_3mini:
         return STR_grok3mini;
+      case AIEngine.grok_4:
+        return STR_grok4;
+      case AIEngine.grok_3_fast:
+        return STR_grok3_fast;
+      case AIEngine.grok_3_fast_mini:
+        return STR_grok3_fast_mini;
       case AIEngine.deepseek_chat:
         return STR_deepseek_chat;
       case AIEngine.deepseek_reasoner:
@@ -226,7 +247,12 @@ class ApiService {
         return _sendToClaude(modelStr, userInput, apiKey);
       case AIEngine.grok_3:
       case AIEngine.grok_3mini:
+      case AIEngine.grok_3_fast:
+      case AIEngine.grok_3_fast_mini:
         return _sendToChatGrok(modelStr, userInput, apiKey);
+      case AIEngine.grok_4:
+        return _sendToChatGrok4(modelStr, userInput, apiKey);
+
       case AIEngine.deepseek_chat:
       case AIEngine.deepseek_reasoner:
         return _sendToChatDeepSeek(modelStr, userInput, apiKey);
@@ -264,7 +290,12 @@ class ApiService {
         return _sendToClaudeWithHistory(modelStr, messages, apiKey);
       case AIEngine.grok_3:
       case AIEngine.grok_3mini:
+      case AIEngine.grok_3_fast:
+      case AIEngine.grok_3_fast_mini:
         return _sendToGrokWithHistory(modelStr, messages, apiKey);
+      case AIEngine.grok_4:
+        return _sendToGrok4WithHistory(modelStr, messages, apiKey);
+
       case AIEngine.deepseek_chat:
       case AIEngine.deepseek_reasoner:
         return _sendToDeepSeekWithHistory(modelStr, messages, apiKey);
@@ -498,7 +529,7 @@ class ApiService {
 
       Logger.log(sendJson);
       msgSendLength = sendJson.length;
-      msgModel = 'Gemini';
+      msgModel = model;
       final response = await http.post(
         //   Uri.parse('$geminiUrl?key=$apiKey'),
         Uri.parse(geminiUrl + model + ':generateContent?key=$apiKey'),
@@ -787,7 +818,7 @@ class ApiService {
       ];
       final sendJson = jsonEncode({
         "model": model,
-        "max_tokens": 2048,
+        "max_tokens": 20000,
         "messages": chatMessages,
         "temperature": 0.7,
       });
@@ -805,6 +836,7 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(utf8.decode(response.bodyBytes));
+        Logger.log(data);
         msgReceivedLength = response.bodyBytes.length;
         String retStr = '';
         try {
@@ -814,6 +846,55 @@ class ApiService {
           final reply = data['content'][0]['text'];
           retStr = reply.trim();
         }
+
+        return retStr;
+      } else {
+        print('grok API error: ${response.body}');
+        return 'Sorry, grok did not respond.';
+      }
+    } catch (e) {
+      print('grok API error: $e');
+      return 'grok Error occurred.';
+    }
+  }
+
+  static Future<String> _sendToGrok4WithHistory(
+      String model, List<Message> messages, String apiKey) async {
+    msgSendLength = 0;
+    msgReceivedLength = 0;
+    msgModel = '';
+    try {
+      String systemPrompt = await SystemService.loadSystem();
+
+      final chatMessages = [
+        {'role': 'user', 'content': systemPrompt},
+        ...messages.map((m) => {'role': m.role, 'content': m.content}).toList(),
+      ];
+      final sendJson = jsonEncode({
+        "model": model,
+        "max_tokens": 60000,
+        "messages": chatMessages,
+        "temperature": 0.7,
+      });
+      msgModel = model;
+      msgSendLength = sendJson.length;
+      Logger.log(sendJson);
+      final response = await http.post(
+        Uri.parse(grokUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $apiKey',
+        },
+        body: sendJson,
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(utf8.decode(response.bodyBytes));
+        Logger.log(data);
+        msgReceivedLength = response.bodyBytes.length;
+        String retStr = '';
+        final reply = data['content'][1]['text'];
+        retStr = reply.trim();
 
         return retStr;
       } else {
@@ -1103,7 +1184,7 @@ class ApiService {
       });
       Logger.log(sendJson);
       msgSendLength = sendJson.length;
-      msgModel = 'gemini';
+      msgModel = model;
       final response = await http.post(
         Uri.parse(geminiUrl + model + ':generateContent?key=$apiKey'),
         headers: {
@@ -1358,7 +1439,7 @@ class ApiService {
           {'role': 'user', 'content': systemPrompt},
           {"role": "user", "content": userInput}
         ],
-        "max_tokens": 2048,
+        "max_tokens": 20000,
         "temperature": 0.7,
       });
 
@@ -1385,6 +1466,55 @@ class ApiService {
           final reply = data['content'][0]['text'];
           retStr = reply.trim();
         }
+        return retStr;
+      } else {
+        print('Grok API error: ${response.body}');
+        return 'Sorry, Grok did not respond.';
+      }
+    } catch (e) {
+      print('Grok API error: $e');
+      return 'Grok Error occurred.';
+    }
+  }
+
+  static Future<String> _sendToChatGrok4(
+      String model, String userInput, String apiKey) async {
+    msgSendLength = 0;
+    msgReceivedLength = 0;
+    msgModel = '';
+
+    try {
+      String systemPrompt = await SystemService.loadSystem();
+
+      final sendJson = jsonEncode({
+        "model": model,
+        "messages": [
+          //  {'role': 'system', 'content': systemPrompt},
+          {'role': 'user', 'content': systemPrompt},
+          {"role": "user", "content": userInput}
+        ],
+        "max_tokens": 60000,
+        "temperature": 0.7,
+      });
+
+      Logger.log(sendJson);
+      msgSendLength = sendJson.length;
+      msgModel = model;
+      final response = await http.post(
+        Uri.parse(grokUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $apiKey',
+        },
+        body: sendJson,
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(utf8.decode(response.bodyBytes));
+        msgReceivedLength = response.bodyBytes.length;
+        String retStr = '';
+        final reply = data['content'][1]['text'];
+        retStr = reply.trim();
         return retStr;
       } else {
         print('Grok API error: ${response.body}');
