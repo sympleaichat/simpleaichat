@@ -20,6 +20,7 @@ enum AIEngine {
   gemini25pro,
   gemini20flash,
   gemini15pro,
+  claude41opus,
   claude40opus,
   claude40sonnet,
   claude35,
@@ -65,6 +66,7 @@ class ApiService {
   static const String NAME_gemini25pro = 'Gemini 2.5 Pro';
   static const String NAME_gemini20flash = 'Gemini 2.0 Flash';
   static const String NAME_gemini15pro = 'Gemini 1.5 Pro';
+  static const String NAME_claude41opus = 'Claude Opus 4.1';
   static const String NAME_claude40opus = 'Claude Opus 4';
   static const String NAME_claude40sonnet = 'Claude Sonnet 4';
   static const String NAME_claude35 = 'Claude 3.5 Haiku';
@@ -93,10 +95,11 @@ class ApiService {
   static const String STR_gemini25pro = 'gemini-2.5-pro-preview-05-06';
   static const String STR_gemini20flash = 'gemini-2.0-flash';
   static const String STR_gemini15pro = 'gemini-1.5-pro';
-  static const String STR_claude40opus = 'claude-opus-4-20250514';
-  static const String STR_claude40sonnet = 'claude-sonnet-4-20250514';
-  static const String STR_claude35 = 'claude-3-5-haiku-20241022';
-  static const String STR_claude37 = 'claude-3-7-sonnet-20250219';
+  static const String STR_claude41opus = 'claude-opus-4-1';
+  static const String STR_claude40opus = 'claude-opus-4-0';
+  static const String STR_claude40sonnet = 'claude-sonnet-4-0';
+  static const String STR_claude35 = 'claude-3-5-haiku-latest';
+  static const String STR_claude37 = 'claude-3-7-sonnet-latest';
   static const String STR_grok4 = 'grok-4';
   static const String STR_grok3_fast = 'grok-3-fast';
   static const String STR_grok3_fast_mini = 'grok-3-mini-fast';
@@ -135,6 +138,8 @@ class ApiService {
         return NAME_gemini20flash;
       case AIEngine.gemini15pro:
         return NAME_gemini15pro;
+      case AIEngine.claude41opus:
+        return NAME_claude41opus;
       case AIEngine.claude40opus:
         return NAME_claude40opus;
       case AIEngine.claude40sonnet:
@@ -190,6 +195,8 @@ class ApiService {
         return STR_gemini20flash;
       case AIEngine.gemini15pro:
         return STR_gemini15pro;
+      case AIEngine.claude41opus:
+        return STR_claude41opus;
       case AIEngine.claude40opus:
         return STR_claude40opus;
       case AIEngine.claude40sonnet:
@@ -240,6 +247,7 @@ class ApiService {
       case AIEngine.gemini20flash:
       case AIEngine.gemini15pro:
         return _sendToGemini(modelStr, userInput, apiKey);
+      case AIEngine.claude41opus:
       case AIEngine.claude40opus:
       case AIEngine.claude40sonnet:
       case AIEngine.claude35:
@@ -283,6 +291,7 @@ class ApiService {
       case AIEngine.gemini20flash:
       case AIEngine.gemini15pro:
         return _sendToGeminiWithHistory(modelStr, messages, apiKey);
+      case AIEngine.claude41opus:
       case AIEngine.claude40opus:
       case AIEngine.claude40sonnet:
       case AIEngine.claude35:
@@ -615,7 +624,7 @@ class ApiService {
       int maxtoken = 60000;
       if (model == STR_claude35) {
         maxtoken = 8000;
-      } else if (model == STR_claude40opus) {
+      } else if (model == STR_claude40opus || model == STR_claude41opus) {
         maxtoken = 30000;
       }
 
@@ -718,7 +727,7 @@ class ApiService {
       int maxtoken = 60000;
       if (model == STR_claude35) {
         maxtoken = 8000;
-      } else if (model == STR_claude40opus) {
+      } else if (model == STR_claude40opus || model == STR_claude41opus) {
         maxtoken = 30000;
       }
 
@@ -1218,7 +1227,7 @@ class ApiService {
       int maxtoken = 60000;
       if (model == STR_claude35) {
         maxtoken = 8000;
-      } else if (model == STR_claude40opus) {
+      } else if (model == STR_claude40opus || model == STR_claude41opus) {
         maxtoken = 30000;
       }
 
@@ -1302,7 +1311,7 @@ class ApiService {
       int maxtoken = 60000;
       if (model == STR_claude35) {
         maxtoken = 8000;
-      } else if (model == STR_claude40opus) {
+      } else if (model == STR_claude40opus || model == STR_claude41opus) {
         maxtoken = 30000;
       }
 
