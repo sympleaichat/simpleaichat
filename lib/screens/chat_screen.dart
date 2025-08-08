@@ -1325,6 +1325,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       if (ApiService.currentEngine == AIEngine.chatgpt_4o ||
                           ApiService.currentEngine == AIEngine.chatgpt_4omini ||
                           ApiService.currentEngine == AIEngine.claude40opus ||
+                          ApiService.currentEngine == AIEngine.claude41opus ||
                           ApiService.currentEngine == AIEngine.claude40sonnet ||
                           ApiService.currentEngine == AIEngine.claude35 ||
                           ApiService.currentEngine == AIEngine.claude37)
@@ -1332,6 +1333,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       if (ApiService.currentEngine == AIEngine.chatgpt_4o ||
                           ApiService.currentEngine == AIEngine.chatgpt_4omini ||
                           ApiService.currentEngine == AIEngine.claude40opus ||
+                          ApiService.currentEngine == AIEngine.claude41opus ||
                           ApiService.currentEngine == AIEngine.claude40sonnet ||
                           ApiService.currentEngine == AIEngine.claude35 ||
                           ApiService.currentEngine == AIEngine.claude37)

@@ -9,6 +9,9 @@ import '../models/message.dart';
 import '../utils/logger.dart';
 
 enum AIEngine {
+  chatgpt_5,
+  chatgpt_5mini,
+  chatgpt_5nano,
   chatgpt_41,
   chatgpt_4omini,
   chatgpt_4o,
@@ -55,6 +58,10 @@ class ApiService {
       'https://api.llama.com/compat/v1/chat/completions';
   static const String mistralUrl = 'https://api.mistral.ai/v1';
 
+  static const String NAME_chatgpt_5 = 'ChatGPT 5';
+  static const String NAME_chatgpt_5mini = 'ChatGPT 5 mini';
+  static const String NAME_chatgpt_5nano = 'ChatGPT 5 nano';
+
   static const String NAME_chatgpt_41 = 'ChatGPT 4.1';
   static const String NAME_chatgpt_4omini = 'ChatGPT o4-mini';
   static const String NAME_chatgpt_4o = 'ChatGPT o4';
@@ -81,6 +88,10 @@ class ApiService {
   static const String NAME_mistral_large = 'Mistral Large';
   static const String NAME_mistral_medium = 'Mistral Medium';
   static const String NAME_mistral_small = 'Mistral Small';
+
+  static const String STR_chatgpt_5 = 'gpt-5';
+  static const String STR_chatgpt_5mini = 'gpt-5-mini';
+  static const String STR_chatgpt_5nano = 'gpt-5-nano';
 
   static const String STR_chatgpt_41 = "gpt-4.1";
   static const String STR_chatgpt_4omini = "gpt-4o-mini";
@@ -116,6 +127,13 @@ class ApiService {
   static String msgModel = '';
   static String getModelName(AIEngine engine) {
     switch (engine) {
+      case AIEngine.chatgpt_5:
+        return NAME_chatgpt_5;
+      case AIEngine.chatgpt_5mini:
+        return NAME_chatgpt_5mini;
+      case AIEngine.chatgpt_5nano:
+        return NAME_chatgpt_5nano;
+
       case AIEngine.chatgpt_41:
         return NAME_chatgpt_41;
       case AIEngine.chatgpt_4omini:
@@ -173,6 +191,12 @@ class ApiService {
 
   static String getModelStr(AIEngine engine) {
     switch (engine) {
+      case AIEngine.chatgpt_5:
+        return STR_chatgpt_5;
+      case AIEngine.chatgpt_5mini:
+        return STR_chatgpt_5mini;
+      case AIEngine.chatgpt_5nano:
+        return STR_chatgpt_5nano;
       case AIEngine.chatgpt_41:
         return STR_chatgpt_41;
       case AIEngine.chatgpt_4omini:
@@ -233,6 +257,9 @@ class ApiService {
     final apiKey = await SettingService.loadApiKey(model);
 
     switch (model) {
+      case AIEngine.chatgpt_5:
+      case AIEngine.chatgpt_5mini:
+      case AIEngine.chatgpt_5nano:
       case AIEngine.chatgpt_41:
       case AIEngine.chatgpt_4omini:
       case AIEngine.chatgpt_4o:
@@ -277,6 +304,9 @@ class ApiService {
     final apiKey = await SettingService.loadApiKey(model);
 
     switch (model) {
+      case AIEngine.chatgpt_5:
+      case AIEngine.chatgpt_5mini:
+      case AIEngine.chatgpt_5nano:
       case AIEngine.chatgpt_41:
       case AIEngine.chatgpt_4omini:
       case AIEngine.chatgpt_4o:
@@ -325,6 +355,7 @@ class ApiService {
     } else if (model == AIEngine.claude35 ||
         model == AIEngine.claude37 ||
         model == AIEngine.claude40opus ||
+        model == AIEngine.claude41opus ||
         model == AIEngine.claude40sonnet) {
       return _sendToClaudeWeb(modelStr, userInput, apiKey);
     } else {
@@ -344,6 +375,7 @@ class ApiService {
     } else if (model == AIEngine.claude35 ||
         model == AIEngine.claude37 ||
         model == AIEngine.claude40opus ||
+        model == AIEngine.claude41opus ||
         model == AIEngine.claude40sonnet) {
       return _sendToClaudeWithHistoryWeb(modelStr, messages, apiKey);
     } else {
@@ -367,7 +399,7 @@ class ApiService {
       final sendJson = jsonEncode({
         "model": model,
         "messages": chatMessages,
-        "temperature": 0.7,
+        //     "temperature": 0.7,
       });
       msgModel = model;
       msgSendLength = sendJson.length;
@@ -1072,7 +1104,7 @@ class ApiService {
           {'role': 'developer', 'content': systemPrompt},
           {"role": "user", "content": userInput}
         ],
-        "temperature": 0.7,
+        //  "temperature": 0.7,
       });
       Logger.log(sendJson);
       msgSendLength = sendJson.length;

@@ -16,6 +16,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _loading = true;
   bool _darkModeChanged = false;
 
+  final TextEditingController _chatgpt5ApiKeyController =
+      TextEditingController();
+  final TextEditingController _chatgpt5miniApiKeyController =
+      TextEditingController();
+  final TextEditingController _chatgpt5nanoApiKeyController =
+      TextEditingController();
+
   final TextEditingController _chatgpt41ApiKeyController =
       TextEditingController();
   final TextEditingController _chatgpt4omApiKeyController =
@@ -95,6 +102,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final engine = await SettingService.loadEngine();
     final darkMode = await SettingService.loadDarkMode();
 
+    final chatgpt5Key = await SettingService.loadApiKey(AIEngine.chatgpt_5);
+    final chatgpt5miniKey =
+        await SettingService.loadApiKey(AIEngine.chatgpt_5mini);
+    final chatgpt5nanoKey =
+        await SettingService.loadApiKey(AIEngine.chatgpt_5nano);
+
     final chatgpt41Key = await SettingService.loadApiKey(AIEngine.chatgpt_41);
     final chatgpt4omKey =
         await SettingService.loadApiKey(AIEngine.chatgpt_4omini);
@@ -142,6 +155,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() {
       _selectedEngine = engine;
       _isDarkMode = darkMode;
+
+      _chatgpt5ApiKeyController.text = chatgpt5Key;
+      _chatgpt5miniApiKeyController.text = chatgpt5miniKey;
+      _chatgpt5nanoApiKeyController.text = chatgpt5nanoKey;
 
       _chatgpt41ApiKeyController.text = chatgpt41Key;
       _chatgpt4omApiKeyController.text = chatgpt4omKey;
@@ -253,6 +270,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   void dispose() {
+    _chatgpt5ApiKeyController.dispose();
+    _chatgpt5miniApiKeyController.dispose();
+    _chatgpt5nanoApiKeyController.dispose();
+
     _claude41oApiKeyController.dispose();
     _claude40oApiKeyController.dispose();
     _claude40sApiKeyController.dispose();
@@ -359,6 +380,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 controller: _scrollController,
                 child: Column(
                   children: [
+                    _buildEngineCard(
+                        AIEngine.chatgpt_5, _chatgpt5ApiKeyController),
+                    _buildEngineCard(
+                        AIEngine.chatgpt_5mini, _chatgpt5miniApiKeyController),
+                    _buildEngineCard(
+                        AIEngine.chatgpt_5nano, _chatgpt5nanoApiKeyController),
                     _buildEngineCard(
                         AIEngine.claude41opus, _claude41oApiKeyController),
                     _buildEngineCard(
