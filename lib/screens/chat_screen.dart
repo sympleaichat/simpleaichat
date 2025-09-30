@@ -1326,6 +1326,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           ApiService.currentEngine == AIEngine.chatgpt_4omini ||
                           ApiService.currentEngine == AIEngine.claude40opus ||
                           ApiService.currentEngine == AIEngine.claude41opus ||
+                          ApiService.currentEngine == AIEngine.claude45sonnet ||
                           ApiService.currentEngine == AIEngine.claude40sonnet ||
                           ApiService.currentEngine == AIEngine.claude35 ||
                           ApiService.currentEngine == AIEngine.claude37)
@@ -1334,6 +1335,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           ApiService.currentEngine == AIEngine.chatgpt_4omini ||
                           ApiService.currentEngine == AIEngine.claude40opus ||
                           ApiService.currentEngine == AIEngine.claude41opus ||
+                          ApiService.currentEngine == AIEngine.claude45sonnet ||
                           ApiService.currentEngine == AIEngine.claude40sonnet ||
                           ApiService.currentEngine == AIEngine.claude35 ||
                           ApiService.currentEngine == AIEngine.claude37)
@@ -1343,13 +1345,17 @@ class _ChatScreenState extends State<ChatScreen> {
                           tooltip: 'Web',
                           color: Theme.of(context).primaryColor,
                         ),
-                      if (ApiService.currentEngine == AIEngine.claude40opus ||
+                      if (ApiService.currentEngine == AIEngine.claude41opus ||
+                          ApiService.currentEngine == AIEngine.claude40opus ||
+                          ApiService.currentEngine == AIEngine.claude40sonnet ||
                           ApiService.currentEngine == AIEngine.claude40sonnet ||
                           ApiService.currentEngine == AIEngine.claude35 ||
                           ApiService.currentEngine == AIEngine.claude37)
                         const SizedBox(width: 8),
-                      if (ApiService.currentEngine == AIEngine.claude40opus ||
-                          ApiService.currentEngine == AIEngine.claude40sonnet ||
+                      if (ApiService.currentEngine == AIEngine.claude41opus ||
+                          ApiService.currentEngine == AIEngine.claude40opus ||
+                          ApiService.currentEngine == AIEngine.claude45sonnet ||
+                          ApiService.currentEngine == AIEngine.claude45sonnet ||
                           ApiService.currentEngine == AIEngine.claude35 ||
                           ApiService.currentEngine == AIEngine.claude37)
                         IconButton(

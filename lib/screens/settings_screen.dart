@@ -49,6 +49,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       TextEditingController();
   final TextEditingController _claude40oApiKeyController =
       TextEditingController();
+
+  final TextEditingController _claude45sApiKeyController =
+      TextEditingController();
   final TextEditingController _claude40sApiKeyController =
       TextEditingController();
   final TextEditingController _claude35ApiKeyController =
@@ -129,6 +132,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
         await SettingService.loadApiKey(AIEngine.gemini15pro);
     final claude41oKey = await SettingService.loadApiKey(AIEngine.claude41opus);
     final claude40oKey = await SettingService.loadApiKey(AIEngine.claude40opus);
+    final claude45sKey =
+        await SettingService.loadApiKey(AIEngine.claude45sonnet);
     final claude40sKey =
         await SettingService.loadApiKey(AIEngine.claude40sonnet);
     final claude35Key = await SettingService.loadApiKey(AIEngine.claude35);
@@ -173,6 +178,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _gemini15proApiKeyController.text = gemini15proKey;
       _claude41oApiKeyController.text = claude41oKey;
       _claude40oApiKeyController.text = claude40oKey;
+      _claude45sApiKeyController.text = claude45sKey;
       _claude40sApiKeyController.text = claude40sKey;
       _claude35ApiKeyController.text = claude35Key;
       _claude37ApiKeyController.text = claude37Key;
@@ -276,6 +282,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     _claude41oApiKeyController.dispose();
     _claude40oApiKeyController.dispose();
+    _claude45sApiKeyController.dispose();
     _claude40sApiKeyController.dispose();
     _claude35ApiKeyController.dispose();
     _claude37ApiKeyController.dispose();
@@ -390,6 +397,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         AIEngine.claude41opus, _claude41oApiKeyController),
                     _buildEngineCard(
                         AIEngine.claude40opus, _claude40oApiKeyController),
+                    _buildEngineCard(
+                        AIEngine.claude45sonnet, _claude45sApiKeyController),
                     _buildEngineCard(
                         AIEngine.claude40sonnet, _claude40sApiKeyController),
                     _buildEngineCard(

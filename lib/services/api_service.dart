@@ -25,6 +25,7 @@ enum AIEngine {
   gemini15pro,
   claude41opus,
   claude40opus,
+  claude45sonnet,
   claude40sonnet,
   claude35,
   claude37,
@@ -75,6 +76,7 @@ class ApiService {
   static const String NAME_gemini15pro = 'Gemini 1.5 Pro';
   static const String NAME_claude41opus = 'Claude Opus 4.1';
   static const String NAME_claude40opus = 'Claude Opus 4';
+  static const String NAME_claude45sonnet = 'Claude Sonnet 4.5';
   static const String NAME_claude40sonnet = 'Claude Sonnet 4';
   static const String NAME_claude35 = 'Claude 3.5 Haiku';
   static const String NAME_claude37 = 'Claude 3.7 Sonnet';
@@ -108,6 +110,7 @@ class ApiService {
   static const String STR_gemini15pro = 'gemini-1.5-pro';
   static const String STR_claude41opus = 'claude-opus-4-1';
   static const String STR_claude40opus = 'claude-opus-4-0';
+  static const String STR_claude45sonnet = 'claude-sonnet-4-5';
   static const String STR_claude40sonnet = 'claude-sonnet-4-0';
   static const String STR_claude35 = 'claude-3-5-haiku-latest';
   static const String STR_claude37 = 'claude-3-7-sonnet-latest';
@@ -133,7 +136,6 @@ class ApiService {
         return NAME_chatgpt_5mini;
       case AIEngine.chatgpt_5nano:
         return NAME_chatgpt_5nano;
-
       case AIEngine.chatgpt_41:
         return NAME_chatgpt_41;
       case AIEngine.chatgpt_4omini:
@@ -160,6 +162,8 @@ class ApiService {
         return NAME_claude41opus;
       case AIEngine.claude40opus:
         return NAME_claude40opus;
+      case AIEngine.claude45sonnet:
+        return NAME_claude45sonnet;
       case AIEngine.claude40sonnet:
         return NAME_claude40sonnet;
       case AIEngine.claude35:
@@ -223,12 +227,16 @@ class ApiService {
         return STR_claude41opus;
       case AIEngine.claude40opus:
         return STR_claude40opus;
+      case AIEngine.claude45sonnet:
+        return STR_claude45sonnet;
       case AIEngine.claude40sonnet:
         return STR_claude40sonnet;
       case AIEngine.claude35:
         return STR_claude35;
       case AIEngine.claude37:
         return STR_claude37;
+      case AIEngine.grok_4:
+        return STR_grok4;
       case AIEngine.grok_3:
         return STR_grok3;
       case AIEngine.grok_3mini:
@@ -276,6 +284,7 @@ class ApiService {
         return _sendToGemini(modelStr, userInput, apiKey);
       case AIEngine.claude41opus:
       case AIEngine.claude40opus:
+      case AIEngine.claude45sonnet:
       case AIEngine.claude40sonnet:
       case AIEngine.claude35:
       case AIEngine.claude37:
@@ -323,6 +332,7 @@ class ApiService {
         return _sendToGeminiWithHistory(modelStr, messages, apiKey);
       case AIEngine.claude41opus:
       case AIEngine.claude40opus:
+      case AIEngine.claude45sonnet:
       case AIEngine.claude40sonnet:
       case AIEngine.claude35:
       case AIEngine.claude37:
@@ -356,6 +366,7 @@ class ApiService {
         model == AIEngine.claude37 ||
         model == AIEngine.claude40opus ||
         model == AIEngine.claude41opus ||
+        model == AIEngine.claude45sonnet ||
         model == AIEngine.claude40sonnet) {
       return _sendToClaudeWeb(modelStr, userInput, apiKey);
     } else {
@@ -376,6 +387,7 @@ class ApiService {
         model == AIEngine.claude37 ||
         model == AIEngine.claude40opus ||
         model == AIEngine.claude41opus ||
+        model == AIEngine.claude45sonnet ||
         model == AIEngine.claude40sonnet) {
       return _sendToClaudeWithHistoryWeb(modelStr, messages, apiKey);
     } else {
