@@ -58,6 +58,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       TextEditingController();
   final TextEditingController _claude37ApiKeyController =
       TextEditingController();
+  final TextEditingController _claude45haikuApiKeyController =
+      TextEditingController();
 
   final TextEditingController _grok4ApiKeyController = TextEditingController();
   final TextEditingController _grok3fastApiKeyController =
@@ -138,6 +140,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
         await SettingService.loadApiKey(AIEngine.claude40sonnet);
     final claude35Key = await SettingService.loadApiKey(AIEngine.claude35);
     final claude37Key = await SettingService.loadApiKey(AIEngine.claude37);
+    final claude45haikuKey =
+        await SettingService.loadApiKey(AIEngine.claude45haiku);
 
     final groq4Key = await SettingService.loadApiKey(AIEngine.grok_4);
     final grok3fastKey = await SettingService.loadApiKey(AIEngine.grok_3_fast);
@@ -182,6 +186,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _claude40sApiKeyController.text = claude40sKey;
       _claude35ApiKeyController.text = claude35Key;
       _claude37ApiKeyController.text = claude37Key;
+      _claude45haikuApiKeyController.text = claude45haikuKey;
 
       _grok4ApiKeyController.text = groq4Key;
       _grok3fastApiKeyController.text = grok3fastKey;
@@ -286,6 +291,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _claude40sApiKeyController.dispose();
     _claude35ApiKeyController.dispose();
     _claude37ApiKeyController.dispose();
+    _claude45haikuApiKeyController.dispose();
     _chatgpt41ApiKeyController.dispose();
     _chatgpt4omApiKeyController.dispose();
     _chatgpt4oApiKeyController.dispose();
@@ -405,6 +411,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         AIEngine.claude35, _claude35ApiKeyController),
                     _buildEngineCard(
                         AIEngine.claude37, _claude37ApiKeyController),
+                    _buildEngineCard(
+                        AIEngine.claude45haiku, _claude45haikuApiKeyController),
                     _buildEngineCard(
                         AIEngine.chatgpt_41, _chatgpt41ApiKeyController),
                     _buildEngineCard(

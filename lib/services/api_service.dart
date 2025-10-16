@@ -29,6 +29,7 @@ enum AIEngine {
   claude40sonnet,
   claude35,
   claude37,
+  claude45haiku,
   grok_3,
   grok_3mini,
   grok_4,
@@ -80,6 +81,7 @@ class ApiService {
   static const String NAME_claude40sonnet = 'Claude Sonnet 4';
   static const String NAME_claude35 = 'Claude 3.5 Haiku';
   static const String NAME_claude37 = 'Claude 3.7 Sonnet';
+  static const String NAME_claude45haiku = 'Claude Haiku 4.5';
   static const String NAME_grok_3 = 'Grok 3';
   static const String NAME_grok_3mini = 'Grok 3 Mini';
   static const String NAME_grok4 = 'Grok 4';
@@ -114,6 +116,7 @@ class ApiService {
   static const String STR_claude40sonnet = 'claude-sonnet-4-0';
   static const String STR_claude35 = 'claude-3-5-haiku-latest';
   static const String STR_claude37 = 'claude-3-7-sonnet-latest';
+  static const String STR_claude45haiku = 'claude-haiku-4-5';
   static const String STR_grok4 = 'grok-4';
   static const String STR_grok3_fast = 'grok-3-fast';
   static const String STR_grok3_fast_mini = 'grok-3-mini-fast';
@@ -170,6 +173,8 @@ class ApiService {
         return NAME_claude35;
       case AIEngine.claude37:
         return NAME_claude37;
+      case AIEngine.claude45haiku:
+        return NAME_claude45haiku;
       case AIEngine.grok_3:
         return NAME_grok_3;
       case AIEngine.grok_3mini:
@@ -233,6 +238,8 @@ class ApiService {
         return STR_claude40sonnet;
       case AIEngine.claude35:
         return STR_claude35;
+      case AIEngine.claude45haiku:
+        return STR_claude45haiku;
       case AIEngine.claude37:
         return STR_claude37;
       case AIEngine.grok_4:
@@ -288,6 +295,7 @@ class ApiService {
       case AIEngine.claude40sonnet:
       case AIEngine.claude35:
       case AIEngine.claude37:
+      case AIEngine.claude45haiku:
         return _sendToClaude(modelStr, userInput, apiKey);
       case AIEngine.grok_3:
       case AIEngine.grok_3mini:
@@ -336,6 +344,7 @@ class ApiService {
       case AIEngine.claude40sonnet:
       case AIEngine.claude35:
       case AIEngine.claude37:
+      case AIEngine.claude45haiku:
         return _sendToClaudeWithHistory(modelStr, messages, apiKey);
       case AIEngine.grok_3:
       case AIEngine.grok_3mini:
@@ -367,7 +376,8 @@ class ApiService {
         model == AIEngine.claude40opus ||
         model == AIEngine.claude41opus ||
         model == AIEngine.claude45sonnet ||
-        model == AIEngine.claude40sonnet) {
+        model == AIEngine.claude40sonnet ||
+        model == AIEngine.claude45haiku) {
       return _sendToClaudeWeb(modelStr, userInput, apiKey);
     } else {
       return 'This model does not support history yet.';
@@ -388,7 +398,8 @@ class ApiService {
         model == AIEngine.claude40opus ||
         model == AIEngine.claude41opus ||
         model == AIEngine.claude45sonnet ||
-        model == AIEngine.claude40sonnet) {
+        model == AIEngine.claude40sonnet ||
+        model == AIEngine.claude45haiku) {
       return _sendToClaudeWithHistoryWeb(modelStr, messages, apiKey);
     } else {
       return 'This model does not support history yet.';
