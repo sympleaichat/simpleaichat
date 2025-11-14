@@ -9,6 +9,7 @@ import '../models/message.dart';
 import '../utils/logger.dart';
 
 enum AIEngine {
+  chatgpt_51,
   chatgpt_5,
   chatgpt_5mini,
   chatgpt_5nano,
@@ -60,6 +61,7 @@ class ApiService {
       'https://api.llama.com/compat/v1/chat/completions';
   static const String mistralUrl = 'https://api.mistral.ai/v1';
 
+  static const String NAME_chatgpt_51 = 'ChatGPT 5.1';
   static const String NAME_chatgpt_5 = 'ChatGPT 5';
   static const String NAME_chatgpt_5mini = 'ChatGPT 5 mini';
   static const String NAME_chatgpt_5nano = 'ChatGPT 5 nano';
@@ -93,6 +95,7 @@ class ApiService {
   static const String NAME_mistral_medium = 'Mistral Medium';
   static const String NAME_mistral_small = 'Mistral Small';
 
+  static const String STR_chatgpt_51 = 'gpt-5.1';
   static const String STR_chatgpt_5 = 'gpt-5';
   static const String STR_chatgpt_5mini = 'gpt-5-mini';
   static const String STR_chatgpt_5nano = 'gpt-5-nano';
@@ -133,6 +136,8 @@ class ApiService {
   static String msgModel = '';
   static String getModelName(AIEngine engine) {
     switch (engine) {
+      case AIEngine.chatgpt_51:
+        return NAME_chatgpt_51;
       case AIEngine.chatgpt_5:
         return NAME_chatgpt_5;
       case AIEngine.chatgpt_5mini:
@@ -200,6 +205,8 @@ class ApiService {
 
   static String getModelStr(AIEngine engine) {
     switch (engine) {
+      case AIEngine.chatgpt_51:
+        return STR_chatgpt_51;
       case AIEngine.chatgpt_5:
         return STR_chatgpt_5;
       case AIEngine.chatgpt_5mini:
@@ -272,6 +279,7 @@ class ApiService {
     final apiKey = await SettingService.loadApiKey(model);
 
     switch (model) {
+      case AIEngine.chatgpt_51:
       case AIEngine.chatgpt_5:
       case AIEngine.chatgpt_5mini:
       case AIEngine.chatgpt_5nano:
@@ -321,6 +329,7 @@ class ApiService {
     final apiKey = await SettingService.loadApiKey(model);
 
     switch (model) {
+      case AIEngine.chatgpt_51:
       case AIEngine.chatgpt_5:
       case AIEngine.chatgpt_5mini:
       case AIEngine.chatgpt_5nano:
@@ -954,16 +963,17 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(utf8.decode(response.bodyBytes));
-        Logger.log(data);
         msgReceivedLength = response.bodyBytes.length;
-        String retStr = '';
-        final reply = data['content'][1]['text'];
-        retStr = reply.trim();
 
-        return retStr;
+        if (data['choices']?.isNotEmpty == true &&
+            data['choices'][0]['message']?['content'] != null) {
+          return data['choices'][0]['message']['content'].toString().trim();
+        }
+        return 'Sorry, no response content.';
       } else {
-        print('grok API error: ${response.body}');
-        return 'Sorry, grok did not respond.';
+        final error = utf8.decode(response.bodyBytes);
+        print('Grok API error: ${response.statusCode} - $error');
+        return 'Sorry, Grok did not respond.';
       }
     } catch (e) {
       print('grok API error: $e');
@@ -1553,19 +1563,19 @@ class ApiService {
       final sendJson = jsonEncode({
         "model": model,
         "messages": [
-          //  {'role': 'system', 'content': systemPrompt},
-          {'role': 'user', 'content': systemPrompt},
-          {"role": "user", "content": userInput}
+          {'role': 'system', 'content': systemPrompt},
+          {'role': 'user', 'content': userInput}
         ],
-        "max_tokens": 60000,
+        "max_tokens": 4096,
         "temperature": 0.7,
       });
 
       Logger.log(sendJson);
       msgSendLength = sendJson.length;
       msgModel = model;
+
       final response = await http.post(
-        Uri.parse(grokUrl),
+        Uri.parse('https://api.x.ai/v1/chat/completions'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $apiKey',
@@ -1576,18 +1586,24 @@ class ApiService {
       if (response.statusCode == 200) {
         final data = jsonDecode(utf8.decode(response.bodyBytes));
         msgReceivedLength = response.bodyBytes.length;
-        String retStr = '';
-        final reply = data['content'][1]['text'];
-        retStr = reply.trim();
-        return retStr;
+
+        if (data['choices']?.isNotEmpty == true &&
+            data['choices'][0]['message']?['content'] != null) {
+          return data['choices'][0]['message']['content'].toString().trim();
+        }
+        return 'Sorry, no response content.';
       } else {
-        print('Grok API error: ${response.body}');
+        final error = utf8.decode(response.bodyBytes);
+        print('Grok API error: ${response.statusCode} - $error');
         return 'Sorry, Grok did not respond.';
       }
     } catch (e) {
-      print('Grok API error: $e');
+      print('Exception: $e');
       return 'Grok Error occurred.';
     }
+
+    // analyzer 警告対策：到達不能な return
+    return 'This should never be reached.';
   }
 
   static Future<String> _sendToChatDeepSeek(

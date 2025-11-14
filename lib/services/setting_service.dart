@@ -28,6 +28,8 @@ class SettingService {
 
   static String getKeyStr(AIEngine engine) {
     switch (engine) {
+      case AIEngine.chatgpt_51:
+        return 'api_key_chatgpt51';
       case AIEngine.chatgpt_5:
         return 'api_key_chatgpt5';
       case AIEngine.chatgpt_5mini:
@@ -97,7 +99,9 @@ class SettingService {
     final config = await _loadConfig();
     final engine = config.get('settings', 'engine');
 
-    if (engine == ApiService.STR_chatgpt_5) {
+    if (engine == ApiService.STR_chatgpt_51) {
+      return AIEngine.chatgpt_51;
+    } else if (engine == ApiService.STR_chatgpt_5) {
       return AIEngine.chatgpt_5;
     } else if (engine == ApiService.STR_chatgpt_5mini) {
       return AIEngine.chatgpt_5mini;
