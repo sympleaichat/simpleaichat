@@ -39,6 +39,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       TextEditingController();
   final TextEditingController _chatgptdavinci002ApiKeyController =
       TextEditingController();
+
+  final TextEditingController _gemini30proApiKeyController =
+      TextEditingController();
   final TextEditingController _gemini25flashApiKeyController =
       TextEditingController();
   final TextEditingController _gemini25proApiKeyController =
@@ -65,6 +68,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   final TextEditingController _grok4ApiKeyController = TextEditingController();
   final TextEditingController _grok3fastApiKeyController =
+      TextEditingController();
+  final TextEditingController _grok41fastminiApiKeyController =
       TextEditingController();
   final TextEditingController _grok3fastminiApiKeyController =
       TextEditingController();
@@ -127,6 +132,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final chatgpt4Key = await SettingService.loadApiKey(AIEngine.gpt4);
     final chatgptdavinci002Key =
         await SettingService.loadApiKey(AIEngine.chatgpt_davinci002);
+
+    final gemini30proKey =
+        await SettingService.loadApiKey(AIEngine.gemini30pro);
     final gemini25flashKey =
         await SettingService.loadApiKey(AIEngine.gemini25flash);
     final gemini25proKey =
@@ -147,6 +155,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
         await SettingService.loadApiKey(AIEngine.claude45haiku);
 
     final groq4Key = await SettingService.loadApiKey(AIEngine.grok_4);
+    final grok41fastKey =
+        await SettingService.loadApiKey(AIEngine.grok_41_fast);
     final grok3fastKey = await SettingService.loadApiKey(AIEngine.grok_3_fast);
     final grok3fastminiKey =
         await SettingService.loadApiKey(AIEngine.grok_3_fast_mini);
@@ -180,6 +190,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _chatgpt4tApiKeyController.text = chatgpt4tKey;
       _chatgpt4ApiKeyController.text = chatgpt4Key;
       _chatgptdavinci002ApiKeyController.text = chatgptdavinci002Key;
+      _gemini30proApiKeyController.text = gemini30proKey;
       _gemini25flashApiKeyController.text = gemini25flashKey;
       _gemini25proApiKeyController.text = gemini25proKey;
       _gemini20flashApiKeyController.text = gemini20flashKey;
@@ -193,6 +204,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _claude45haikuApiKeyController.text = claude45haikuKey;
 
       _grok4ApiKeyController.text = groq4Key;
+      _grok41fastminiApiKeyController.text = grok41fastKey;
       _grok3fastApiKeyController.text = grok3fastKey;
       _grok3fastminiApiKeyController.text = grok3fastminiKey;
 
@@ -305,12 +317,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _chatgpt4tApiKeyController.dispose();
     _chatgpt4ApiKeyController.dispose();
     _chatgptdavinci002ApiKeyController.dispose();
+    _gemini30proApiKeyController.dispose();
     _gemini25flashApiKeyController.dispose();
     _gemini25proApiKeyController.dispose();
     _gemini20flashApiKeyController.dispose();
     _gemini15proApiKeyController.dispose();
     _grok4ApiKeyController.dispose();
     _grok3fastApiKeyController.dispose();
+    _grok41fastminiApiKeyController.dispose();
     _grok3fastminiApiKeyController.dispose();
     _grok3ApiKeyController.dispose();
     _grok3miniApiKeyController.dispose();
@@ -435,6 +449,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     _buildEngineCard(AIEngine.chatgpt_davinci002,
                         _chatgptdavinci002ApiKeyController),
                     _buildEngineCard(
+                        AIEngine.gemini30pro, _gemini30proApiKeyController),
+                    _buildEngineCard(
                         AIEngine.gemini25flash, _gemini25flashApiKeyController),
                     _buildEngineCard(
                         AIEngine.gemini25pro, _gemini25proApiKeyController),
@@ -442,6 +458,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         AIEngine.gemini20flash, _gemini20flashApiKeyController),
                     _buildEngineCard(
                         AIEngine.gemini15pro, _gemini15proApiKeyController),
+                    _buildEngineCard(
+                        AIEngine.grok_41_fast, _grok41fastminiApiKeyController),
                     _buildEngineCard(AIEngine.grok_4, _grok4ApiKeyController),
                     _buildEngineCard(
                         AIEngine.grok_3_fast, _grok3fastApiKeyController),

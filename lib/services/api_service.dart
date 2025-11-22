@@ -20,6 +20,7 @@ enum AIEngine {
   chatgpt_4turbo,
   gpt4,
   chatgpt_davinci002,
+  gemini30pro,
   gemini25flash,
   gemini25pro,
   gemini20flash,
@@ -34,6 +35,7 @@ enum AIEngine {
   grok_3,
   grok_3mini,
   grok_4,
+  grok_41_fast,
   grok_3_fast,
   grok_3_fast_mini,
   deepseek_chat,
@@ -73,6 +75,7 @@ class ApiService {
   static const String NAME_chatgpt_4turbo = 'ChatGPT 4-turbo';
   static const String NAME_chatgpt_4 = 'ChatGPT 4';
   static const String NAME_chatgpt_davinci002 = 'ChatGPT davinci002';
+  static const String NAME_gemini30pro = 'Gemini 3.0 Pro';
   static const String NAME_gemini25flash = 'Gemini 2.5 Flash';
   static const String NAME_gemini25pro = 'Gemini 2.5 Pro';
   static const String NAME_gemini20flash = 'Gemini 2.0 Flash';
@@ -87,6 +90,7 @@ class ApiService {
   static const String NAME_grok_3 = 'Grok 3';
   static const String NAME_grok_3mini = 'Grok 3 Mini';
   static const String NAME_grok4 = 'Grok 4';
+  static const String NAME_grok41_fast = 'Grok 4.1 fast';
   static const String NAME_grok3_fast = 'Grok 3 fast';
   static const String NAME_grok3_fast_mini = 'Grok 3 Mini fast';
   static const String NAME_deepseek_chat = 'deepseek-chat';
@@ -109,6 +113,7 @@ class ApiService {
   static const String STR_chatgpt_4turbo = "gpt-4-turbo";
   static const String STR_chatgpt_4 = "gpt-4";
   static const String STR_chatgpt_davinci002 = "davinci-002";
+  static const String STR_gemini30pro = 'gemini-3-pro-preview';
   static const String STR_gemini25flash = 'gemini-2.5-flash-preview-05-20';
   static const String STR_gemini25pro = 'gemini-2.5-pro-preview-05-06';
   static const String STR_gemini20flash = 'gemini-2.0-flash';
@@ -121,6 +126,7 @@ class ApiService {
   static const String STR_claude37 = 'claude-3-7-sonnet-latest';
   static const String STR_claude45haiku = 'claude-haiku-4-5';
   static const String STR_grok4 = 'grok-4';
+  static const String STR_grok41_fast = 'grok-4-1-fast-reasoning';
   static const String STR_grok3_fast = 'grok-3-fast';
   static const String STR_grok3_fast_mini = 'grok-3-mini-fast';
   static const String STR_grok3 = 'grok-3';
@@ -158,6 +164,8 @@ class ApiService {
         return NAME_chatgpt_4;
       case AIEngine.chatgpt_davinci002:
         return NAME_chatgpt_davinci002;
+      case AIEngine.gemini30pro:
+        return NAME_gemini30pro;
       case AIEngine.gemini25flash:
         return NAME_gemini25flash;
       case AIEngine.gemini25pro:
@@ -186,6 +194,8 @@ class ApiService {
         return NAME_grok_3mini;
       case AIEngine.grok_4:
         return NAME_grok4;
+      case AIEngine.grok_41_fast:
+        return NAME_grok41_fast;
       case AIEngine.grok_3_fast:
         return NAME_grok3_fast;
       case AIEngine.grok_3_fast_mini:
@@ -227,6 +237,8 @@ class ApiService {
         return STR_chatgpt_4;
       case AIEngine.chatgpt_davinci002:
         return STR_chatgpt_davinci002;
+      case AIEngine.gemini30pro:
+        return STR_gemini30pro;
       case AIEngine.gemini25flash:
         return STR_gemini25flash;
       case AIEngine.gemini25pro:
@@ -255,8 +267,10 @@ class ApiService {
         return STR_grok3;
       case AIEngine.grok_3mini:
         return STR_grok3mini;
-      case AIEngine.grok_4:
-        return STR_grok4;
+      case AIEngine.grok_41_fast:
+        return STR_grok41_fast;
+      case AIEngine.grok_3_fast:
+        return STR_grok3_fast;
       case AIEngine.grok_3_fast:
         return STR_grok3_fast;
       case AIEngine.grok_3_fast_mini:
@@ -292,6 +306,7 @@ class ApiService {
         return _sendToChatGPT(modelStr, userInput, apiKey);
       case AIEngine.chatgpt_davinci002:
         return _sendToChatGPTLegacy(modelStr, userInput, apiKey);
+      case AIEngine.gemini30pro:
       case AIEngine.gemini25flash:
       case AIEngine.gemini25pro:
       case AIEngine.gemini20flash:
@@ -305,6 +320,7 @@ class ApiService {
       case AIEngine.claude37:
       case AIEngine.claude45haiku:
         return _sendToClaude(modelStr, userInput, apiKey);
+      case AIEngine.grok_41_fast:
       case AIEngine.grok_3:
       case AIEngine.grok_3mini:
       case AIEngine.grok_3_fast:
@@ -342,6 +358,7 @@ class ApiService {
         return _sendToChatGPTWithHistory(modelStr, messages, apiKey);
       case AIEngine.chatgpt_davinci002:
         return 'This model does not support thread messages.';
+      case AIEngine.gemini30pro:
       case AIEngine.gemini25flash:
       case AIEngine.gemini25pro:
       case AIEngine.gemini20flash:
@@ -355,6 +372,7 @@ class ApiService {
       case AIEngine.claude37:
       case AIEngine.claude45haiku:
         return _sendToClaudeWithHistory(modelStr, messages, apiKey);
+      case AIEngine.grok_41_fast:
       case AIEngine.grok_3:
       case AIEngine.grok_3mini:
       case AIEngine.grok_3_fast:

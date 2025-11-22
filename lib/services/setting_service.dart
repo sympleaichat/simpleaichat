@@ -50,6 +50,8 @@ class SettingService {
         return 'api_key_chatgpt4';
       case AIEngine.chatgpt_davinci002:
         return 'api_key_chatgptdavinci002';
+      case AIEngine.gemini30pro:
+        return 'api_key_gemini30pro';
       case AIEngine.gemini25flash:
         return 'api_key_gemini25flash';
       case AIEngine.gemini25pro:
@@ -78,6 +80,8 @@ class SettingService {
         return 'api_key_grok3mini';
       case AIEngine.grok_4:
         return 'api_key_grok4';
+      case AIEngine.grok_41_fast:
+        return 'api_key_grok41fast';
       case AIEngine.grok_3_fast:
         return 'api_key_grok3fast';
       case AIEngine.grok_3_fast_mini:
@@ -121,6 +125,8 @@ class SettingService {
       return AIEngine.gpt4;
     } else if (engine == ApiService.STR_chatgpt_davinci002) {
       return AIEngine.chatgpt_davinci002;
+    } else if (engine == ApiService.STR_gemini30pro) {
+      return AIEngine.gemini30pro;
     } else if (engine == ApiService.STR_gemini25flash) {
       return AIEngine.gemini25flash;
     } else if (engine == ApiService.STR_gemini25pro) {
@@ -149,8 +155,8 @@ class SettingService {
       return AIEngine.grok_3;
     } else if (engine == ApiService.STR_grok3mini) {
       return AIEngine.grok_3mini;
-    } else if (engine == ApiService.STR_grok4) {
-      return AIEngine.gpt4;
+    } else if (engine == ApiService.STR_grok41_fast) {
+      return AIEngine.grok_41_fast;
     } else if (engine == ApiService.STR_grok3_fast) {
       return AIEngine.grok_3_fast;
     } else if (engine == ApiService.STR_grok3_fast_mini) {
