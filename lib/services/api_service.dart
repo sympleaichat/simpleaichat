@@ -25,6 +25,7 @@ enum AIEngine {
   gemini25pro,
   gemini20flash,
   gemini15pro,
+  claude45opus,
   claude41opus,
   claude40opus,
   claude45sonnet,
@@ -80,6 +81,8 @@ class ApiService {
   static const String NAME_gemini25pro = 'Gemini 2.5 Pro';
   static const String NAME_gemini20flash = 'Gemini 2.0 Flash';
   static const String NAME_gemini15pro = 'Gemini 1.5 Pro';
+
+  static const String NAME_claude45opus = 'Claude Opus 4.5';
   static const String NAME_claude41opus = 'Claude Opus 4.1';
   static const String NAME_claude40opus = 'Claude Opus 4';
   static const String NAME_claude45sonnet = 'Claude Sonnet 4.5';
@@ -118,6 +121,7 @@ class ApiService {
   static const String STR_gemini25pro = 'gemini-2.5-pro-preview-05-06';
   static const String STR_gemini20flash = 'gemini-2.0-flash';
   static const String STR_gemini15pro = 'gemini-1.5-pro';
+  static const String STR_claude45opus = 'claude-opus-4-5';
   static const String STR_claude41opus = 'claude-opus-4-1';
   static const String STR_claude40opus = 'claude-opus-4-0';
   static const String STR_claude45sonnet = 'claude-sonnet-4-5';
@@ -174,6 +178,8 @@ class ApiService {
         return NAME_gemini20flash;
       case AIEngine.gemini15pro:
         return NAME_gemini15pro;
+      case AIEngine.claude45opus:
+        return NAME_claude45opus;
       case AIEngine.claude41opus:
         return NAME_claude41opus;
       case AIEngine.claude40opus:
@@ -247,6 +253,8 @@ class ApiService {
         return STR_gemini20flash;
       case AIEngine.gemini15pro:
         return STR_gemini15pro;
+      case AIEngine.claude45opus:
+        return STR_claude45opus;
       case AIEngine.claude41opus:
         return STR_claude41opus;
       case AIEngine.claude40opus:
@@ -312,6 +320,7 @@ class ApiService {
       case AIEngine.gemini20flash:
       case AIEngine.gemini15pro:
         return _sendToGemini(modelStr, userInput, apiKey);
+      case AIEngine.claude45opus:
       case AIEngine.claude41opus:
       case AIEngine.claude40opus:
       case AIEngine.claude45sonnet:
@@ -364,6 +373,7 @@ class ApiService {
       case AIEngine.gemini20flash:
       case AIEngine.gemini15pro:
         return _sendToGeminiWithHistory(modelStr, messages, apiKey);
+      case AIEngine.claude45opus:
       case AIEngine.claude41opus:
       case AIEngine.claude40opus:
       case AIEngine.claude45sonnet:
@@ -402,6 +412,7 @@ class ApiService {
         model == AIEngine.claude37 ||
         model == AIEngine.claude40opus ||
         model == AIEngine.claude41opus ||
+        model == AIEngine.claude45opus ||
         model == AIEngine.claude45sonnet ||
         model == AIEngine.claude40sonnet ||
         model == AIEngine.claude45haiku) {
@@ -424,6 +435,7 @@ class ApiService {
         model == AIEngine.claude37 ||
         model == AIEngine.claude40opus ||
         model == AIEngine.claude41opus ||
+        model == AIEngine.claude45opus ||
         model == AIEngine.claude45sonnet ||
         model == AIEngine.claude40sonnet ||
         model == AIEngine.claude45haiku) {
@@ -706,7 +718,9 @@ class ApiService {
       int maxtoken = 60000;
       if (model == STR_claude35) {
         maxtoken = 8000;
-      } else if (model == STR_claude40opus || model == STR_claude41opus) {
+      } else if (model == STR_claude40opus ||
+          model == STR_claude41opus ||
+          model == STR_claude45opus) {
         maxtoken = 30000;
       }
 
@@ -809,7 +823,9 @@ class ApiService {
       int maxtoken = 60000;
       if (model == STR_claude35) {
         maxtoken = 8000;
-      } else if (model == STR_claude40opus || model == STR_claude41opus) {
+      } else if (model == STR_claude40opus ||
+          model == STR_claude41opus ||
+          model == STR_claude45opus) {
         maxtoken = 30000;
       }
 
@@ -1310,7 +1326,9 @@ class ApiService {
       int maxtoken = 60000;
       if (model == STR_claude35) {
         maxtoken = 8000;
-      } else if (model == STR_claude40opus || model == STR_claude41opus) {
+      } else if (model == STR_claude40opus ||
+          model == STR_claude41opus ||
+          model == STR_claude45opus) {
         maxtoken = 30000;
       }
 
@@ -1394,7 +1412,9 @@ class ApiService {
       int maxtoken = 60000;
       if (model == STR_claude35) {
         maxtoken = 8000;
-      } else if (model == STR_claude40opus || model == STR_claude41opus) {
+      } else if (model == STR_claude40opus ||
+          model == STR_claude41opus ||
+          model == STR_claude45opus) {
         maxtoken = 30000;
       }
 
