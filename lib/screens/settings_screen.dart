@@ -16,6 +16,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _loading = true;
   bool _darkModeChanged = false;
 
+  final TextEditingController _chatgpt52ApiKeyController =
+      TextEditingController();
   final TextEditingController _chatgpt51ApiKeyController =
       TextEditingController();
   final TextEditingController _chatgpt5ApiKeyController =
@@ -116,6 +118,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final engine = await SettingService.loadEngine();
     final darkMode = await SettingService.loadDarkMode();
 
+    final chatgpt52Key = await SettingService.loadApiKey(AIEngine.chatgpt_52);
     final chatgpt51Key = await SettingService.loadApiKey(AIEngine.chatgpt_51);
     final chatgpt5Key = await SettingService.loadApiKey(AIEngine.chatgpt_5);
     final chatgpt5miniKey =
@@ -182,6 +185,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _selectedEngine = engine;
       _isDarkMode = darkMode;
 
+      _chatgpt52ApiKeyController.text = chatgpt52Key;
       _chatgpt51ApiKeyController.text = chatgpt51Key;
       _chatgpt5ApiKeyController.text = chatgpt5Key;
       _chatgpt5miniApiKeyController.text = chatgpt5miniKey;
@@ -302,6 +306,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   void dispose() {
+    _chatgpt52ApiKeyController.dispose();
     _chatgpt51ApiKeyController.dispose();
 
     _chatgpt5ApiKeyController.dispose();
@@ -419,6 +424,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 controller: _scrollController,
                 child: Column(
                   children: [
+                    _buildEngineCard(
+                        AIEngine.chatgpt_52, _chatgpt52ApiKeyController),
                     _buildEngineCard(
                         AIEngine.chatgpt_51, _chatgpt51ApiKeyController),
                     _buildEngineCard(
