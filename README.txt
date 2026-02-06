@@ -27,6 +27,7 @@ Example structure:
 
 [settings]
 engine = chatgpt
+api_key_chatgpt52pro = your_chatgpt_api_key_here
 api_key_chatgpt52 = your_chatgpt_api_key_here
 api_key_chatgpt51 = your_chatgpt_api_key_here
 api_key_chatgpt5 = your_chatgpt_api_key_here
@@ -44,6 +45,7 @@ api_key_gemini25flash = your_gemini_api_key_here
 api_key_gemini25pro = your_gemini_api_key_here
 api_key_gemini20flash = your_gemini_api_key_here
 api_key_gemini15pro = your_gemini_api_key_here
+api_key_claude46opus = your_claude_api_key_here
 api_key_claude45opus = your_claude_api_key_here
 api_key_claude41opus = your_claude_api_key_here
 api_key_claude40opus = your_claude_api_key_here
@@ -71,6 +73,7 @@ dark_mode = false
 | Key                 | Description                                   | Example                        |
 |---------------------|-----------------------------------------------|--------------------------------|
 | engine              | AI engine to use (chatgpt or gemini)          | engine = chatgpt               |
+| api_key_chatgpt52pro   | API key for ChatGPT-5.2 pro                      | api_key_chatgpt  = sk-xxxxxx |
 | api_key_chatgpt52   | API key for ChatGPT-5.2                      | api_key_chatgpt  = sk-xxxxxx |
 | api_key_chatgpt51   | API key for ChatGPT-5.1                      | api_key_chatgpt  = sk-xxxxxx |
 | api_key_chatgpt5   | API key for ChatGPT-5                       | api_key_chatgpt  = sk-xxxxxx |
@@ -87,6 +90,7 @@ dark_mode = false
 | api_key_gemini25pro        | API key for Gemini 2.5 Pro             | api_key_gemini = AIxxxxxx      |
 | api_key_gemini25flash      | API key for Gemini 2.0 Flash           | api_key_gemini = AIxxxxxx      |
 | api_key_gemini15pro        | API key for Gemini 1.5 Pro             | api_key_gemini = AIxxxxxx      |
+| api_key_claude46opus| API key for Claude Opus 4.6                     | api_key_claude = sk-xxxxxx     |
 | api_key_claude45opus| API key for Claude Opus 4.5                     | api_key_claude = sk-xxxxxx     |
 | api_key_claude41opus| API key for Claude Opus 4.1                     | api_key_claude = sk-xxxxxx     |
 | api_key_claude40opus| API key for Claude Opus 4                     | api_key_claude = sk-xxxxxx     |
@@ -131,6 +135,7 @@ Information registered in the memory list can be sent with the chat message.
 Only information that is checked in the checkbox will be sent
 
 ■ Compatible models
+ChatGPT-5.2 pro 
 ChatGPT-5.2
 ChatGPT-5.1
 ChatGPT-5
@@ -148,6 +153,7 @@ Gemini 2.5 Flash
 Gemini 2.5 Pro
 Gemini 2.0 Flash
 Gemini 1.5 Pro
+Claude Opus 4.6
 Claude Opus 4.5
 Claude Opus 4.1
 Claude Opus 4
