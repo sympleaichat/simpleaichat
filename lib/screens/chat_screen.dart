@@ -1327,6 +1327,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           ApiService.currentEngine == AIEngine.claude40opus ||
                           ApiService.currentEngine == AIEngine.claude41opus ||
                           ApiService.currentEngine == AIEngine.claude45opus ||
+                          ApiService.currentEngine == AIEngine.claude46opus ||
                           ApiService.currentEngine == AIEngine.claude45sonnet ||
                           ApiService.currentEngine == AIEngine.claude40sonnet ||
                           ApiService.currentEngine == AIEngine.claude35 ||
@@ -1338,6 +1339,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           ApiService.currentEngine == AIEngine.claude40opus ||
                           ApiService.currentEngine == AIEngine.claude41opus ||
                           ApiService.currentEngine == AIEngine.claude45opus ||
+                          ApiService.currentEngine == AIEngine.claude46opus ||
                           ApiService.currentEngine == AIEngine.claude45sonnet ||
                           ApiService.currentEngine == AIEngine.claude40sonnet ||
                           ApiService.currentEngine == AIEngine.claude35 ||
@@ -1352,6 +1354,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       if (ApiService.currentEngine == AIEngine.claude41opus ||
                           ApiService.currentEngine == AIEngine.claude40opus ||
                           ApiService.currentEngine == AIEngine.claude45opus ||
+                          ApiService.currentEngine == AIEngine.claude46opus ||
                           ApiService.currentEngine == AIEngine.claude40sonnet ||
                           ApiService.currentEngine == AIEngine.claude40sonnet ||
                           ApiService.currentEngine == AIEngine.claude35 ||
@@ -1361,6 +1364,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       if (ApiService.currentEngine == AIEngine.claude41opus ||
                           ApiService.currentEngine == AIEngine.claude40opus ||
                           ApiService.currentEngine == AIEngine.claude45opus ||
+                          ApiService.currentEngine == AIEngine.claude46opus ||
                           ApiService.currentEngine == AIEngine.claude45sonnet ||
                           ApiService.currentEngine == AIEngine.claude45sonnet ||
                           ApiService.currentEngine == AIEngine.claude35 ||

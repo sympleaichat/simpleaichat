@@ -53,6 +53,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final TextEditingController _gemini15proApiKeyController =
       TextEditingController();
 
+  final TextEditingController _claude46oApiKeyController =
+      TextEditingController();
   final TextEditingController _claude45oApiKeyController =
       TextEditingController();
   final TextEditingController _claude41oApiKeyController =
@@ -149,6 +151,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final gemini15proKey =
         await SettingService.loadApiKey(AIEngine.gemini15pro);
 
+    final claude46oKey = await SettingService.loadApiKey(AIEngine.claude46opus);
     final claude45oKey = await SettingService.loadApiKey(AIEngine.claude45opus);
     final claude41oKey = await SettingService.loadApiKey(AIEngine.claude41opus);
     final claude40oKey = await SettingService.loadApiKey(AIEngine.claude40opus);
@@ -203,6 +206,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _gemini20flashApiKeyController.text = gemini20flashKey;
       _gemini15proApiKeyController.text = gemini15proKey;
 
+      _claude46oApiKeyController.text = claude46oKey;
       _claude45oApiKeyController.text = claude45oKey;
       _claude41oApiKeyController.text = claude41oKey;
       _claude40oApiKeyController.text = claude40oKey;
@@ -313,6 +317,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _chatgpt5miniApiKeyController.dispose();
     _chatgpt5nanoApiKeyController.dispose();
 
+    _claude46oApiKeyController.dispose();
     _claude45oApiKeyController.dispose();
     _claude41oApiKeyController.dispose();
     _claude40oApiKeyController.dispose();
@@ -424,6 +429,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 controller: _scrollController,
                 child: Column(
                   children: [
+                    _buildEngineCard(
+                        AIEngine.claude46opus, _claude46oApiKeyController),
                     _buildEngineCard(
                         AIEngine.chatgpt_52, _chatgpt52ApiKeyController),
                     _buildEngineCard(

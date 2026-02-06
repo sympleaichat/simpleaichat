@@ -26,6 +26,7 @@ enum AIEngine {
   gemini25pro,
   gemini20flash,
   gemini15pro,
+  claude46opus,
   claude45opus,
   claude41opus,
   claude40opus,
@@ -84,6 +85,7 @@ class ApiService {
   static const String NAME_gemini20flash = 'Gemini 2.0 Flash';
   static const String NAME_gemini15pro = 'Gemini 1.5 Pro';
 
+  static const String NAME_claude46opus = 'Claude Opus 4.6';
   static const String NAME_claude45opus = 'Claude Opus 4.5';
   static const String NAME_claude41opus = 'Claude Opus 4.1';
   static const String NAME_claude40opus = 'Claude Opus 4';
@@ -124,6 +126,8 @@ class ApiService {
   static const String STR_gemini25pro = 'gemini-2.5-pro-preview-05-06';
   static const String STR_gemini20flash = 'gemini-2.0-flash';
   static const String STR_gemini15pro = 'gemini-1.5-pro';
+
+  static const String STR_claude46opus = 'claude-opus-4-6';
   static const String STR_claude45opus = 'claude-opus-4-5';
   static const String STR_claude41opus = 'claude-opus-4-1';
   static const String STR_claude40opus = 'claude-opus-4-0';
@@ -183,6 +187,9 @@ class ApiService {
         return NAME_gemini20flash;
       case AIEngine.gemini15pro:
         return NAME_gemini15pro;
+
+      case AIEngine.claude46opus:
+        return NAME_claude46opus;
       case AIEngine.claude45opus:
         return NAME_claude45opus;
       case AIEngine.claude41opus:
@@ -260,6 +267,9 @@ class ApiService {
         return STR_gemini20flash;
       case AIEngine.gemini15pro:
         return STR_gemini15pro;
+
+      case AIEngine.claude46opus:
+        return STR_claude46opus;
       case AIEngine.claude45opus:
         return STR_claude45opus;
       case AIEngine.claude41opus:
@@ -328,6 +338,7 @@ class ApiService {
       case AIEngine.gemini20flash:
       case AIEngine.gemini15pro:
         return _sendToGemini(modelStr, userInput, apiKey);
+      case AIEngine.claude46opus:
       case AIEngine.claude45opus:
       case AIEngine.claude41opus:
       case AIEngine.claude40opus:
@@ -382,6 +393,7 @@ class ApiService {
       case AIEngine.gemini20flash:
       case AIEngine.gemini15pro:
         return _sendToGeminiWithHistory(modelStr, messages, apiKey);
+      case AIEngine.claude46opus:
       case AIEngine.claude45opus:
       case AIEngine.claude41opus:
       case AIEngine.claude40opus:
@@ -422,6 +434,7 @@ class ApiService {
         model == AIEngine.claude40opus ||
         model == AIEngine.claude41opus ||
         model == AIEngine.claude45opus ||
+        model == AIEngine.claude46opus ||
         model == AIEngine.claude45sonnet ||
         model == AIEngine.claude40sonnet ||
         model == AIEngine.claude45haiku) {
@@ -445,6 +458,7 @@ class ApiService {
         model == AIEngine.claude40opus ||
         model == AIEngine.claude41opus ||
         model == AIEngine.claude45opus ||
+        model == AIEngine.claude46opus ||
         model == AIEngine.claude45sonnet ||
         model == AIEngine.claude40sonnet ||
         model == AIEngine.claude45haiku) {
@@ -731,6 +745,8 @@ class ApiService {
           model == STR_claude41opus ||
           model == STR_claude45opus) {
         maxtoken = 30000;
+      } else if (model == STR_claude46opus) {
+        maxtoken = 120000;
       }
 
       final sendJson = jsonEncode({
@@ -836,6 +852,8 @@ class ApiService {
           model == STR_claude41opus ||
           model == STR_claude45opus) {
         maxtoken = 30000;
+      } else if (model == STR_claude46opus) {
+        maxtoken = 120000;
       }
 
       final sendJson = jsonEncode({
@@ -1339,6 +1357,8 @@ class ApiService {
           model == STR_claude41opus ||
           model == STR_claude45opus) {
         maxtoken = 30000;
+      } else if (model == STR_claude46opus) {
+        maxtoken = 120000;
       }
 
       String sendJson = "";
@@ -1425,6 +1445,8 @@ class ApiService {
           model == STR_claude41opus ||
           model == STR_claude45opus) {
         maxtoken = 30000;
+      } else if (model == STR_claude46opus) {
+        maxtoken = 120000;
       }
 
       String sendJson = "";
