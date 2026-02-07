@@ -94,11 +94,16 @@ MIT License — see [LICENSE](LICENSE).
 
 ---
 
-Regarding discontinuation:
+##  Regarding discontinuation
+
 Request quests for the following models will fail after February 19, 2026.
+
 Claude 3.7 Sonnet(claude-3-7-sonnet-20250219)
+
 Claude 3.5 Haiku(claude-3-5-haiku-20241022)
+
 https://platform.claude.com/docs/ja/about-claude/model-deprecations
+
 ---
 
 
