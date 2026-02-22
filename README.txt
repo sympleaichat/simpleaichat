@@ -40,6 +40,8 @@ api_key_chatgpt35t = your_chatgpt_api_key_here
 api_key_chatgpt4t  = your_chatgpt_api_key_here
 api_key_chatgpt4 = your_chatgpt_api_key_here
 api_key_chatgptdavinci002 = your_chatgpt_api_key_here
+api_key_gemini31flash = your_gemini_api_key_here
+api_key_gemini31pro = your_gemini_api_key_here
 api_key_gemini30pro = your_gemini_api_key_here
 api_key_gemini25flash = your_gemini_api_key_here
 api_key_gemini25pro = your_gemini_api_key_here
@@ -51,8 +53,6 @@ api_key_claude41opus = your_claude_api_key_here
 api_key_claude40opus = your_claude_api_key_here
 api_key_claude45sonnet = your_claude_api_key_here
 api_key_claude40sonnet = your_claude_api_key_here
-api_key_claude35 = your_claude_api_key_here
-api_key_claude37 = your_claude_api_key_here
 api_key_claude45haiku = your_claude_api_key_here
 api_key_grok4 = your_grok_api_key_here
 api_key_grok41fast = your_grok_api_key_here
@@ -86,6 +86,9 @@ dark_mode = false
 | api_key_chatgpt4t   | API key for ChatGPT-4 turbo                   | api_key_chatgpt = sk-xxxxxx  |
 | api_key_chatgpt4    | API key for ChatGPT-4                         | api_key_chatgpt   = sk-xxxxxx |
 | api_key_chatgptdavinci002  | API key for ChatGPT-davinci-002        | api_key_chatgpt = sk-xxxxxx |
+| api_key_gemini31flash      | API key for Gemini 3.1 Flash           | api_key_gemini = AIxxxxxx      |
+| api_key_gemini31pro        | API key for Gemini 3.1 Pro             | api_key_gemini = AIxxxxxx      |
+| api_key_gemini30pro        | API key for Gemini 3.0 Pro             | api_key_gemini = AIxxxxxx      |
 | api_key_gemini25flash      | API key for Gemini 2.5 Flash           | api_key_gemini = AIxxxxxx      |
 | api_key_gemini25pro        | API key for Gemini 2.5 Pro             | api_key_gemini = AIxxxxxx      |
 | api_key_gemini25flash      | API key for Gemini 2.0 Flash           | api_key_gemini = AIxxxxxx      |
@@ -96,8 +99,6 @@ dark_mode = false
 | api_key_claude40opus| API key for Claude Opus 4                     | api_key_claude = sk-xxxxxx     |
 | api_key_claude45sonnet    | API key for Claude Sonnet 4.5                 | api_key_claude = sk-xxxxxx |
 | api_key_claude40sonnet    | API key for Claude Sonnet 4                 | api_key_claude = sk-xxxxxx |
-| api_key_claude35    | API key for Claude 3.5 Haiku                  | api_key_claude = sk-xxxxxx     |
-| api_key_claude37    | API key for Claude 3.7 Sonnet                 | api_key_claude = sk-xxxxxx     |
 | api_key_claude45haiku    | API key for Claude 4.5 Haiku             | api_key_claude = sk-xxxxxx     |
 | api_key_grok4       | API key for Grok 4                            | api_key_grok = xai-xxxx        |
 | api_key_grok41fast   | API key for Grok 41 fast                       | api_key_grok = xai-xxxx        |
@@ -148,6 +149,8 @@ ChatGPT 3.5-turbo
 ChatGPT 4-turbo
 ChatGPT 4
 ChatGPT davinci-002
+Gemini 3.1 Flash
+Gemini 3.1 Pro
 Gemini 3.0 Pro
 Gemini 2.5 Flash
 Gemini 2.5 Pro
@@ -157,10 +160,9 @@ Claude Opus 4.6
 Claude Opus 4.5
 Claude Opus 4.1
 Claude Opus 4
+Claude Sonnet 4.6
 Claude Sonnet 4.5
 Claude Sonnet 4
-Claude 3.5 Haiku
-Claude 3.7 Sonnet
 Claude 4.5 Haiku
 Grok 4
 Grok 4.1 fast
