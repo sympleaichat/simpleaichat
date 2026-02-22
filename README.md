@@ -7,7 +7,7 @@ A fast, ad-free, fully local AI chat client for Windows.
 
 Designed for Claude, ChatGPT, Gemini, Grok, DeepSeek, Mistral — with full message editing and local history.
 
-🔔[news] Support for Claude Opus 4.6 API!🔔
+🔔[news] Support for gemini 3.1 API, Claude Sonnet 4.6 API!🔔
 
 Download for Desktop<br>
 ([Windows](https://github.com/sympleaichat/simpleaichat/raw/refs/heads/main/SimpleAIChatSetup.exe)) 
@@ -91,18 +91,6 @@ By using the memory function, the information registered by the user will be add
 ##  License
 
 MIT License — see [LICENSE](LICENSE).
-
----
-
-##  Regarding discontinuation
-
-Request quests for the following models will fail after February 19, 2026.
-
-Claude 3.7 Sonnet(claude-3-7-sonnet-20250219)
-
-Claude 3.5 Haiku(claude-3-5-haiku-20241022)
-
-https://platform.claude.com/docs/ja/about-claude/model-deprecations
 
 ---
 
