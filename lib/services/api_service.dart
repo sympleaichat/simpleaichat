@@ -21,6 +21,8 @@ enum AIEngine {
   chatgpt_4turbo,
   gpt4,
   chatgpt_davinci002,
+  gemini31pro,
+  gemini31flash,
   gemini30pro,
   gemini25flash,
   gemini25pro,
@@ -30,10 +32,11 @@ enum AIEngine {
   claude45opus,
   claude41opus,
   claude40opus,
+  claude46sonnet,
   claude45sonnet,
   claude40sonnet,
-  claude35,
-  claude37,
+  // claude35,
+  // claude37,
   claude45haiku,
   grok_3,
   grok_3mini,
@@ -79,6 +82,8 @@ class ApiService {
   static const String NAME_chatgpt_4turbo = 'ChatGPT 4-turbo';
   static const String NAME_chatgpt_4 = 'ChatGPT 4';
   static const String NAME_chatgpt_davinci002 = 'ChatGPT davinci002';
+  static const String NAME_gemini31flash = 'Gemini 3.1 Flash';
+  static const String NAME_gemini31pro = 'Gemini 3.1 Pro';
   static const String NAME_gemini30pro = 'Gemini 3.0 Pro';
   static const String NAME_gemini25flash = 'Gemini 2.5 Flash';
   static const String NAME_gemini25pro = 'Gemini 2.5 Pro';
@@ -89,6 +94,7 @@ class ApiService {
   static const String NAME_claude45opus = 'Claude Opus 4.5';
   static const String NAME_claude41opus = 'Claude Opus 4.1';
   static const String NAME_claude40opus = 'Claude Opus 4';
+  static const String NAME_claude46sonnet = 'Claude Sonnet 4.6';
   static const String NAME_claude45sonnet = 'Claude Sonnet 4.5';
   static const String NAME_claude40sonnet = 'Claude Sonnet 4';
   static const String NAME_claude35 = 'Claude 3.5 Haiku';
@@ -121,6 +127,8 @@ class ApiService {
   static const String STR_chatgpt_4turbo = "gpt-4-turbo";
   static const String STR_chatgpt_4 = "gpt-4";
   static const String STR_chatgpt_davinci002 = "davinci-002";
+  static const String STR_gemini31flash = 'gemini-3-flash-preview';
+  static const String STR_gemini31pro = 'gemini-3.1-pro-preview';
   static const String STR_gemini30pro = 'gemini-3-pro-preview';
   static const String STR_gemini25flash = 'gemini-2.5-flash-preview-05-20';
   static const String STR_gemini25pro = 'gemini-2.5-pro-preview-05-06';
@@ -131,6 +139,7 @@ class ApiService {
   static const String STR_claude45opus = 'claude-opus-4-5';
   static const String STR_claude41opus = 'claude-opus-4-1';
   static const String STR_claude40opus = 'claude-opus-4-0';
+  static const String STR_claude46sonnet = 'claude-sonnet-4-6';
   static const String STR_claude45sonnet = 'claude-sonnet-4-5';
   static const String STR_claude40sonnet = 'claude-sonnet-4-0';
   static const String STR_claude35 = 'claude-3-5-haiku-latest';
@@ -177,6 +186,11 @@ class ApiService {
         return NAME_chatgpt_4;
       case AIEngine.chatgpt_davinci002:
         return NAME_chatgpt_davinci002;
+
+      case AIEngine.gemini31flash:
+        return NAME_gemini31flash;
+      case AIEngine.gemini31pro:
+        return NAME_gemini31pro;
       case AIEngine.gemini30pro:
         return NAME_gemini30pro;
       case AIEngine.gemini25flash:
@@ -196,14 +210,16 @@ class ApiService {
         return NAME_claude41opus;
       case AIEngine.claude40opus:
         return NAME_claude40opus;
+      case AIEngine.claude46sonnet:
+        return NAME_claude46sonnet;
       case AIEngine.claude45sonnet:
         return NAME_claude45sonnet;
       case AIEngine.claude40sonnet:
         return NAME_claude40sonnet;
-      case AIEngine.claude35:
-        return NAME_claude35;
-      case AIEngine.claude37:
-        return NAME_claude37;
+      //  case AIEngine.claude35:
+      //    return NAME_claude35;
+      //  case AIEngine.claude37:
+      //   return NAME_claude37;
       case AIEngine.claude45haiku:
         return NAME_claude45haiku;
       case AIEngine.grok_3:
@@ -257,6 +273,11 @@ class ApiService {
         return STR_chatgpt_4;
       case AIEngine.chatgpt_davinci002:
         return STR_chatgpt_davinci002;
+
+      case AIEngine.gemini31flash:
+        return STR_gemini31flash;
+      case AIEngine.gemini31pro:
+        return STR_gemini31pro;
       case AIEngine.gemini30pro:
         return STR_gemini30pro;
       case AIEngine.gemini25flash:
@@ -276,16 +297,18 @@ class ApiService {
         return STR_claude41opus;
       case AIEngine.claude40opus:
         return STR_claude40opus;
+      case AIEngine.claude46sonnet:
+        return STR_claude46sonnet;
       case AIEngine.claude45sonnet:
         return STR_claude45sonnet;
       case AIEngine.claude40sonnet:
         return STR_claude40sonnet;
-      case AIEngine.claude35:
-        return STR_claude35;
+      // case AIEngine.claude35:
+      //    return STR_claude35;
       case AIEngine.claude45haiku:
         return STR_claude45haiku;
-      case AIEngine.claude37:
-        return STR_claude37;
+      //   case AIEngine.claude37:
+      //     return STR_claude37;
       case AIEngine.grok_4:
         return STR_grok4;
       case AIEngine.grok_3:
@@ -332,6 +355,8 @@ class ApiService {
         return _sendToChatGPT(modelStr, userInput, apiKey);
       case AIEngine.chatgpt_davinci002:
         return _sendToChatGPTLegacy(modelStr, userInput, apiKey);
+      case AIEngine.gemini31flash:
+      case AIEngine.gemini31pro:
       case AIEngine.gemini30pro:
       case AIEngine.gemini25flash:
       case AIEngine.gemini25pro:
@@ -342,10 +367,11 @@ class ApiService {
       case AIEngine.claude45opus:
       case AIEngine.claude41opus:
       case AIEngine.claude40opus:
+      case AIEngine.claude46sonnet:
       case AIEngine.claude45sonnet:
       case AIEngine.claude40sonnet:
-      case AIEngine.claude35:
-      case AIEngine.claude37:
+      //  case AIEngine.claude35:
+      //   case AIEngine.claude37:
       case AIEngine.claude45haiku:
         return _sendToClaude(modelStr, userInput, apiKey);
       case AIEngine.grok_41_fast:
@@ -387,6 +413,8 @@ class ApiService {
         return _sendToChatGPTWithHistory(modelStr, messages, apiKey);
       case AIEngine.chatgpt_davinci002:
         return 'This model does not support thread messages.';
+      case AIEngine.gemini31flash:
+      case AIEngine.gemini31pro:
       case AIEngine.gemini30pro:
       case AIEngine.gemini25flash:
       case AIEngine.gemini25pro:
@@ -397,10 +425,11 @@ class ApiService {
       case AIEngine.claude45opus:
       case AIEngine.claude41opus:
       case AIEngine.claude40opus:
+      case AIEngine.claude46sonnet:
       case AIEngine.claude45sonnet:
       case AIEngine.claude40sonnet:
-      case AIEngine.claude35:
-      case AIEngine.claude37:
+      // case AIEngine.claude35:
+      // case AIEngine.claude37:
       case AIEngine.claude45haiku:
         return _sendToClaudeWithHistory(modelStr, messages, apiKey);
       case AIEngine.grok_41_fast:
@@ -429,15 +458,17 @@ class ApiService {
       return _sendToChatGPTWeb(STR_chatgpt_4omini_web, userInput, apiKey);
     } else if (model == AIEngine.chatgpt_4o) {
       return _sendToChatGPTWeb(STR_chatgpt_4o_web, userInput, apiKey);
-    } else if (model == AIEngine.claude35 ||
-        model == AIEngine.claude37 ||
+    } else if (
+        //  model == AIEngine.claude35 ||
+        //    model == AIEngine.claude37 ||
         model == AIEngine.claude40opus ||
-        model == AIEngine.claude41opus ||
-        model == AIEngine.claude45opus ||
-        model == AIEngine.claude46opus ||
-        model == AIEngine.claude45sonnet ||
-        model == AIEngine.claude40sonnet ||
-        model == AIEngine.claude45haiku) {
+            model == AIEngine.claude41opus ||
+            model == AIEngine.claude45opus ||
+            model == AIEngine.claude46opus ||
+            model == AIEngine.claude46sonnet ||
+            model == AIEngine.claude45sonnet ||
+            model == AIEngine.claude40sonnet ||
+            model == AIEngine.claude45haiku) {
       return _sendToClaudeWeb(modelStr, userInput, apiKey);
     } else {
       return 'This model does not support history yet.';
@@ -453,15 +484,17 @@ class ApiService {
           STR_chatgpt_4omini_web, messages, apiKey);
     } else if (model == AIEngine.chatgpt_4o) {
       return _sendToChatGPTWithHistoryWeb(STR_chatgpt_4o_web, messages, apiKey);
-    } else if (model == AIEngine.claude35 ||
-        model == AIEngine.claude37 ||
+    } else if (
+        //  model == AIEngine.claude35 ||
+        //    model == AIEngine.claude37 ||
         model == AIEngine.claude40opus ||
-        model == AIEngine.claude41opus ||
-        model == AIEngine.claude45opus ||
-        model == AIEngine.claude46opus ||
-        model == AIEngine.claude45sonnet ||
-        model == AIEngine.claude40sonnet ||
-        model == AIEngine.claude45haiku) {
+            model == AIEngine.claude41opus ||
+            model == AIEngine.claude45opus ||
+            model == AIEngine.claude46opus ||
+            model == AIEngine.claude46sonnet ||
+            model == AIEngine.claude45sonnet ||
+            model == AIEngine.claude40sonnet ||
+            model == AIEngine.claude45haiku) {
       return _sendToClaudeWithHistoryWeb(modelStr, messages, apiKey);
     } else {
       return 'This model does not support history yet.';

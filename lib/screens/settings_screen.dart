@@ -42,6 +42,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final TextEditingController _chatgptdavinci002ApiKeyController =
       TextEditingController();
 
+  final TextEditingController _gemini31flashApiKeyController =
+      TextEditingController();
+  final TextEditingController _gemini31proApiKeyController =
+      TextEditingController();
   final TextEditingController _gemini30proApiKeyController =
       TextEditingController();
   final TextEditingController _gemini25flashApiKeyController =
@@ -60,6 +64,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final TextEditingController _claude41oApiKeyController =
       TextEditingController();
   final TextEditingController _claude40oApiKeyController =
+      TextEditingController();
+  final TextEditingController _claude46sApiKeyController =
       TextEditingController();
   final TextEditingController _claude45sApiKeyController =
       TextEditingController();
@@ -140,6 +146,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final chatgptdavinci002Key =
         await SettingService.loadApiKey(AIEngine.chatgpt_davinci002);
 
+    final gemini31flashKey =
+        await SettingService.loadApiKey(AIEngine.gemini31flash);
+    final gemini31proKey =
+        await SettingService.loadApiKey(AIEngine.gemini31pro);
     final gemini30proKey =
         await SettingService.loadApiKey(AIEngine.gemini30pro);
     final gemini25flashKey =
@@ -155,12 +165,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final claude45oKey = await SettingService.loadApiKey(AIEngine.claude45opus);
     final claude41oKey = await SettingService.loadApiKey(AIEngine.claude41opus);
     final claude40oKey = await SettingService.loadApiKey(AIEngine.claude40opus);
+
+    final claude46sKey =
+        await SettingService.loadApiKey(AIEngine.claude46sonnet);
     final claude45sKey =
         await SettingService.loadApiKey(AIEngine.claude45sonnet);
     final claude40sKey =
         await SettingService.loadApiKey(AIEngine.claude40sonnet);
-    final claude35Key = await SettingService.loadApiKey(AIEngine.claude35);
-    final claude37Key = await SettingService.loadApiKey(AIEngine.claude37);
+    //  final claude35Key = await SettingService.loadApiKey(AIEngine.claude35);
+    // final claude37Key = await SettingService.loadApiKey(AIEngine.claude37);
     final claude45haikuKey =
         await SettingService.loadApiKey(AIEngine.claude45haiku);
 
@@ -200,6 +213,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _chatgpt4tApiKeyController.text = chatgpt4tKey;
       _chatgpt4ApiKeyController.text = chatgpt4Key;
       _chatgptdavinci002ApiKeyController.text = chatgptdavinci002Key;
+      _gemini31flashApiKeyController.text = gemini31flashKey;
+      _gemini31proApiKeyController.text = gemini31proKey;
       _gemini30proApiKeyController.text = gemini30proKey;
       _gemini25flashApiKeyController.text = gemini25flashKey;
       _gemini25proApiKeyController.text = gemini25proKey;
@@ -210,10 +225,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _claude45oApiKeyController.text = claude45oKey;
       _claude41oApiKeyController.text = claude41oKey;
       _claude40oApiKeyController.text = claude40oKey;
+      _claude46sApiKeyController.text = claude46sKey;
       _claude45sApiKeyController.text = claude45sKey;
       _claude40sApiKeyController.text = claude40sKey;
-      _claude35ApiKeyController.text = claude35Key;
-      _claude37ApiKeyController.text = claude37Key;
+      //  _claude35ApiKeyController.text = claude35Key;
+      //  _claude37ApiKeyController.text = claude37Key;
       _claude45haikuApiKeyController.text = claude45haikuKey;
 
       _grok4ApiKeyController.text = groq4Key;
@@ -321,6 +337,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _claude45oApiKeyController.dispose();
     _claude41oApiKeyController.dispose();
     _claude40oApiKeyController.dispose();
+    _claude46sApiKeyController.dispose();
     _claude45sApiKeyController.dispose();
     _claude40sApiKeyController.dispose();
     _claude35ApiKeyController.dispose();
@@ -333,6 +350,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _chatgpt4tApiKeyController.dispose();
     _chatgpt4ApiKeyController.dispose();
     _chatgptdavinci002ApiKeyController.dispose();
+    _gemini31flashApiKeyController.dispose();
+    _gemini31proApiKeyController.dispose();
     _gemini30proApiKeyController.dispose();
     _gemini25flashApiKeyController.dispose();
     _gemini25proApiKeyController.dispose();
@@ -430,7 +449,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: Column(
                   children: [
                     _buildEngineCard(
-                        AIEngine.claude46opus, _claude46oApiKeyController),
+                        AIEngine.gemini31flash, _gemini31flashApiKeyController),
+                    _buildEngineCard(
+                        AIEngine.gemini31pro, _gemini31proApiKeyController),
+                    _buildEngineCard(
+                        AIEngine.claude46sonnet, _claude46sApiKeyController),
                     _buildEngineCard(
                         AIEngine.chatgpt_52, _chatgpt52ApiKeyController),
                     _buildEngineCard(
@@ -442,6 +465,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     _buildEngineCard(
                         AIEngine.chatgpt_5nano, _chatgpt5nanoApiKeyController),
                     _buildEngineCard(
+                        AIEngine.claude46opus, _claude46oApiKeyController),
+                    _buildEngineCard(
                         AIEngine.claude45opus, _claude45oApiKeyController),
                     _buildEngineCard(
                         AIEngine.claude41opus, _claude41oApiKeyController),
@@ -451,10 +476,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         AIEngine.claude45sonnet, _claude45sApiKeyController),
                     _buildEngineCard(
                         AIEngine.claude40sonnet, _claude40sApiKeyController),
-                    _buildEngineCard(
-                        AIEngine.claude35, _claude35ApiKeyController),
-                    _buildEngineCard(
-                        AIEngine.claude37, _claude37ApiKeyController),
+                    // _buildEngineCard(
+                    //      AIEngine.claude35, _claude35ApiKeyController),
+                    //  _buildEngineCard(
+                    //      AIEngine.claude37, _claude37ApiKeyController),
                     _buildEngineCard(
                         AIEngine.claude45haiku, _claude45haikuApiKeyController),
                     _buildEngineCard(
