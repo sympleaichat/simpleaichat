@@ -16,6 +16,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _loading = true;
   bool _darkModeChanged = false;
 
+  final TextEditingController _chatgpt54ApiKeyController =
+      TextEditingController();
   final TextEditingController _chatgpt52ApiKeyController =
       TextEditingController();
   final TextEditingController _chatgpt51ApiKeyController =
@@ -126,6 +128,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final engine = await SettingService.loadEngine();
     final darkMode = await SettingService.loadDarkMode();
 
+    final chatgpt54Key = await SettingService.loadApiKey(AIEngine.chatgpt_54);
     final chatgpt52Key = await SettingService.loadApiKey(AIEngine.chatgpt_52);
     final chatgpt51Key = await SettingService.loadApiKey(AIEngine.chatgpt_51);
     final chatgpt5Key = await SettingService.loadApiKey(AIEngine.chatgpt_5);
@@ -201,6 +204,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _selectedEngine = engine;
       _isDarkMode = darkMode;
 
+      _chatgpt54ApiKeyController.text = chatgpt54Key;
       _chatgpt52ApiKeyController.text = chatgpt52Key;
       _chatgpt51ApiKeyController.text = chatgpt51Key;
       _chatgpt5ApiKeyController.text = chatgpt5Key;
@@ -326,6 +330,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   void dispose() {
+    _chatgpt54ApiKeyController.dispose();
     _chatgpt52ApiKeyController.dispose();
     _chatgpt51ApiKeyController.dispose();
 
@@ -449,11 +454,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: Column(
                   children: [
                     _buildEngineCard(
-                        AIEngine.gemini31flash, _gemini31flashApiKeyController),
-                    _buildEngineCard(
-                        AIEngine.gemini31pro, _gemini31proApiKeyController),
-                    _buildEngineCard(
-                        AIEngine.claude46sonnet, _claude46sApiKeyController),
+                        AIEngine.chatgpt_54, _chatgpt54ApiKeyController),
                     _buildEngineCard(
                         AIEngine.chatgpt_52, _chatgpt52ApiKeyController),
                     _buildEngineCard(
@@ -464,6 +465,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         AIEngine.chatgpt_5mini, _chatgpt5miniApiKeyController),
                     _buildEngineCard(
                         AIEngine.chatgpt_5nano, _chatgpt5nanoApiKeyController),
+                    _buildEngineCard(
+                        AIEngine.claude46sonnet, _claude46sApiKeyController),
                     _buildEngineCard(
                         AIEngine.claude46opus, _claude46oApiKeyController),
                     _buildEngineCard(
@@ -495,6 +498,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     _buildEngineCard(AIEngine.gpt4, _chatgpt4ApiKeyController),
                     _buildEngineCard(AIEngine.chatgpt_davinci002,
                         _chatgptdavinci002ApiKeyController),
+                    _buildEngineCard(
+                        AIEngine.gemini31flash, _gemini31flashApiKeyController),
+                    _buildEngineCard(
+                        AIEngine.gemini31pro, _gemini31proApiKeyController),
                     _buildEngineCard(
                         AIEngine.gemini30pro, _gemini30proApiKeyController),
                     _buildEngineCard(
