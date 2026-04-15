@@ -27,7 +27,7 @@ Example structure:
 
 [settings]
 engine = chatgpt
-api_key_chatgpt52pro = your_chatgpt_api_key_here
+api_key_chatgpt54 = your_chatgpt_api_key_here
 api_key_chatgpt52 = your_chatgpt_api_key_here
 api_key_chatgpt51 = your_chatgpt_api_key_here
 api_key_chatgpt5 = your_chatgpt_api_key_here
@@ -54,6 +54,7 @@ api_key_claude40opus = your_claude_api_key_here
 api_key_claude45sonnet = your_claude_api_key_here
 api_key_claude40sonnet = your_claude_api_key_here
 api_key_claude45haiku = your_claude_api_key_here
+api_key_grok42 = your_grok_api_key_here
 api_key_grok4 = your_grok_api_key_here
 api_key_grok41fast = your_grok_api_key_here
 api_key_grok3fast = your_grok_api_key_here
@@ -73,7 +74,7 @@ dark_mode = false
 | Key                 | Description                                   | Example                        |
 |---------------------|-----------------------------------------------|--------------------------------|
 | engine              | AI engine to use (chatgpt or gemini)          | engine = chatgpt               |
-| api_key_chatgpt52pro   | API key for ChatGPT-5.2 pro                      | api_key_chatgpt  = sk-xxxxxx |
+| api_key_chatgpt54   | API key for ChatGPT-5.4                      | api_key_chatgpt  = sk-xxxxxx |
 | api_key_chatgpt52   | API key for ChatGPT-5.2                      | api_key_chatgpt  = sk-xxxxxx |
 | api_key_chatgpt51   | API key for ChatGPT-5.1                      | api_key_chatgpt  = sk-xxxxxx |
 | api_key_chatgpt5   | API key for ChatGPT-5                       | api_key_chatgpt  = sk-xxxxxx |
@@ -100,6 +101,7 @@ dark_mode = false
 | api_key_claude45sonnet    | API key for Claude Sonnet 4.5                 | api_key_claude = sk-xxxxxx |
 | api_key_claude40sonnet    | API key for Claude Sonnet 4                 | api_key_claude = sk-xxxxxx |
 | api_key_claude45haiku    | API key for Claude 4.5 Haiku             | api_key_claude = sk-xxxxxx     |
+| api_key_grok42       | API key for Grok 42                            | api_key_grok = xai-xxxx        |
 | api_key_grok4       | API key for Grok 4                            | api_key_grok = xai-xxxx        |
 | api_key_grok41fast   | API key for Grok 41 fast                       | api_key_grok = xai-xxxx        |
 | api_key_grok3fast   | API key for Grok 3 fast                       | api_key_grok = xai-xxxx        |
@@ -136,7 +138,7 @@ Information registered in the memory list can be sent with the chat message.
 Only information that is checked in the checkbox will be sent
 
 ■ Compatible models
-ChatGPT-5.2 pro 
+ChatGPT-5.4
 ChatGPT-5.2
 ChatGPT-5.1
 ChatGPT-5
@@ -164,6 +166,7 @@ Claude Sonnet 4.6
 Claude Sonnet 4.5
 Claude Sonnet 4
 Claude 4.5 Haiku
+Grok 4.20
 Grok 4
 Grok 4.1 fast
 Grok 3 fast
