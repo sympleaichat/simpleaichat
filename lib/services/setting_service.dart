@@ -93,6 +93,8 @@ class SettingService {
         return 'api_key_grok3';
       case AIEngine.grok_3mini:
         return 'api_key_grok3mini';
+      case AIEngine.grok_42:
+        return 'api_key_grok42';
       case AIEngine.grok_4:
         return 'api_key_grok4';
       case AIEngine.grok_41_fast:
@@ -178,6 +180,8 @@ class SettingService {
       //   return AIEngine.claude37;
     } else if (engine == ApiService.STR_claude45haiku) {
       return AIEngine.claude45haiku;
+    } else if (engine == ApiService.STR_grok42) {
+      return AIEngine.grok_42;
     } else if (engine == ApiService.STR_grok4) {
       return AIEngine.grok_4;
     } else if (engine == ApiService.STR_grok3) {

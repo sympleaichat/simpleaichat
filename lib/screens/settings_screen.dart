@@ -80,6 +80,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final TextEditingController _claude45haikuApiKeyController =
       TextEditingController();
 
+  final TextEditingController _grok42ApiKeyController = TextEditingController();
   final TextEditingController _grok4ApiKeyController = TextEditingController();
   final TextEditingController _grok3fastApiKeyController =
       TextEditingController();
@@ -180,6 +181,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final claude45haikuKey =
         await SettingService.loadApiKey(AIEngine.claude45haiku);
 
+    final groq42Key = await SettingService.loadApiKey(AIEngine.grok_42);
     final groq4Key = await SettingService.loadApiKey(AIEngine.grok_4);
     final grok41fastKey =
         await SettingService.loadApiKey(AIEngine.grok_41_fast);
@@ -236,6 +238,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       //  _claude37ApiKeyController.text = claude37Key;
       _claude45haikuApiKeyController.text = claude45haikuKey;
 
+      _grok42ApiKeyController.text = groq42Key;
       _grok4ApiKeyController.text = groq4Key;
       _grok41fastminiApiKeyController.text = grok41fastKey;
       _grok3fastApiKeyController.text = grok3fastKey;
@@ -362,6 +365,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _gemini25proApiKeyController.dispose();
     _gemini20flashApiKeyController.dispose();
     _gemini15proApiKeyController.dispose();
+    _grok42ApiKeyController.dispose();
     _grok4ApiKeyController.dispose();
     _grok3fastApiKeyController.dispose();
     _grok41fastminiApiKeyController.dispose();
@@ -453,6 +457,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 controller: _scrollController,
                 child: Column(
                   children: [
+                    _buildEngineCard(AIEngine.grok_42, _grok42ApiKeyController),
                     _buildEngineCard(
                         AIEngine.chatgpt_54, _chatgpt54ApiKeyController),
                     _buildEngineCard(

@@ -41,6 +41,7 @@ enum AIEngine {
   claude45haiku,
   grok_3,
   grok_3mini,
+  grok_42,
   grok_4,
   grok_41_fast,
   grok_3_fast,
@@ -104,6 +105,7 @@ class ApiService {
   static const String NAME_claude45haiku = 'Claude Haiku 4.5';
   static const String NAME_grok_3 = 'Grok 3';
   static const String NAME_grok_3mini = 'Grok 3 Mini';
+  static const String NAME_grok42 = 'Grok 4.20';
   static const String NAME_grok4 = 'Grok 4';
   static const String NAME_grok41_fast = 'Grok 4.1 fast';
   static const String NAME_grok3_fast = 'Grok 3 fast';
@@ -148,6 +150,7 @@ class ApiService {
   static const String STR_claude35 = 'claude-3-5-haiku-latest';
   static const String STR_claude37 = 'claude-3-7-sonnet-latest';
   static const String STR_claude45haiku = 'claude-haiku-4-5';
+  static const String STR_grok42 = 'grok-4.20-0309-reasoning';
   static const String STR_grok4 = 'grok-4';
   static const String STR_grok41_fast = 'grok-4-1-fast-reasoning';
   static const String STR_grok3_fast = 'grok-3-fast';
@@ -231,6 +234,9 @@ class ApiService {
         return NAME_grok_3;
       case AIEngine.grok_3mini:
         return NAME_grok_3mini;
+
+      case AIEngine.grok_42:
+        return NAME_grok42;
       case AIEngine.grok_4:
         return NAME_grok4;
       case AIEngine.grok_41_fast:
@@ -316,6 +322,8 @@ class ApiService {
         return STR_claude45haiku;
       //   case AIEngine.claude37:
       //     return STR_claude37;
+      case AIEngine.grok_42:
+        return STR_grok42;
       case AIEngine.grok_4:
         return STR_grok4;
       case AIEngine.grok_3:
@@ -387,9 +395,12 @@ class ApiService {
       case AIEngine.grok_3mini:
       case AIEngine.grok_3_fast:
       case AIEngine.grok_3_fast_mini:
-        return _sendToChatGrok(modelStr, userInput, apiKey);
+      case AIEngine.grok_42:
       case AIEngine.grok_4:
-        return _sendToChatGrok4(modelStr, userInput, apiKey);
+        return _sendToChatGrok(modelStr, userInput, apiKey);
+      //   case AIEngine.grok_42:
+      //  case AIEngine.grok_4:
+      //     return _sendToChatGrok4(modelStr, userInput, apiKey);
 
       case AIEngine.deepseek_chat:
       case AIEngine.deepseek_reasoner:
@@ -446,9 +457,12 @@ class ApiService {
       case AIEngine.grok_3mini:
       case AIEngine.grok_3_fast:
       case AIEngine.grok_3_fast_mini:
-        return _sendToGrokWithHistory(modelStr, messages, apiKey);
+      case AIEngine.grok_42:
       case AIEngine.grok_4:
-        return _sendToGrok4WithHistory(modelStr, messages, apiKey);
+        return _sendToGrokWithHistory(modelStr, messages, apiKey);
+      //  case AIEngine.grok_42:
+      //  case AIEngine.grok_4:
+      //     return _sendToGrok4WithHistory(modelStr, messages, apiKey);
 
       case AIEngine.deepseek_chat:
       case AIEngine.deepseek_reasoner:
