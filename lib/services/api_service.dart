@@ -29,6 +29,7 @@ enum AIEngine {
   gemini25pro,
   gemini20flash,
   gemini15pro,
+  claude47opus,
   claude46opus,
   claude45opus,
   claude41opus,
@@ -93,6 +94,7 @@ class ApiService {
   static const String NAME_gemini20flash = 'Gemini 2.0 Flash';
   static const String NAME_gemini15pro = 'Gemini 1.5 Pro';
 
+  static const String NAME_claude47opus = 'Claude Opus 4.7';
   static const String NAME_claude46opus = 'Claude Opus 4.6';
   static const String NAME_claude45opus = 'Claude Opus 4.5';
   static const String NAME_claude41opus = 'Claude Opus 4.1';
@@ -140,6 +142,7 @@ class ApiService {
   static const String STR_gemini20flash = 'gemini-2.0-flash';
   static const String STR_gemini15pro = 'gemini-1.5-pro';
 
+  static const String STR_claude47opus = 'claude-opus-4-7';
   static const String STR_claude46opus = 'claude-opus-4-6';
   static const String STR_claude45opus = 'claude-opus-4-5';
   static const String STR_claude41opus = 'claude-opus-4-1';
@@ -210,6 +213,8 @@ class ApiService {
       case AIEngine.gemini15pro:
         return NAME_gemini15pro;
 
+      case AIEngine.claude47opus:
+        return NAME_claude47opus;
       case AIEngine.claude46opus:
         return NAME_claude46opus;
       case AIEngine.claude45opus:
@@ -302,6 +307,8 @@ class ApiService {
       case AIEngine.gemini15pro:
         return STR_gemini15pro;
 
+      case AIEngine.claude47opus:
+        return STR_claude47opus;
       case AIEngine.claude46opus:
         return STR_claude46opus;
       case AIEngine.claude45opus:
@@ -379,6 +386,7 @@ class ApiService {
       case AIEngine.gemini20flash:
       case AIEngine.gemini15pro:
         return _sendToGemini(modelStr, userInput, apiKey);
+      case AIEngine.claude47opus:
       case AIEngine.claude46opus:
       case AIEngine.claude45opus:
       case AIEngine.claude41opus:
@@ -441,6 +449,7 @@ class ApiService {
       case AIEngine.gemini20flash:
       case AIEngine.gemini15pro:
         return _sendToGeminiWithHistory(modelStr, messages, apiKey);
+      case AIEngine.claude47opus:
       case AIEngine.claude46opus:
       case AIEngine.claude45opus:
       case AIEngine.claude41opus:
@@ -488,6 +497,7 @@ class ApiService {
             model == AIEngine.claude41opus ||
             model == AIEngine.claude45opus ||
             model == AIEngine.claude46opus ||
+            model == AIEngine.claude47opus ||
             model == AIEngine.claude46sonnet ||
             model == AIEngine.claude45sonnet ||
             model == AIEngine.claude40sonnet ||
@@ -514,6 +524,7 @@ class ApiService {
             model == AIEngine.claude41opus ||
             model == AIEngine.claude45opus ||
             model == AIEngine.claude46opus ||
+            model == AIEngine.claude47opus ||
             model == AIEngine.claude46sonnet ||
             model == AIEngine.claude45sonnet ||
             model == AIEngine.claude40sonnet ||
@@ -801,7 +812,7 @@ class ApiService {
           model == STR_claude41opus ||
           model == STR_claude45opus) {
         maxtoken = 30000;
-      } else if (model == STR_claude46opus) {
+      } else if (model == STR_claude46opus || model == STR_claude47opus) {
         maxtoken = 120000;
       }
 
@@ -809,7 +820,7 @@ class ApiService {
         'model': model,
         'messages': chatMessages,
         'max_tokens': maxtoken,
-        'temperature': 0.7,
+        if (model != STR_claude47opus) 'temperature': 0.7,
       });
       Logger.log(sendJson);
       msgSendLength = sendJson.length;
@@ -908,7 +919,7 @@ class ApiService {
           model == STR_claude41opus ||
           model == STR_claude45opus) {
         maxtoken = 30000;
-      } else if (model == STR_claude46opus) {
+      } else if (model == STR_claude46opus || model == STR_claude47opus) {
         maxtoken = 120000;
       }
 
@@ -916,7 +927,7 @@ class ApiService {
         'model': model,
         'messages': chatMessages,
         'max_tokens': maxtoken,
-        'temperature': 0.7,
+        if (model != STR_claude47opus) 'temperature': 0.7,
         "tools": [
           {
             "type": "web_search_20250305",
@@ -1010,7 +1021,7 @@ class ApiService {
         "model": model,
         "max_tokens": 20000,
         "messages": chatMessages,
-        "temperature": 0.7,
+        if (model != STR_claude47opus) 'temperature': 0.7,
       });
       msgModel = model;
       msgSendLength = sendJson.length;
@@ -1413,7 +1424,7 @@ class ApiService {
           model == STR_claude41opus ||
           model == STR_claude45opus) {
         maxtoken = 30000;
-      } else if (model == STR_claude46opus) {
+      } else if (model == STR_claude46opus || model == STR_claude47opus) {
         maxtoken = 120000;
       }
 
@@ -1443,7 +1454,7 @@ class ApiService {
             }
           ],
           'max_tokens': maxtoken,
-          'temperature': 0.7,
+          if (model != STR_claude47opus) 'temperature': 0.7,
         });
       } else {
         sendJson = jsonEncode({
@@ -1453,7 +1464,7 @@ class ApiService {
             {'role': 'user', 'content': userInput}
           ],
           'max_tokens': maxtoken,
-          'temperature': 0.7,
+          if (model != STR_claude47opus) 'temperature': 0.7,
         });
       }
 
@@ -1501,7 +1512,7 @@ class ApiService {
           model == STR_claude41opus ||
           model == STR_claude45opus) {
         maxtoken = 30000;
-      } else if (model == STR_claude46opus) {
+      } else if (model == STR_claude46opus || model == STR_claude47opus) {
         maxtoken = 120000;
       }
 
@@ -1531,7 +1542,7 @@ class ApiService {
             }
           ],
           'max_tokens': maxtoken,
-          'temperature': 0.7,
+          if (model != STR_claude47opus) 'temperature': 0.7,
         });
       } else {
         sendJson = jsonEncode({
@@ -1541,7 +1552,7 @@ class ApiService {
             {'role': 'user', 'content': userInput}
           ],
           'max_tokens': maxtoken,
-          'temperature': 0.7,
+          if (model != STR_claude47opus) 'temperature': 0.7,
           "tools": [
             {
               "type": "web_search_20250305",

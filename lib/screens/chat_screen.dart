@@ -1328,11 +1328,10 @@ class _ChatScreenState extends State<ChatScreen> {
                           ApiService.currentEngine == AIEngine.claude41opus ||
                           ApiService.currentEngine == AIEngine.claude45opus ||
                           ApiService.currentEngine == AIEngine.claude46opus ||
+                          ApiService.currentEngine == AIEngine.claude47opus ||
                           ApiService.currentEngine == AIEngine.claude46sonnet ||
                           ApiService.currentEngine == AIEngine.claude45sonnet ||
                           ApiService.currentEngine == AIEngine.claude40sonnet ||
-                          //   ApiService.currentEngine == AIEngine.claude35 ||
-                          //  ApiService.currentEngine == AIEngine.claude37 ||
                           ApiService.currentEngine == AIEngine.claude45haiku)
                         const SizedBox(width: 8),
                       if (ApiService.currentEngine == AIEngine.chatgpt_4o ||
@@ -1341,11 +1340,10 @@ class _ChatScreenState extends State<ChatScreen> {
                           ApiService.currentEngine == AIEngine.claude41opus ||
                           ApiService.currentEngine == AIEngine.claude45opus ||
                           ApiService.currentEngine == AIEngine.claude46opus ||
+                          ApiService.currentEngine == AIEngine.claude47opus ||
                           ApiService.currentEngine == AIEngine.claude46sonnet ||
                           ApiService.currentEngine == AIEngine.claude45sonnet ||
                           ApiService.currentEngine == AIEngine.claude40sonnet ||
-                          // ApiService.currentEngine == AIEngine.claude35 ||
-                          //  ApiService.currentEngine == AIEngine.claude37 ||
                           ApiService.currentEngine == AIEngine.claude45haiku)
                         IconButton(
                           icon: const Icon(Icons.language),
@@ -1357,22 +1355,20 @@ class _ChatScreenState extends State<ChatScreen> {
                           ApiService.currentEngine == AIEngine.claude40opus ||
                           ApiService.currentEngine == AIEngine.claude45opus ||
                           ApiService.currentEngine == AIEngine.claude46opus ||
+                          ApiService.currentEngine == AIEngine.claude47opus ||
                           ApiService.currentEngine == AIEngine.claude46sonnet ||
                           ApiService.currentEngine == AIEngine.claude45sonnet ||
                           ApiService.currentEngine == AIEngine.claude40sonnet ||
-                          //  ApiService.currentEngine == AIEngine.claude35 ||
-                          //  ApiService.currentEngine == AIEngine.claude37 ||
                           ApiService.currentEngine == AIEngine.claude45haiku)
                         const SizedBox(width: 8),
                       if (ApiService.currentEngine == AIEngine.claude41opus ||
                           ApiService.currentEngine == AIEngine.claude40opus ||
                           ApiService.currentEngine == AIEngine.claude45opus ||
                           ApiService.currentEngine == AIEngine.claude46opus ||
+                          ApiService.currentEngine == AIEngine.claude47opus ||
                           ApiService.currentEngine == AIEngine.claude46sonnet ||
                           ApiService.currentEngine == AIEngine.claude45sonnet ||
                           ApiService.currentEngine == AIEngine.claude40sonnet ||
-                          //   ApiService.currentEngine == AIEngine.claude35 ||
-                          //  ApiService.currentEngine == AIEngine.claude37 ||
                           ApiService.currentEngine == AIEngine.claude45haiku)
                         IconButton(
                           icon: const Icon(Icons.insert_drive_file_outlined),
@@ -1507,6 +1503,26 @@ class _ChatScreenState extends State<ChatScreen> {
                       .removeWhere((t) => t.threadId == thread.threadId);
                 });
                 await StorageService.saveAllData(_threads, _folders, _memories);
+
+                // Processing if the deleted thread was an open thread
+                if (_activeThreadId == thread.threadId) {
+                  // Extract threads outside of folders (those without a folderId, or empty).
+                  final threadsOutsideFolder = _threads
+                      .where((t) => t.folderId == null || t.folderId == '')
+                      .toList();
+
+                  if (threadsOutsideFolder.isNotEmpty) {
+                    // If threads exist outside the folder, activate the first one
+                    setState(() {
+                      _activeThreadId = threadsOutsideFolder.first.threadId;
+                      threadsOutsideFolder.first.isUnread = false;
+                    });
+                    await _loadMessages(); // Read messages from newly activated threads.
+                  } else {
+// If there are no threads outside the folder, a new thread will be created and displayed.
+                    await _createNewThread();
+                  }
+                }
               }
             } else if (value == 'copy') {
               await _copyThread(thread.threadId);

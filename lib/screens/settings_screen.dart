@@ -11,7 +11,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  AIEngine _selectedEngine = AIEngine.chatgpt_41;
+  AIEngine _selectedEngine = AIEngine.chatgpt_54;
   bool _isDarkMode = false;
   bool _loading = true;
   bool _darkModeChanged = false;
@@ -59,6 +59,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final TextEditingController _gemini15proApiKeyController =
       TextEditingController();
 
+  final TextEditingController _claude47oApiKeyController =
+      TextEditingController();
   final TextEditingController _claude46oApiKeyController =
       TextEditingController();
   final TextEditingController _claude45oApiKeyController =
@@ -165,6 +167,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final gemini15proKey =
         await SettingService.loadApiKey(AIEngine.gemini15pro);
 
+    final claude47oKey = await SettingService.loadApiKey(AIEngine.claude47opus);
     final claude46oKey = await SettingService.loadApiKey(AIEngine.claude46opus);
     final claude45oKey = await SettingService.loadApiKey(AIEngine.claude45opus);
     final claude41oKey = await SettingService.loadApiKey(AIEngine.claude41opus);
@@ -227,6 +230,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _gemini20flashApiKeyController.text = gemini20flashKey;
       _gemini15proApiKeyController.text = gemini15proKey;
 
+      _claude47oApiKeyController.text = claude47oKey;
       _claude46oApiKeyController.text = claude46oKey;
       _claude45oApiKeyController.text = claude45oKey;
       _claude41oApiKeyController.text = claude41oKey;
@@ -341,6 +345,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _chatgpt5miniApiKeyController.dispose();
     _chatgpt5nanoApiKeyController.dispose();
 
+    _claude47oApiKeyController.dispose();
     _claude46oApiKeyController.dispose();
     _claude45oApiKeyController.dispose();
     _claude41oApiKeyController.dispose();
@@ -457,7 +462,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 controller: _scrollController,
                 child: Column(
                   children: [
-                    _buildEngineCard(AIEngine.grok_42, _grok42ApiKeyController),
+                    _buildEngineCard(
+                        AIEngine.claude47opus, _claude47oApiKeyController),
+
                     _buildEngineCard(
                         AIEngine.chatgpt_54, _chatgpt54ApiKeyController),
                     _buildEngineCard(
@@ -517,6 +524,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         AIEngine.gemini20flash, _gemini20flashApiKeyController),
                     _buildEngineCard(
                         AIEngine.gemini15pro, _gemini15proApiKeyController),
+                    _buildEngineCard(AIEngine.grok_42, _grok42ApiKeyController),
                     _buildEngineCard(
                         AIEngine.grok_41_fast, _grok41fastminiApiKeyController),
                     _buildEngineCard(AIEngine.grok_4, _grok4ApiKeyController),
