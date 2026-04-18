@@ -47,6 +47,7 @@ api_key_gemini25flash = your_gemini_api_key_here
 api_key_gemini25pro = your_gemini_api_key_here
 api_key_gemini20flash = your_gemini_api_key_here
 api_key_gemini15pro = your_gemini_api_key_here
+api_key_claude47opus = your_claude_api_key_here
 api_key_claude46opus = your_claude_api_key_here
 api_key_claude45opus = your_claude_api_key_here
 api_key_claude41opus = your_claude_api_key_here
@@ -94,6 +95,7 @@ dark_mode = false
 | api_key_gemini25pro        | API key for Gemini 2.5 Pro             | api_key_gemini = AIxxxxxx      |
 | api_key_gemini25flash      | API key for Gemini 2.0 Flash           | api_key_gemini = AIxxxxxx      |
 | api_key_gemini15pro        | API key for Gemini 1.5 Pro             | api_key_gemini = AIxxxxxx      |
+| api_key_claude47opus| API key for Claude Opus 4.7                     | api_key_claude = sk-xxxxxx     |
 | api_key_claude46opus| API key for Claude Opus 4.6                     | api_key_claude = sk-xxxxxx     |
 | api_key_claude45opus| API key for Claude Opus 4.5                     | api_key_claude = sk-xxxxxx     |
 | api_key_claude41opus| API key for Claude Opus 4.1                     | api_key_claude = sk-xxxxxx     |
@@ -158,6 +160,7 @@ Gemini 2.5 Flash
 Gemini 2.5 Pro
 Gemini 2.0 Flash
 Gemini 1.5 Pro
+Claude Opus 4.7
 Claude Opus 4.6
 Claude Opus 4.5
 Claude Opus 4.1
