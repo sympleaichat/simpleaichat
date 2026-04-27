@@ -27,6 +27,7 @@ Example structure:
 
 [settings]
 engine = chatgpt
+api_key_chatgpt55 = your_chatgpt_api_key_here
 api_key_chatgpt54 = your_chatgpt_api_key_here
 api_key_chatgpt52 = your_chatgpt_api_key_here
 api_key_chatgpt51 = your_chatgpt_api_key_here
@@ -75,6 +76,7 @@ dark_mode = false
 | Key                 | Description                                   | Example                        |
 |---------------------|-----------------------------------------------|--------------------------------|
 | engine              | AI engine to use (chatgpt or gemini)          | engine = chatgpt               |
+| api_key_chatgpt55   | API key for ChatGPT-5.5                      | api_key_chatgpt  = sk-xxxxxx |
 | api_key_chatgpt54   | API key for ChatGPT-5.4                      | api_key_chatgpt  = sk-xxxxxx |
 | api_key_chatgpt52   | API key for ChatGPT-5.2                      | api_key_chatgpt  = sk-xxxxxx |
 | api_key_chatgpt51   | API key for ChatGPT-5.1                      | api_key_chatgpt  = sk-xxxxxx |
@@ -140,6 +142,7 @@ Information registered in the memory list can be sent with the chat message.
 Only information that is checked in the checkbox will be sent
 
 ■ Compatible models
+ChatGPT-5.5
 ChatGPT-5.4
 ChatGPT-5.2
 ChatGPT-5.1
