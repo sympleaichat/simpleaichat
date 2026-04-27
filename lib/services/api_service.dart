@@ -9,6 +9,7 @@ import '../models/message.dart';
 import '../utils/logger.dart';
 
 enum AIEngine {
+  chatgpt_55,
   chatgpt_54,
   chatgpt_52,
   chatgpt_51,
@@ -72,6 +73,7 @@ class ApiService {
       'https://api.llama.com/compat/v1/chat/completions';
   static const String mistralUrl = 'https://api.mistral.ai/v1';
 
+  static const String NAME_chatgpt_55 = 'ChatGPT 5.5';
   static const String NAME_chatgpt_54 = 'ChatGPT 5.4';
   static const String NAME_chatgpt_52 = 'ChatGPT 5.2';
   static const String NAME_chatgpt_51 = 'ChatGPT 5.1';
@@ -118,6 +120,7 @@ class ApiService {
   static const String NAME_mistral_medium = 'Mistral Medium';
   static const String NAME_mistral_small = 'Mistral Small';
 
+  static const String STR_chatgpt_55 = 'gpt-5.5-2026-04-23';
   static const String STR_chatgpt_54 = 'gpt-5.4';
   static const String STR_chatgpt_52 = 'gpt-5.2';
   static const String STR_chatgpt_51 = 'gpt-5.1';
@@ -171,6 +174,8 @@ class ApiService {
   static String msgModel = '';
   static String getModelName(AIEngine engine) {
     switch (engine) {
+      case AIEngine.chatgpt_55:
+        return NAME_chatgpt_55;
       case AIEngine.chatgpt_54:
         return NAME_chatgpt_54;
       case AIEngine.chatgpt_52:
@@ -265,6 +270,8 @@ class ApiService {
 
   static String getModelStr(AIEngine engine) {
     switch (engine) {
+      case AIEngine.chatgpt_55:
+        return STR_chatgpt_55;
       case AIEngine.chatgpt_54:
         return STR_chatgpt_54;
       case AIEngine.chatgpt_52:
@@ -363,6 +370,7 @@ class ApiService {
     final apiKey = await SettingService.loadApiKey(model);
 
     switch (model) {
+      case AIEngine.chatgpt_55:
       case AIEngine.chatgpt_54:
       case AIEngine.chatgpt_52:
       case AIEngine.chatgpt_51:
@@ -426,6 +434,7 @@ class ApiService {
     final apiKey = await SettingService.loadApiKey(model);
 
     switch (model) {
+      case AIEngine.chatgpt_55:
       case AIEngine.chatgpt_54:
       case AIEngine.chatgpt_52:
       case AIEngine.chatgpt_51:
