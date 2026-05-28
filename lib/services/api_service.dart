@@ -23,6 +23,8 @@ enum AIEngine {
   chatgpt_4turbo,
   gpt4,
   chatgpt_davinci002,
+  gemini35flash,
+  gemini31flashLite,
   gemini31pro,
   gemini31flash,
   gemini30pro,
@@ -30,6 +32,7 @@ enum AIEngine {
   gemini25pro,
   gemini20flash,
   gemini15pro,
+  claude48opus,
   claude47opus,
   claude46opus,
   claude45opus,
@@ -88,6 +91,9 @@ class ApiService {
   static const String NAME_chatgpt_4turbo = 'ChatGPT 4-turbo';
   static const String NAME_chatgpt_4 = 'ChatGPT 4';
   static const String NAME_chatgpt_davinci002 = 'ChatGPT davinci002';
+
+  static const String NAME_gemini35flash = 'Gemini 3.5 Flash';
+  static const String NAME_gemini31flashLite = 'Gemini 3.1 Flash-Lite';
   static const String NAME_gemini31flash = 'Gemini 3.1 Flash';
   static const String NAME_gemini31pro = 'Gemini 3.1 Pro';
   static const String NAME_gemini30pro = 'Gemini 3.0 Pro';
@@ -96,6 +102,7 @@ class ApiService {
   static const String NAME_gemini20flash = 'Gemini 2.0 Flash';
   static const String NAME_gemini15pro = 'Gemini 1.5 Pro';
 
+  static const String NAME_claude48opus = 'Claude Opus 4.8';
   static const String NAME_claude47opus = 'Claude Opus 4.7';
   static const String NAME_claude46opus = 'Claude Opus 4.6';
   static const String NAME_claude45opus = 'Claude Opus 4.5';
@@ -137,6 +144,9 @@ class ApiService {
   static const String STR_chatgpt_4turbo = "gpt-4-turbo";
   static const String STR_chatgpt_4 = "gpt-4";
   static const String STR_chatgpt_davinci002 = "davinci-002";
+
+  static const String STR_gemini35flash = 'gemini-3.5-flash';
+  static const String STR_gemini31flashLite = 'gemini-3.1-flash-lite';
   static const String STR_gemini31flash = 'gemini-3-flash-preview';
   static const String STR_gemini31pro = 'gemini-3.1-pro-preview';
   static const String STR_gemini30pro = 'gemini-3-pro-preview';
@@ -145,6 +155,7 @@ class ApiService {
   static const String STR_gemini20flash = 'gemini-2.0-flash';
   static const String STR_gemini15pro = 'gemini-1.5-pro';
 
+  static const String STR_claude48opus = 'claude-opus-4-8';
   static const String STR_claude47opus = 'claude-opus-4-7';
   static const String STR_claude46opus = 'claude-opus-4-6';
   static const String STR_claude45opus = 'claude-opus-4-5';
@@ -203,6 +214,10 @@ class ApiService {
       case AIEngine.chatgpt_davinci002:
         return NAME_chatgpt_davinci002;
 
+      case AIEngine.gemini35flash:
+        return NAME_gemini35flash;
+      case AIEngine.gemini31flashLite:
+        return NAME_gemini31flashLite;
       case AIEngine.gemini31flash:
         return NAME_gemini31flash;
       case AIEngine.gemini31pro:
@@ -218,6 +233,8 @@ class ApiService {
       case AIEngine.gemini15pro:
         return NAME_gemini15pro;
 
+      case AIEngine.claude48opus:
+        return NAME_claude48opus;
       case AIEngine.claude47opus:
         return NAME_claude47opus;
       case AIEngine.claude46opus:
@@ -299,6 +316,10 @@ class ApiService {
       case AIEngine.chatgpt_davinci002:
         return STR_chatgpt_davinci002;
 
+      case AIEngine.gemini35flash:
+        return STR_gemini35flash;
+      case AIEngine.gemini31flashLite:
+        return STR_gemini31flashLite;
       case AIEngine.gemini31flash:
         return STR_gemini31flash;
       case AIEngine.gemini31pro:
@@ -314,6 +335,8 @@ class ApiService {
       case AIEngine.gemini15pro:
         return STR_gemini15pro;
 
+      case AIEngine.claude48opus:
+        return STR_claude48opus;
       case AIEngine.claude47opus:
         return STR_claude47opus;
       case AIEngine.claude46opus:
@@ -386,6 +409,8 @@ class ApiService {
         return _sendToChatGPT(modelStr, userInput, apiKey);
       case AIEngine.chatgpt_davinci002:
         return _sendToChatGPTLegacy(modelStr, userInput, apiKey);
+      case AIEngine.gemini35flash:
+      case AIEngine.gemini31flashLite:
       case AIEngine.gemini31flash:
       case AIEngine.gemini31pro:
       case AIEngine.gemini30pro:
@@ -394,6 +419,7 @@ class ApiService {
       case AIEngine.gemini20flash:
       case AIEngine.gemini15pro:
         return _sendToGemini(modelStr, userInput, apiKey);
+      case AIEngine.claude48opus:
       case AIEngine.claude47opus:
       case AIEngine.claude46opus:
       case AIEngine.claude45opus:
@@ -450,6 +476,8 @@ class ApiService {
         return _sendToChatGPTWithHistory(modelStr, messages, apiKey);
       case AIEngine.chatgpt_davinci002:
         return 'This model does not support thread messages.';
+      case AIEngine.gemini35flash:
+      case AIEngine.gemini31flashLite:
       case AIEngine.gemini31flash:
       case AIEngine.gemini31pro:
       case AIEngine.gemini30pro:
@@ -458,6 +486,7 @@ class ApiService {
       case AIEngine.gemini20flash:
       case AIEngine.gemini15pro:
         return _sendToGeminiWithHistory(modelStr, messages, apiKey);
+      case AIEngine.claude48opus:
       case AIEngine.claude47opus:
       case AIEngine.claude46opus:
       case AIEngine.claude45opus:
@@ -507,6 +536,7 @@ class ApiService {
             model == AIEngine.claude45opus ||
             model == AIEngine.claude46opus ||
             model == AIEngine.claude47opus ||
+            model == AIEngine.claude48opus ||
             model == AIEngine.claude46sonnet ||
             model == AIEngine.claude45sonnet ||
             model == AIEngine.claude40sonnet ||
@@ -534,6 +564,7 @@ class ApiService {
             model == AIEngine.claude45opus ||
             model == AIEngine.claude46opus ||
             model == AIEngine.claude47opus ||
+            model == AIEngine.claude48opus ||
             model == AIEngine.claude46sonnet ||
             model == AIEngine.claude45sonnet ||
             model == AIEngine.claude40sonnet ||
@@ -821,7 +852,9 @@ class ApiService {
           model == STR_claude41opus ||
           model == STR_claude45opus) {
         maxtoken = 30000;
-      } else if (model == STR_claude46opus || model == STR_claude47opus) {
+      } else if (model == STR_claude46opus ||
+          model == STR_claude47opus ||
+          model == STR_claude48opus) {
         maxtoken = 120000;
       }
 
@@ -829,7 +862,8 @@ class ApiService {
         'model': model,
         'messages': chatMessages,
         'max_tokens': maxtoken,
-        if (model != STR_claude47opus) 'temperature': 0.7,
+        if (!(model == STR_claude47opus || model == STR_claude48opus))
+          'temperature': 0.7,
       });
       Logger.log(sendJson);
       msgSendLength = sendJson.length;
@@ -928,7 +962,9 @@ class ApiService {
           model == STR_claude41opus ||
           model == STR_claude45opus) {
         maxtoken = 30000;
-      } else if (model == STR_claude46opus || model == STR_claude47opus) {
+      } else if (model == STR_claude46opus ||
+          model == STR_claude47opus ||
+          model == STR_claude48opus) {
         maxtoken = 120000;
       }
 
@@ -936,7 +972,8 @@ class ApiService {
         'model': model,
         'messages': chatMessages,
         'max_tokens': maxtoken,
-        if (model != STR_claude47opus) 'temperature': 0.7,
+        if (!(model == STR_claude47opus || model == STR_claude48opus))
+          'temperature': 0.7,
         "tools": [
           {
             "type": "web_search_20250305",
@@ -1030,7 +1067,8 @@ class ApiService {
         "model": model,
         "max_tokens": 20000,
         "messages": chatMessages,
-        if (model != STR_claude47opus) 'temperature': 0.7,
+        if (!(model == STR_claude47opus || model == STR_claude48opus))
+          'temperature': 0.7,
       });
       msgModel = model;
       msgSendLength = sendJson.length;
@@ -1463,7 +1501,8 @@ class ApiService {
             }
           ],
           'max_tokens': maxtoken,
-          if (model != STR_claude47opus) 'temperature': 0.7,
+          if (!(model == STR_claude47opus || model == STR_claude48opus))
+            'temperature': 0.7,
         });
       } else {
         sendJson = jsonEncode({
@@ -1473,7 +1512,8 @@ class ApiService {
             {'role': 'user', 'content': userInput}
           ],
           'max_tokens': maxtoken,
-          if (model != STR_claude47opus) 'temperature': 0.7,
+          if (!(model == STR_claude47opus || model == STR_claude48opus))
+            'temperature': 0.7,
         });
       }
 
@@ -1551,7 +1591,8 @@ class ApiService {
             }
           ],
           'max_tokens': maxtoken,
-          if (model != STR_claude47opus) 'temperature': 0.7,
+          if (!(model == STR_claude47opus || model == STR_claude48opus))
+            'temperature': 0.7,
         });
       } else {
         sendJson = jsonEncode({
@@ -1561,7 +1602,8 @@ class ApiService {
             {'role': 'user', 'content': userInput}
           ],
           'max_tokens': maxtoken,
-          if (model != STR_claude47opus) 'temperature': 0.7,
+          if (!(model == STR_claude47opus || model == STR_claude48opus))
+            'temperature': 0.7,
           "tools": [
             {
               "type": "web_search_20250305",
