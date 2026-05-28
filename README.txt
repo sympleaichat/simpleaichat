@@ -41,6 +41,8 @@ api_key_chatgpt35t = your_chatgpt_api_key_here
 api_key_chatgpt4t  = your_chatgpt_api_key_here
 api_key_chatgpt4 = your_chatgpt_api_key_here
 api_key_chatgptdavinci002 = your_chatgpt_api_key_here
+api_key_gemini35flash = your_gemini_api_key_here
+api_key_gemini31flashLite = your_gemini_api_key_here
 api_key_gemini31flash = your_gemini_api_key_here
 api_key_gemini31pro = your_gemini_api_key_here
 api_key_gemini30pro = your_gemini_api_key_here
@@ -48,6 +50,7 @@ api_key_gemini25flash = your_gemini_api_key_here
 api_key_gemini25pro = your_gemini_api_key_here
 api_key_gemini20flash = your_gemini_api_key_here
 api_key_gemini15pro = your_gemini_api_key_here
+api_key_claude48opus = your_claude_api_key_here
 api_key_claude47opus = your_claude_api_key_here
 api_key_claude46opus = your_claude_api_key_here
 api_key_claude45opus = your_claude_api_key_here
@@ -90,6 +93,8 @@ dark_mode = false
 | api_key_chatgpt4t   | API key for ChatGPT-4 turbo                   | api_key_chatgpt = sk-xxxxxx  |
 | api_key_chatgpt4    | API key for ChatGPT-4                         | api_key_chatgpt   = sk-xxxxxx |
 | api_key_chatgptdavinci002  | API key for ChatGPT-davinci-002        | api_key_chatgpt = sk-xxxxxx |
+| api_key_gemini35flash      | API key for Gemini 3.5 Flash           | api_key_gemini = AIxxxxxx      |
+| api_key_gemini31flashLite      | API key for Gemini 3.1 Flash Lite           | api_key_gemini = AIxxxxxx      |
 | api_key_gemini31flash      | API key for Gemini 3.1 Flash           | api_key_gemini = AIxxxxxx      |
 | api_key_gemini31pro        | API key for Gemini 3.1 Pro             | api_key_gemini = AIxxxxxx      |
 | api_key_gemini30pro        | API key for Gemini 3.0 Pro             | api_key_gemini = AIxxxxxx      |
@@ -97,6 +102,7 @@ dark_mode = false
 | api_key_gemini25pro        | API key for Gemini 2.5 Pro             | api_key_gemini = AIxxxxxx      |
 | api_key_gemini25flash      | API key for Gemini 2.0 Flash           | api_key_gemini = AIxxxxxx      |
 | api_key_gemini15pro        | API key for Gemini 1.5 Pro             | api_key_gemini = AIxxxxxx      |
+| api_key_claude48opus| API key for Claude Opus 4.8                     | api_key_claude = sk-xxxxxx     |
 | api_key_claude47opus| API key for Claude Opus 4.7                     | api_key_claude = sk-xxxxxx     |
 | api_key_claude46opus| API key for Claude Opus 4.6                     | api_key_claude = sk-xxxxxx     |
 | api_key_claude45opus| API key for Claude Opus 4.5                     | api_key_claude = sk-xxxxxx     |
@@ -156,6 +162,8 @@ ChatGPT 3.5-turbo
 ChatGPT 4-turbo
 ChatGPT 4
 ChatGPT davinci-002
+Gemini 3.5 Flash
+Gemini 3.1 Flash Lite
 Gemini 3.1 Flash
 Gemini 3.1 Pro
 Gemini 3.0 Pro
@@ -163,6 +171,7 @@ Gemini 2.5 Flash
 Gemini 2.5 Pro
 Gemini 2.0 Flash
 Gemini 1.5 Pro
+Claude Opus 4.8
 Claude Opus 4.7
 Claude Opus 4.6
 Claude Opus 4.5
