@@ -7,7 +7,9 @@ A fast, ad-free, fully local AI chat client for Windows.
 
 Designed for Claude, ChatGPT, Gemini, Grok, DeepSeek, Mistral — with full message editing and local history.
 
-🔔[news] Support for GTP 5.5 API API!🔔
+🔔[news]Support for Claude Opus 4.8 API🔔
+🔔[news]Support for Claude Gemini 3.5 Flash API🔔
+🔔[news]Support for Claude Gemini 3.1 Flash Lite API🔔
 
 Download for Desktop<br>
 ([Windows](https://github.com/sympleaichat/simpleaichat/raw/refs/heads/main/SimpleAIChatSetup.exe)) 
