@@ -747,10 +747,39 @@ class ApiService {
     try {
       final systemPrompt = await SystemService.loadSystem();
 
-      final userHistory = [
-        {"text": systemPrompt},
-        ...messages.map((m) => {"text": "${m.role}: ${m.content}"})
+      // final userHistory = [
+      //   {"text": systemPrompt},
+      //   ...messages.map((m) => {"text": "${m.role}: ${m.content}"})
+      // ];
+      final List<Map<String, dynamic>> userHistory = [
+        <String, dynamic>{"text": systemPrompt},
+        ...messages
+            .map((m) => <String, dynamic>{"text": "${m.role}: ${m.content}"})
       ];
+      // ファイルが選択されている場合、履歴の末尾にパーツとして追加
+      if (ApiService.pdffilePath != "" && ApiService.pdffilePath != null) {
+        final file = File(ApiService.pdffilePath!);
+        final bytes = await file.readAsBytes();
+        final base64String = base64Encode(bytes);
+        final mimeType = _getMimeType(ApiService.pdffilePath!);
+
+        if (mimeType == 'text/plain') {
+          // 💡 テキストファイルの場合は、そのまま文字列として読み込んで "text" に入れる
+          final fileContent = await file.readAsString();
+          userHistory.add(
+              {"text": "【添付ファイル: ${ApiService.pdffileName}】\n$fileContent"});
+        } else {
+          // 画像やPDFなどは今まで通りBase64化して inlineData で送る
+          final bytes = await file.readAsBytes();
+          final base64String = base64Encode(bytes);
+          userHistory.add({
+            "inlineData": {
+              "mimeType": mimeType,
+              "data": base64String,
+            }
+          });
+        }
+      }
 
       final sendJson = jsonEncode({
         "contents": [
@@ -1421,16 +1450,62 @@ class ApiService {
     try {
       String systemPrompt = await SystemService.loadSystem();
 
-      final sendJson = jsonEncode({
-        "contents": [
-          {
-            "parts": [
-              {"text": systemPrompt},
-              {"text": userInput}
+      String sendJson = "";
+
+      if (ApiService.pdffilePath != "" && ApiService.pdffilePath != null) {
+        final file = File(ApiService.pdffilePath!);
+        final bytes = await file.readAsBytes();
+
+        final mimeType = _getMimeType(ApiService.pdffilePath!);
+
+        if (mimeType == 'text/plain') {
+          // 💡 テキストファイルの場合は、そのまま文字列として読み込んで "text" に入れる
+          final fileContent = await file.readAsString();
+
+          final base64String = base64Encode(bytes);
+          sendJson = jsonEncode({
+            "contents": [
+              {
+                "parts": [
+                  {"text": systemPrompt},
+                  {"text": userInput},
+                  {"text": "【添付ファイル: ${ApiService.pdffileName}】\n$fileContent"}
+                ]
+              }
             ]
-          }
-        ]
-      });
+          });
+        } else {
+          final base64String = base64Encode(bytes);
+          sendJson = jsonEncode({
+            "contents": [
+              {
+                "parts": [
+                  {"text": systemPrompt},
+                  {"text": userInput},
+                  {
+                    "inlineData": {
+                      "mimeType": mimeType,
+                      "data": base64String,
+                    }
+                  }
+                ]
+              }
+            ]
+          });
+        }
+      } else {
+        sendJson = jsonEncode({
+          "contents": [
+            {
+              "parts": [
+                {"text": systemPrompt},
+                {"text": userInput}
+              ]
+            }
+          ]
+        });
+      }
+
       Logger.log(sendJson);
       msgSendLength = sendJson.length;
       msgModel = model;
@@ -1454,6 +1529,24 @@ class ApiService {
     } catch (e) {
       print('Gemini API error: $e');
       return 'Gemini Error occurred.';
+    }
+  }
+
+// api_service.dart の ApiService クラス内に追記
+  static String _getMimeType(String filePath) {
+    final extension = filePath.split('.').last.toLowerCase();
+    switch (extension) {
+      case 'pdf':
+        return 'application/pdf';
+      case 'jpg':
+      case 'jpeg':
+        return 'image/jpeg';
+      case 'png':
+        return 'image/png';
+      case 'txt':
+        return 'text/plain';
+      default:
+        return 'application/octet-stream';
     }
   }
 

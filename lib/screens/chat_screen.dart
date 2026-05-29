@@ -1334,36 +1334,12 @@ class _ChatScreenState extends State<ChatScreen> {
                           ApiService.currentEngine == AIEngine.claude45sonnet ||
                           ApiService.currentEngine == AIEngine.claude40sonnet ||
                           ApiService.currentEngine == AIEngine.claude45haiku)
-                        const SizedBox(width: 8),
-                      if (ApiService.currentEngine == AIEngine.chatgpt_4o ||
-                          ApiService.currentEngine == AIEngine.chatgpt_4omini ||
-                          ApiService.currentEngine == AIEngine.claude40opus ||
-                          ApiService.currentEngine == AIEngine.claude41opus ||
-                          ApiService.currentEngine == AIEngine.claude45opus ||
-                          ApiService.currentEngine == AIEngine.claude46opus ||
-                          ApiService.currentEngine == AIEngine.claude47opus ||
-                          ApiService.currentEngine == AIEngine.claude48opus ||
-                          ApiService.currentEngine == AIEngine.claude46sonnet ||
-                          ApiService.currentEngine == AIEngine.claude45sonnet ||
-                          ApiService.currentEngine == AIEngine.claude40sonnet ||
-                          ApiService.currentEngine == AIEngine.claude45haiku)
                         IconButton(
                           icon: const Icon(Icons.language),
                           onPressed: () => _sendMessage(_controller.text, true),
                           tooltip: 'Web',
                           color: Theme.of(context).primaryColor,
                         ),
-                      if (ApiService.currentEngine == AIEngine.claude41opus ||
-                          ApiService.currentEngine == AIEngine.claude40opus ||
-                          ApiService.currentEngine == AIEngine.claude45opus ||
-                          ApiService.currentEngine == AIEngine.claude46opus ||
-                          ApiService.currentEngine == AIEngine.claude47opus ||
-                          ApiService.currentEngine == AIEngine.claude48opus ||
-                          ApiService.currentEngine == AIEngine.claude46sonnet ||
-                          ApiService.currentEngine == AIEngine.claude45sonnet ||
-                          ApiService.currentEngine == AIEngine.claude40sonnet ||
-                          ApiService.currentEngine == AIEngine.claude45haiku)
-                        const SizedBox(width: 8),
                       if (ApiService.currentEngine == AIEngine.claude41opus ||
                           ApiService.currentEngine == AIEngine.claude40opus ||
                           ApiService.currentEngine == AIEngine.claude45opus ||
@@ -1381,6 +1357,44 @@ class _ChatScreenState extends State<ChatScreen> {
                                 await FilePicker.platform.pickFiles(
                               type: FileType.custom,
                               allowedExtensions: ['pdf'],
+                            );
+
+                            if (result != null) {
+                              setState(() {
+                                ApiService.pdffilePath =
+                                    result.files.single.path;
+                                ApiService.pdffileName =
+                                    result.files.single.name;
+                              });
+                            } else {}
+                          },
+                          tooltip: 'Pdf',
+                          color: Theme.of(context).primaryColor,
+                        ),
+                      if (ApiService.currentEngine == AIEngine.gemini35flash ||
+                          ApiService.currentEngine ==
+                              AIEngine.gemini31flashLite ||
+                          ApiService.currentEngine == AIEngine.gemini31pro ||
+                          ApiService.currentEngine == AIEngine.gemini31flash ||
+                          ApiService.currentEngine == AIEngine.gemini30pro ||
+                          ApiService.currentEngine == AIEngine.gemini25flash ||
+                          ApiService.currentEngine == AIEngine.gemini25pro ||
+                          ApiService.currentEngine == AIEngine.gemini20flash ||
+                          ApiService.currentEngine == AIEngine.gemini15pro)
+                        IconButton(
+                          icon: const Icon(Icons.insert_drive_file_outlined),
+                          onPressed: () async {
+                            FilePickerResult? result =
+                                await FilePicker.platform.pickFiles(
+                              type: FileType.custom,
+// 許可する拡張子に jpg, jpeg, png, txt を追加
+                              allowedExtensions: [
+                                'pdf',
+                                'jpg',
+                                'jpeg',
+                                'png',
+                                'txt'
+                              ],
                             );
 
                             if (result != null) {
