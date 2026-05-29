@@ -9,6 +9,8 @@ Designed for Claude, ChatGPT, Gemini, Grok, DeepSeek, Mistral — with full mess
 
 🔔[news]Support for Claude Opus 4.8 , Gemini 3.5 Flash, Gemini 3.1 Flash Lite API🔔
 
+🔔It is now possible to attach files when using the Gemini API.🔔
+
 Download for Desktop<br>
 ([Windows](https://github.com/sympleaichat/simpleaichat/raw/refs/heads/main/SimpleAIChatSetup.exe)) 
 
